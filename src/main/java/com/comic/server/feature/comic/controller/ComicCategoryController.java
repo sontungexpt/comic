@@ -1,18 +1,27 @@
 package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
+import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.service.ComicCategoryService;
+import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.security.RolesAllowed;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-public record ComicCategoryController(ComicCategoryService comicCategoryService) {
+@RequiredArgsConstructor
+public class ComicCategoryController {
+
+  private final ComicCategoryService comicCategoryService;
 
   @Operation(
       summary = "Retrieve Categories of Comics",
@@ -30,5 +39,27 @@ public record ComicCategoryController(ComicCategoryService comicCategoryService)
             pageable.getPageNumber() == 0
                 ? comicCategoryService.getAllComicCategories()
                 : comicCategoryService.getAllComicCategories(pageable));
+  }
+
+  @Operation(
+      summary = "Create a new Category",
+      description =
+          "This endpoint creates a new category for a comic, and returns the created"
+              + " category. This endpoint is only accessible to users with the 'ADMIN' role.")
+  @PostMapping("")
+  @RolesAllowed(RoleType.Fields.ADMIN)
+  public ResponseEntity<?> createCategory(@RequestBody ComicCategory category) {
+    return ResponseEntity.ok().body(comicCategoryService.createComicCategory(category));
+  }
+
+  @Operation(
+      summary = "Create multiple Categories",
+      description =
+          "This endpoint creates multiple categories for a comic, and returns the created"
+              + " categories.This endpoint is only accessible to users with the 'ADMIN' role.")
+  @PostMapping("/bulk")
+  @RolesAllowed(RoleType.Fields.ADMIN)
+  public ResponseEntity<?> createCategories(@RequestBody Iterable<ComicCategory> categories) {
+    return ResponseEntity.ok().body(comicCategoryService.createComicCategories(categories));
   }
 }

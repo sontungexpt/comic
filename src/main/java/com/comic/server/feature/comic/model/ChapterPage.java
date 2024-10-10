@@ -9,7 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChapterPage {
 
-  int number;
+  private int number;
+
+  private String imagePath;
 
   public String getChapterImageFileName() {
     return "chapter-" + number + ".jpg";

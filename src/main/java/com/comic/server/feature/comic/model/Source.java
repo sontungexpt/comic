@@ -2,10 +2,12 @@ package com.comic.server.feature.comic.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class Source {
 
   @Schema(description = "The URL of the source where the comic was originally fetched")

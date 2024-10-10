@@ -11,23 +11,21 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document(collection = "comics")
+@Builder
 @JsonIgnoreProperties(
     value = {
-      "id",
-      "slug",
       "statusUpdatedAt",
-      "createdAt",
-      "updatedAt",
     },
     allowGetters = true)
-@Builder
 public class Comic implements Sluggable {
 
   public enum Status {
@@ -67,7 +65,13 @@ public class Comic implements Sluggable {
   @Setter(AccessLevel.NONE)
   private Instant statusUpdatedAt = Instant.now();
 
-  @Schema(description = "The original source was the comic was fetch")
+  @Schema(description = "The publication date of the comic")
+  private Instant publicationDate;
+
+  @Schema(description = "The rating of the comic")
+  private Double rating;
+
+  @Schema(description = "The original source from which the comic was fetched")
   private Source originalSource;
 
   private List<Author> authors;
@@ -82,12 +86,16 @@ public class Comic implements Sluggable {
 
   private List<Character> characters;
 
+  @CreatedBy private String createdBy;
+
   @CreatedDate private Instant createdAt;
+
+  @LastModifiedBy private String updatedBy;
 
   @LastModifiedDate private Instant updatedAt;
 
   @Override
-  public String createSlugFrom() {
+  public String generateSlug() {
     return name;
   }
 }

@@ -3,6 +3,7 @@ package com.comic.server.event;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.comic.server.common.model.Sluggable;
 import com.github.slugify.Slugify;
+import java.util.Locale;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
@@ -15,14 +16,20 @@ public class SluggableModelListener extends AbstractMongoEventListener<Sluggable
   @Override
   public void onBeforeSave(BeforeSaveEvent<Sluggable> event) {
     Sluggable sluggable = event.getSource();
-    String creatorName = sluggable.createSlugFrom();
-    if (StringUtils.hasText(creatorName) && !StringUtils.hasText(sluggable.getSlug())) {
-      final Slugify slg = Slugify.builder().build();
-      sluggable.setSlug(slg.slugify(creatorName) + "-" + NanoIdUtils.randomNanoId());
+    String slug = sluggable.getSlug();
+
+    if (!StringUtils.hasText(slug)) {
+      String sourceString = sluggable.generateSlug();
+      if (StringUtils.hasText(sourceString)) {
+        final Slugify slg = Slugify.builder().locale(Locale.ENGLISH).build();
+        slug = slg.slugify(sourceString) + "-" + NanoIdUtils.randomNanoId();
+      } else {
+        throw new IllegalArgumentException("Slug is required");
+      }
     }
     Document document = event.getDocument();
     if (document != null) {
-      document.put("slug", sluggable.getSlug());
+      document.put(sluggable.getSlugFieldName(), slug);
     }
   }
 }

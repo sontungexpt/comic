@@ -1,0 +1,997 @@
+[
+	{
+		"_id": "6598f2f968e54cf5b50a29d4",
+		"name": "Wind Breaker",
+		"slug": "wind-breaker",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "wind-breaker-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4d6",
+				"name": "Manga",
+				"slug": "manga"
+			},
+			{
+				"id": "6508654905d5791ad671a4ec",
+				"name": "School Life",
+				"slug": "school-life"
+			},
+			{
+				"id": "6508654905d5791ad671a4f6",
+				"name": "Shounen",
+				"slug": "shounen"
+			}
+		],
+		"updatedAt": "2024-10-10T09:21:05.595Z",
+		"chaptersLatest": [
+			{
+				"filename": "Wind Breaker (Nii Satoru) [Chap 132-152]",
+				"chapter_name": "152",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/6707820cc926626890a36aea"
+			}
+		]
+	},
+	{
+		"_id": "658f7b9968e54cf5b5090590",
+		"name": "Kingdom - Vương Giả Thiên Hạ",
+		"slug": "kingdom-vuong-gia-thien-ha",
+		"origin_name": ["Kingdom", "Vương Giả Thiên Hạ"],
+		"status": "ongoing",
+		"thumb_url": "kingdom-vuong-gia-thien-ha-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4a6",
+				"name": "Adventure",
+				"slug": "adventure"
+			},
+			{
+				"id": "6508654905d5791ad671a4be",
+				"name": "Drama",
+				"slug": "drama"
+			},
+			{
+				"id": "6508654905d5791ad671a4ce",
+				"name": "Historical",
+				"slug": "historical"
+			},
+			{
+				"id": "6508654905d5791ad671a4d6",
+				"name": "Manga",
+				"slug": "manga"
+			},
+			{
+				"id": "6508654905d5791ad671a4f0",
+				"name": "Seinen",
+				"slug": "seinen"
+			}
+		],
+		"updatedAt": "2024-10-10T09:20:48.599Z",
+		"chaptersLatest": [
+			{
+				"filename": "Vương Giả Thiên Hạ [Chap 804-811]",
+				"chapter_name": "811",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/6706311dc926626890a3659b"
+			}
+		]
+	},
+	{
+		"_id": "659380ef68e54cf5b5091ae8",
+		"name": "Vô Tận Thôn Phệ",
+		"slug": "vo-tan-thon-phe",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "vo-tan-thon-phe-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e2",
+				"name": "Mystery",
+				"slug": "mystery"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:20:35.533Z",
+		"chaptersLatest": [
+			{
+				"filename": "Vô Tận Thôn Phệ [Chap 205]",
+				"chapter_name": "205",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781ddc705a578a7f7a095"
+			}
+		]
+	},
+	{
+		"_id": "6584ff2068e54cf5b508c4bc",
+		"name": "Vô Địch Học Bạ Hệ Thống",
+		"slug": "vo-dich-hoc-ba-he-thong",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "vo-dich-hoc-ba-he-thong-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e2",
+				"name": "Mystery",
+				"slug": "mystery"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:20:21.678Z",
+		"chaptersLatest": [
+			{
+				"filename": "Vô Địch Học Bạ Hệ Thống [Chap 157]",
+				"chapter_name": "157",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781d3c926626890a36aa3"
+			}
+		]
+	},
+	{
+		"_id": "658e76de68e54cf5b508fd32",
+		"name": "Vạn Tướng Chi Vương",
+		"slug": "van-tuong-chi-vuong",
+		"origin_name": [""],
+		"status": "coming_soon",
+		"thumb_url": "van-tuong-chi-vuong-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e2",
+				"name": "Mystery",
+				"slug": "mystery"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:20:06.505Z",
+		"chaptersLatest": [
+			{
+				"filename": "Vạn Tướng Chi Vương [Chap 322]",
+				"chapter_name": "322",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781d0c705a578a7f7a08e"
+			}
+		]
+	},
+	{
+		"_id": "658f7caa10dc9c0a7e2e4ba9",
+		"name": "Vạn Cổ Chí Tôn",
+		"slug": "van-co-chi-ton",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "van-co-chi-ton-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4ac",
+				"name": "Chuyển Sinh",
+				"slug": "chuyen-sinh"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e2",
+				"name": "Mystery",
+				"slug": "mystery"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			},
+			{
+				"id": "6508654a05d5791ad671a516",
+				"name": "Xuyên Không",
+				"slug": "xuyen-khong"
+			}
+		],
+		"updatedAt": "2024-10-10T09:19:53.584Z",
+		"chaptersLatest": [
+			{
+				"filename": "Vạn Cổ Chí Tôn [Chap 353-354]",
+				"chapter_name": "354",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781cbc926626890a36a9d"
+			}
+		]
+	},
+	{
+		"_id": "658a43de68e54cf5b508e4a0",
+		"name": "Trọng Sinh Địa Cầu Tiên Tôn",
+		"slug": "trong-sinh-dia-cau-tien-ton",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "trong-sinh-dia-cau-tien-ton-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4a6",
+				"name": "Adventure",
+				"slug": "adventure"
+			},
+			{
+				"id": "6508654905d5791ad671a4a9",
+				"name": "Anime",
+				"slug": "anime"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			}
+		],
+		"updatedAt": "2024-10-10T09:19:40.413Z",
+		"chaptersLatest": [
+			{
+				"filename": "Trọng Sinh Địa Cầu Tiên Tôn [Chap 258]",
+				"chapter_name": "258",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781c2c705a578a7f7a088"
+			}
+		]
+	},
+	{
+		"_id": "658f7bc668e54cf5b50905dd",
+		"name": "Tokimori-san Chẳng Chút Phòng Bị!!",
+		"slug": "tokimori-san-chang-chut-phong-bi",
+		"origin_name": [
+			"Tokimori",
+			"san ga Muboubi desu!!",
+			"Tokimari",
+			"san is Completely Defenseless!!"
+		],
+		"status": "ongoing",
+		"thumb_url": "tokimori-san-chang-chut-phong-bi-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4d6",
+				"name": "Manga",
+				"slug": "manga"
+			},
+			{
+				"id": "6508654905d5791ad671a4ea",
+				"name": "Romance",
+				"slug": "romance"
+			},
+			{
+				"id": "6508654a05d5791ad671a4fa",
+				"name": "Slice of Life",
+				"slug": "slice-of-life"
+			}
+		],
+		"updatedAt": "2024-10-10T09:19:27.305Z",
+		"chaptersLatest": [
+			{
+				"filename": "Tokimori-San Chẳng Chút Phòng Bị!! [Chap 43-48]",
+				"chapter_name": "48",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670781b1c926626890a36a94"
+			}
+		]
+	},
+	{
+		"_id": "659381bc68e54cf5b5091c63",
+		"name": "Tôi Phải Làm Một Kẻ Đại Xấu Xa",
+		"slug": "toi-phai-lam-mot-ke-dai-xau-xa",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "toi-phai-lam-mot-ke-dai-xau-xa-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4c1",
+				"name": "Đam Mỹ",
+				"slug": "dam-my"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			},
+			{
+				"id": "6508654a05d5791ad671a516",
+				"name": "Xuyên Không",
+				"slug": "xuyen-khong"
+			}
+		],
+		"updatedAt": "2024-10-10T09:19:13.908Z",
+		"chaptersLatest": [
+			{
+				"filename": "Tôi Phải Làm Một Kẻ Đại Xấu Xa [Chap 149]",
+				"chapter_name": "149",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078184c926626890a36a7f"
+			}
+		]
+	},
+	{
+		"_id": "6593826d10dc9c0a7e2e6077",
+		"name": "Tiểu Thiếu Gia Gia Tộc Tài Phiệt",
+		"slug": "tieu-thieu-gia-gia-toc-tai-phiet",
+		"origin_name": ["Cậu Út Nhà Tài Phiệt"],
+		"status": "ongoing",
+		"thumb_url": "tieu-thieu-gia-gia-toc-tai-phiet-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4be",
+				"name": "Drama",
+				"slug": "drama"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			},
+			{
+				"id": "6508654a05d5791ad671a514",
+				"name": "Webtoon",
+				"slug": "webtoon"
+			}
+		],
+		"updatedAt": "2024-10-10T09:19:03.204Z",
+		"chaptersLatest": [
+			{
+				"filename": "Tiểu Thiếu Gia Gia Tộc Tài Phiệt [Chap 106-118]",
+				"chapter_name": "118",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078182c926626890a36a7c"
+			}
+		]
+	},
+	{
+		"_id": "658f7c5110dc9c0a7e2e4b15",
+		"name": "Thực Long Ma Pháp Sư",
+		"slug": "thuc-long-ma-phap-su",
+		"origin_name": ["Phệ Long Ma Pháp Sư"],
+		"status": "ongoing",
+		"thumb_url": "thuc-long-ma-phap-su-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:18:33.431Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thực Long Ma Pháp Sư [Chap 76]",
+				"chapter_name": "76",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/6707815dc926626890a36a57"
+			}
+		]
+	},
+	{
+		"_id": "658f7d9c10dc9c0a7e2e4d29",
+		"name": "Thiết Huyết Kiếm Sĩ Hồi Quy",
+		"slug": "thiet-huyet-kiem-si-hoi-quy",
+		"origin_name": ["Thiết Huyết Cẩu Kiếm Sĩ Báo Thù"],
+		"status": "ongoing",
+		"thumb_url": "thiet-huyet-kiem-si-hoi-quy-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:18:23.872Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thiết Huyết Kiếm Sĩ Hồi Quy [Chap 81]",
+				"chapter_name": "81",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078159c926626890a36a51"
+			}
+		]
+	},
+	{
+		"_id": "6598f40b10dc9c0a7e2f726e",
+		"name": "Thiên Phú Bóng Đá, Tất Cả Đều Là Của Tôi!",
+		"slug": "thien-phu-bong-da-tat-ca-deu-la-cua-toi",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "thien-phu-bong-da-tat-ca-deu-la-cua-toi-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4ac",
+				"name": "Chuyển Sinh",
+				"slug": "chuyen-sinh"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a502",
+				"name": "Sports",
+				"slug": "sports"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:18:10.723Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thiên Phú Bóng Đá Tất Cả Đều Là Của Tôi! [Chap 74]",
+				"chapter_name": "74",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078145c705a578a7f7a046"
+			}
+		]
+	},
+	{
+		"_id": "65fe80d166b83f0711116c0a",
+		"name": "Thiên Ma Quy Hoàn",
+		"slug": "thien-ma-quy-hoan",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "thien-ma-quy-hoan-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4a6",
+				"name": "Adventure",
+				"slug": "adventure"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:17:46.898Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thiên Ma Quy Hoàn [Chap 37]",
+				"chapter_name": "37",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078143c705a578a7f7a041"
+			}
+		]
+	},
+	{
+		"_id": "6598f42968e54cf5b50a2e56",
+		"name": "Thiên Ma Không Muốn Thăng Cấp",
+		"slug": "thien-ma-khong-muon-thang-cap",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "thien-ma-khong-muon-thang-cap-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:17:37.793Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thiên Ma Không Muốn Thăng Cấp [Chap 61-62]",
+				"chapter_name": "62",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078141c705a578a7f7a03b"
+			}
+		]
+	},
+	{
+		"_id": "6593816768e54cf5b5091bcf",
+		"name": "Thể Thao Cực Hạn",
+		"slug": "the-thao-cuc-han",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "the-thao-cuc-han-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4be",
+				"name": "Drama",
+				"slug": "drama"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a502",
+				"name": "Sports",
+				"slug": "sports"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:17:23.160Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thể Thao Cực Hạn [Chap 500-518]",
+				"chapter_name": "518",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/67078179c705a578a7f7a082"
+			}
+		]
+	},
+	{
+		"_id": "658e773410dc9c0a7e2e4335",
+		"name": "The New Gate",
+		"slug": "the-new-gate",
+		"origin_name": [""],
+		"status": "coming_soon",
+		"thumb_url": "the-new-gate-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4a6",
+				"name": "Adventure",
+				"slug": "adventure"
+			},
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4be",
+				"name": "Drama",
+				"slug": "drama"
+			},
+			{
+				"id": "6508654905d5791ad671a4c7",
+				"name": "Fantasy",
+				"slug": "fantasy"
+			},
+			{
+				"id": "6508654905d5791ad671a4ea",
+				"name": "Romance",
+				"slug": "romance"
+			},
+			{
+				"id": "6508654905d5791ad671a4f6",
+				"name": "Shounen",
+				"slug": "shounen"
+			}
+		],
+		"updatedAt": "2024-10-10T09:16:55.375Z",
+		"chaptersLatest": [
+			{
+				"filename": "The New Gate [Chap 103-104]",
+				"chapter_name": "104",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780f4c926626890a36a4a"
+			}
+		]
+	},
+	{
+		"_id": "65864eb168e54cf5b508ce4e",
+		"name": "The Fairytale-like You Goes On The Assault",
+		"slug": "the-fairytale-like-you-goes-on-the-assault",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "the-fairytale-like-you-goes-on-the-assault-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4d6",
+				"name": "Manga",
+				"slug": "manga"
+			},
+			{
+				"id": "6508654905d5791ad671a4ea",
+				"name": "Romance",
+				"slug": "romance"
+			},
+			{
+				"id": "6508654a05d5791ad671a4fa",
+				"name": "Slice of Life",
+				"slug": "slice-of-life"
+			}
+		],
+		"updatedAt": "2024-10-10T09:16:28.662Z",
+		"chaptersLatest": [
+			{
+				"filename": "The Fairytale-Like You Goes On The Assault [Chap 33]",
+				"chapter_name": "33",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780e7c705a578a7f7a027"
+			}
+		]
+	},
+	{
+		"_id": "66f3cd2e80217a7ba9b4ee8d",
+		"name": "Thanh Mai Trúc Mã Của Đệ Nhất Thiên Hạ",
+		"slug": "thanh-mai-truc-ma-cua-de-nhat-thien-ha",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "thanh-mai-truc-ma-cua-de-nhat-thien-ha-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			}
+		],
+		"updatedAt": "2024-10-10T09:16:16.050Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thanh Mai Trúc Mã Của Đệ Nhất Thiên Hạ [Chap 30]",
+				"chapter_name": "30",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780e6c705a578a7f7a023"
+			}
+		]
+	},
+	{
+		"_id": "658e779b68e54cf5b508ff1e",
+		"name": "Thần Trù Cuồng Hậu",
+		"slug": "than-tru-cuong-hau",
+		"origin_name": [""],
+		"status": "coming_soon",
+		"thumb_url": "than-tru-cuong-hau-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4af",
+				"name": "Comedy",
+				"slug": "comedy"
+			},
+			{
+				"id": "6508654905d5791ad671a4b2",
+				"name": "Comic",
+				"slug": "comic"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e4",
+				"name": "Ngôn Tình",
+				"slug": "ngon-tinh"
+			},
+			{
+				"id": "6508654905d5791ad671a4ea",
+				"name": "Romance",
+				"slug": "romance"
+			},
+			{
+				"id": "6508654905d5791ad671a4f2",
+				"name": "Shoujo",
+				"slug": "shoujo"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:16:05.630Z",
+		"chaptersLatest": [
+			{
+				"filename": "Thần Trù Cuồng Hậu [Chap 68]",
+				"chapter_name": "68",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780dcc926626890a36a41"
+			}
+		]
+	},
+	{
+		"_id": "663319ca66b83f071122f4d2",
+		"name": "Tay Súng Chinh Phục Võ Lâm",
+		"slug": "tay-sung-chinh-phuc-vo-lam",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "tay-sung-chinh-phuc-vo-lam-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4da",
+				"name": "Manhwa",
+				"slug": "manhwa"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:15:52.691Z",
+		"chaptersLatest": [
+			{
+				"filename": "Tay Súng Chinh Phục Võ Lâm [Chap 27-31]",
+				"chapter_name": "31",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780e2c705a578a7f7a01c"
+			}
+		]
+	},
+	{
+		"_id": "65f5455466b83f07110de6e3",
+		"name": "Ta Là Chúa Tể Tùng Lâm",
+		"slug": "ta-la-chua-te-tung-lam",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "ta-la-chua-te-tung-lam-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4c7",
+				"name": "Fantasy",
+				"slug": "fantasy"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654a05d5791ad671a504",
+				"name": "Supernatural",
+				"slug": "supernatural"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:15:39.936Z",
+		"chaptersLatest": [
+			{
+				"filename": "Ta Là Chúa Tể Tùng Lâm [Chap 4-6]",
+				"chapter_name": "6",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780d6c926626890a36a3b"
+			}
+		]
+	},
+	{
+		"_id": "6598f47910dc9c0a7e2f7405",
+		"name": "Ta Học Trảm Thần Trong Bệnh Viện Tâm Thần",
+		"slug": "ta-hoc-tram-than-trong-benh-vien-tam-than",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "ta-hoc-tram-than-trong-benh-vien-tam-than-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a4be",
+				"name": "Drama",
+				"slug": "drama"
+			},
+			{
+				"id": "6508654905d5791ad671a4d0",
+				"name": "Horror",
+				"slug": "horror"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654905d5791ad671a4e2",
+				"name": "Mystery",
+				"slug": "mystery"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:15:27.614Z",
+		"chaptersLatest": [
+			{
+				"filename": "Ta Học Trảm Thần Trong Bệnh Viện Tâm Thần [Chap 154]",
+				"chapter_name": "154",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780c0c926626890a36a30"
+			}
+		]
+	},
+	{
+		"_id": "657e5d0510dc9c0a7e2ddfb4",
+		"name": "Ta Có Thể Thấy Tỉ Lệ Thành Công",
+		"slug": "ta-co-the-thay-ti-le-thanh-cong",
+		"origin_name": [""],
+		"status": "ongoing",
+		"thumb_url": "ta-co-the-thay-ti-le-thanh-cong-thumb.jpg",
+		"sub_docquyen": false,
+		"category": [
+			{
+				"id": "6508654905d5791ad671a491",
+				"name": "Action",
+				"slug": "action"
+			},
+			{
+				"id": "6508654905d5791ad671a4d8",
+				"name": "Manhua",
+				"slug": "manhua"
+			},
+			{
+				"id": "6508654a05d5791ad671a510",
+				"name": "Truyện Màu",
+				"slug": "truyen-mau"
+			}
+		],
+		"updatedAt": "2024-10-10T09:15:16.200Z",
+		"chaptersLatest": [
+			{
+				"filename": "Ta Có Thể Thấy Tỉ Lệ Thành Công [Chap 209-210]",
+				"chapter_name": "210",
+				"chapter_title": "",
+				"chapter_api_data": "https://sv1.otruyencdn.com/v1/api/chapter/670780bec926626890a36a2a"
+			}
+		]
+	}
+]

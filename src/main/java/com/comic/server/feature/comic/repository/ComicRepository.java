@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface ComicRepository extends MongoRepository<Comic, String> {
 
   Optional<Comic> findBySlug(String slug);
+
+  Optional<Comic> findByName(String name);
 }

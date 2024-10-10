@@ -48,7 +48,8 @@ public record ComicCategoryDBInit(
     for (Object jsonObject : jsonObjectList) {
       Map<String, Object> jsonMap = objectMapper.convertValue(jsonObject, Map.class);
       String name = (String) jsonMap.get("name");
-      categories.add(new ComicCategory(name));
+      ComicCategory category = new ComicCategory(name);
+      categories.add(category);
     }
 
     return categories;

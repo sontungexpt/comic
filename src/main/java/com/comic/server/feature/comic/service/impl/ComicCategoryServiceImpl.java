@@ -14,12 +14,12 @@ public record ComicCategoryServiceImpl(ComicCategoryRepository comicCategoryRepo
 
   @Override
   public Page<ComicCategory> getAllComicCategories(Pageable pageable) {
-    return comicCategoryRepository.findAll(pageable);
+    return comicCategoryRepository.findByDeleted(false, pageable);
   }
 
   @Override
   public List<ComicCategory> getAllComicCategories() {
-    return comicCategoryRepository.findAll();
+    return comicCategoryRepository.findByDeleted(false);
   }
 
   @Override

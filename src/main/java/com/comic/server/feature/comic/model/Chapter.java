@@ -26,6 +26,8 @@ public class Chapter {
 
   private String comicId;
 
+  private String baseUrl;
+
   @NotNull
   @Min(1)
   @Schema(description = "The number of the chapter", example = "1")
