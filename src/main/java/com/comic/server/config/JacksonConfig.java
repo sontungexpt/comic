@@ -1,5 +1,7 @@
 package com.comic.server.config;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -10,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class BeanConfig {
+public class JacksonConfig {
 
   @Bean
   @Primary
@@ -21,6 +23,10 @@ public class BeanConfig {
     // module.addDeserializer(Slice.class, new SliceDeserializer());
     // module.addSerializer(Slice.class, new SliceSerializer());
     // mapper.registerModule(module);
+
+    mapper
+        .configOverride(String.class)
+        .setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
 
     return mapper
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

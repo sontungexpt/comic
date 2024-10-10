@@ -2,10 +2,12 @@ package com.comic.server.feature.auth.controller;
 
 import com.comic.server.annotation.BearerToken;
 import com.comic.server.annotation.PublicEndpoint;
+import com.comic.server.config.OpenApiConfig;
 import com.comic.server.feature.auth.dto.LoginRequest;
 import com.comic.server.feature.auth.dto.RegistrationRequest;
 import com.comic.server.feature.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.ServletException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,7 @@ public record AuthController(AuthService authService) {
 
   @PostMapping("/refresh-token")
   @Operation(summary = "Refresh the expired jwt authentication")
+  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> refreshToken(@BearerToken String refreshToken) throws ServletException {
     return ResponseEntity.ok(authService.refreshToken(refreshToken));
   }

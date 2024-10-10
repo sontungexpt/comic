@@ -3,7 +3,6 @@ package com.comic.server.feature.user.model;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.comic.server.feature.user.enums.RoleType;
 import com.comic.server.feature.user.enums.UserStatus;
-import com.comic.server.feature.user.model.authorization.Role;
 import com.comic.server.validation.annotation.OptimizedName;
 import com.comic.server.validation.annotation.Password;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -71,7 +70,8 @@ public class User implements UserDetails, Persistable<String> {
   private UserStatus status = UserStatus.ACTIVE;
 
   @Schema(description = "The roles of the account")
-  private Set<Role> roles;
+  @Default
+  private Set<RoleType> roles = Set.of(RoleType.READER);
 
   @CreatedDate
   @Schema(description = "The created time of the account")
@@ -86,7 +86,7 @@ public class User implements UserDetails, Persistable<String> {
   @JsonIgnore @Transient private Collection<? extends GrantedAuthority> authorities;
 
   public boolean hasRole(RoleType roleType) {
-    return roles.stream().anyMatch(r -> r.getName().equals(roleType));
+    return roles.stream().anyMatch(r -> r.equals(roleType));
   }
 
   public User(User user) {
@@ -109,17 +109,10 @@ public class User implements UserDetails, Persistable<String> {
     } else {
       if (authorities == null || authorities.isEmpty()) {
         Collection<SimpleGrantedAuthority> auths = new HashSet<>();
-        // roles.forEach(
-        //     role -> {
-        //       auths.add(new SimpleGrantedAuthority("ROLE_" + role.getName().name()));
-        //       if (role.getPermissions() != null) {
-        //         role.getPermissions().stream()
-        //             .forEach(
-        //                 permission -> {
-        //                   auths.add(new SimpleGrantedAuthority(permission.name()));
-        //                 });
-        //       }
-        //     });
+        roles.forEach(
+            role -> {
+              auths.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+            });
         authorities = auths;
       }
       return authorities;

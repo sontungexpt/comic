@@ -107,15 +107,14 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-    apiEndpointSecurityInspector.getPublicEndpoints().add("/api/v1/auth/**");
+    apiEndpointSecurityInspector.getPublicEndpoints().add("/v1/auth/**");
     apiEndpointSecurityInspector.getPublicEndpoints().add("/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(
             customizer -> {
-              customizer.disable();
               // customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-              // customizer.ignoringRequestMatchers("/**", "/actuator/**");
+              customizer.ignoringRequestMatchers("/**", "/actuator/**");
             })
 
         // exception handling
@@ -148,7 +147,7 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/api/v1/auth/logout")
+                    .logoutUrl("/v1/auth/logout")
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler(logoutSuccessHandler));
 
