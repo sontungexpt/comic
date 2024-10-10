@@ -1,10 +1,12 @@
 package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
+import com.comic.server.config.OpenApiConfig;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.service.ComicCategoryService;
 import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,7 @@ public class ComicCategoryController {
               + " category. This endpoint is only accessible to users with the 'ADMIN' role.")
   @PostMapping("")
   @RolesAllowed(RoleType.Fields.ADMIN)
+  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> createCategory(@RequestBody ComicCategory category) {
     return ResponseEntity.ok().body(comicCategoryService.createComicCategory(category));
   }
@@ -59,6 +62,7 @@ public class ComicCategoryController {
               + " categories.This endpoint is only accessible to users with the 'ADMIN' role.")
   @PostMapping("/bulk")
   @RolesAllowed(RoleType.Fields.ADMIN)
+  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> createCategories(@RequestBody Iterable<ComicCategory> categories) {
     return ResponseEntity.ok().body(comicCategoryService.createComicCategories(categories));
   }

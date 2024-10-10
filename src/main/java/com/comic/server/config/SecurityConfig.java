@@ -147,7 +147,7 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/v1/auth/logout")
+                    .logoutUrl("/api/v1/auth/logout")
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler(logoutSuccessHandler));
 
