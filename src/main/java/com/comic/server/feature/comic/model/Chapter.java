@@ -39,6 +39,8 @@ public class Chapter {
       example = "The first chapter of the comic")
   private String description;
 
+  private Source originalSource;
+
   List<ChapterPage> pages;
 
   @CreatedDate private Instant createdAt;

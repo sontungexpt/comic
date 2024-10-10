@@ -1,7 +1,7 @@
 package com.comic.server.event;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-import com.comic.server.common.payload.Sluggable;
+import com.comic.server.common.model.Sluggable;
 import com.github.slugify.Slugify;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -18,7 +18,7 @@ public class SluggableModelListener extends AbstractMongoEventListener<Sluggable
     String creatorName = sluggable.createSlugFrom();
     if (StringUtils.hasText(creatorName) && !StringUtils.hasText(sluggable.getSlug())) {
       final Slugify slg = Slugify.builder().build();
-      sluggable.setSlug(slg.slugify(creatorName + "-" + NanoIdUtils.randomNanoId()));
+      sluggable.setSlug(slg.slugify(creatorName) + "-" + NanoIdUtils.randomNanoId());
     }
     Document document = event.getDocument();
     if (document != null) {

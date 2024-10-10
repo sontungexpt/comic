@@ -1,4 +1,4 @@
-package com.comic.server.common.payload;
+package com.comic.server.common.model;
 
 public interface Sluggable {
   String createSlugFrom();

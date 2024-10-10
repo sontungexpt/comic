@@ -1,6 +1,6 @@
 package com.comic.server.feature.comic.model;
 
-import com.comic.server.common.payload.Sluggable;
+import com.comic.server.common.model.Sluggable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
