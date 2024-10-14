@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.service;
 
 import com.comic.server.feature.comic.dto.ComicDTO;
+import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface ComicService {
 
   List<Comic> createComics(Iterable<Comic> comics);
 
-  Comic getComic(String comicId);
+  ComicDetailDTO getComicDetail(String comicId, Pageable pageable);
 
   Page<ComicDTO> getComicsWithCategories(Pageable pageable);
 

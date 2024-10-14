@@ -1,4 +1,4 @@
-package com.comic.server.feature.comic.payload;
+package com.comic.server.feature.comic.dto;
 
 import com.comic.server.feature.comic.model.Artist;
 import com.comic.server.feature.comic.model.Author;
@@ -7,14 +7,15 @@ import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
 import com.comic.server.feature.comic.model.chapter.Chapter;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Setter
-@Builder
-public class ComicDetailPayload {
+@NoArgsConstructor
+public class ComicDetailDTO {
 
   private String id;
 
@@ -42,9 +43,12 @@ public class ComicDetailPayload {
 
   private List<String> tags;
 
-  private List<Chapter> chapters;
+  private List<Chapter> newChapters;
+
+  private Page<Chapter> chapters;
 
   private List<Character> characters;
 
+  // NOTE: Unimplemented field
   private boolean isFollowed;
 }

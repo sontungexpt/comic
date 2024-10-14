@@ -1,7 +1,7 @@
 package com.comic.server.feature.comic.service.impl;
 
-import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.dto.ComicDTO;
+import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.CustomComicRepository;
@@ -30,13 +30,6 @@ public record ComicServiceImpl(
   }
 
   @Override
-  public Comic getComic(String comicId) {
-    return comicRepository
-        .findById(comicId)
-        .orElseThrow(() -> new ResourceNotFoundException(Comic.class, "id", comicId));
-  }
-
-  @Override
   public long countComics() {
     return comicRepository.count();
   }
@@ -44,5 +37,10 @@ public record ComicServiceImpl(
   @Override
   public Page<ComicDTO> getComicsWithCategories(Pageable pageable) {
     return customComicRepository.findAllWithCategories(pageable);
+  }
+
+  @Override
+  public ComicDetailDTO getComicDetail(String comicId, Pageable pageable) {
+    return customComicRepository.findComicDetail(comicId, pageable);
   }
 }

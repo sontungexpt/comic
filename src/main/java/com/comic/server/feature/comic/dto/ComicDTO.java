@@ -5,8 +5,8 @@ import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.chapter.Chapter;
 // import com.comic.server.feature.comic.model.chapter.Chapter;
-import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.user.model.FollowedComic;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,7 +52,7 @@ public class ComicDTO {
 
   private List<String> tags;
 
-  private List<ShortInfoChapter> newChapters;
+  private List<Chapter> newChapters;
 
   private List<Character> characters;
 

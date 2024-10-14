@@ -14,4 +14,6 @@ public interface FollowedComicRepository extends MongoRepository<FollowedComic, 
   FollowedComic findByUserIdAndComicId(String userId, String comicId);
 
   void deleteByUserIdAndComicId(String userId, String comicId);
+
+  boolean existsByUserIdAndComicId(String id, String comicId);
 }

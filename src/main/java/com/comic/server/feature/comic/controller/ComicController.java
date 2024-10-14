@@ -27,4 +27,14 @@ public class ComicController {
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable));
   }
+
+  @GetMapping("/{comicId}")
+  @PublicEndpoint
+  @Operation(summary = "Get comic detail", description = "Get comic detail by comicId")
+  public ResponseEntity<?> getComicDetail(
+      String comicId,
+      @PageableDefault(page = 0, size = 20, sort = "number", direction = Sort.Direction.ASC)
+          Pageable pageable) {
+    return ResponseEntity.ok(comicService.getComicDetail(comicId, pageable));
+  }
 }
