@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+  <include resource="logback/config/properties.xml"></include>
+  <include resource="logback/appender/file-appender.xml"></include>
+  <include resource="logback/appender/smtp-appender.xml"></include>
+  <!-- Appender -->
+  <root level="INFO">
+    <springProfile name="dev|develop">
+      <appender-ref ref="CONSOLE"></appender-ref>
+    </springProfile>
+    <appender-ref ref="ASYNC_INFO_FILE"></appender-ref>
+    <appender-ref ref="ASYNC_WARN_FILE"></appender-ref>
+    <appender-ref ref="ASYNC_DEBUG_FILE"></appender-ref>
+    <appender-ref ref="ASYNC_ERROR_FILE"></appender-ref>
+    <appender-ref ref="HOT_ERROR_EMAIL_APPENDER"></appender-ref>
+  </root>
+  <logger additivity="false" level="INFO" name="com.foodey.server.logging.LoggingHttpRequestService">
+    <springProfile name="dev|develop">
+      <appender-ref ref="CONSOLE"></appender-ref>
+    </springProfile>
+    <appender-ref ref="ASYNC_HTTP_REQUEST_FILE"></appender-ref>
+  </logger>
+</configuration>

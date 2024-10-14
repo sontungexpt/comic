@@ -1,8 +1,10 @@
 package com.comic.server.feature.comic.service.impl;
 
 import com.comic.server.exceptions.ResourceNotFoundException;
+import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.repository.ComicRepository;
+import com.comic.server.feature.comic.repository.CustomComicRepository;
 import com.comic.server.feature.comic.service.ComicService;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -11,7 +13,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public record ComicServiceImpl(MongoTemplate mongoTemplate, ComicRepository comicRepository)
+public record ComicServiceImpl(
+    MongoTemplate mongoTemplate,
+    ComicRepository comicRepository,
+    CustomComicRepository customComicRepository)
     implements ComicService {
 
   @Override
@@ -37,7 +42,7 @@ public record ComicServiceImpl(MongoTemplate mongoTemplate, ComicRepository comi
   }
 
   @Override
-  public Page<Comic> getComics(Pageable pageable) {
-    return comicRepository.findAll(pageable);
+  public Page<ComicDTO> getComicsWithCategories(Pageable pageable) {
+    return customComicRepository.findAllWithCategories(pageable);
   }
 }

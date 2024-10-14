@@ -67,6 +67,7 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
           if (jwtService.isAccessTokenValid(jwtToken, user)) {
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             context.setAuthentication(authentication);
             log.debug("User {} successfully authenticated with pubId {}", user.getId(), userPubId);

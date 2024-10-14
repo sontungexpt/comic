@@ -1,5 +1,7 @@
 debug: false
 
+comic:
+
 caching:
   spring:
     userListTTL: 60000
@@ -7,12 +9,12 @@ caching:
 jwt:
   # inlaco.JWT-secret-key
   secret-key: ${JWT_SECRET_KEY}
-  access-token-expiration: 300000 # 5 mins
+  access-token-expiration: 36000000 # 5 mins
   refresh-token-expiration: 2592000000 # 30 days
 
 spring:
   application:
-    name: "crewmgrservice"
+    name: "comic"
   profiles:
     active: dev
   mail:
@@ -32,6 +34,12 @@ spring:
           auth: true
           starttls:
             enable: true
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      # uri: mongodb+srv://${MONGO_USER:admin}:${MONGO_PASSWORD}@${MONGO_DATABASE:comic-db}.mmm13.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_DATABASE:comic-db}
+      database: ${MONGO_DATABASE:comic-db}
+      autoIndexCreation: true
 
   # cache:
   #   type: caffeine
@@ -42,19 +50,13 @@ spring:
   #     - rate-limit-filter
   #   jcache:
   #     provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-  data:
-    mongodb:
-      uri: mongodb+srv://${MONGO_USER:admin}:${MONGO_PASSWORD}@${MONGO_DATABASE:comic-db}.mmm13.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_DATABASE:comic-db}
-      database: ${MONGO_DATABASE:comic-db}
-      autoIndexCreation: true
-    # redis:
-    #   host: ${REDIS_HOST}
-    #   port: ${REDIS_PORT}
-    #   password: ${REDIS_PASSWORD:IxXNUvoIE4ZywfZ8PMZ0nmVxVzKwUeC3}
-    #
+  # redis:
+  #   host: ${REDIS_HOST}
+  #   port: ${REDIS_PORT}
+  #   password: ${REDIS_PASSWORD:IxXNUvoIE4ZywfZ8PMZ0nmVxVzKwUeC3}
+  #
 
-comic:
-# cloudinary:
-#   cloud_name: ${CLOUDINARY_CLOUD_NAME:foodey}
-#   api_key: ${CLOUDINARY_API_KEY}
-#   api_secret: ${CLOUDINARY_API_SECRET}
+cloudinary:
+  cloud_name: ${CLOUDINARY_CLOUD_NAME}
+  api_key: ${CLOUDINARY_API_KEY}
+  api_secret: ${CLOUDINARY_API_SECRET}

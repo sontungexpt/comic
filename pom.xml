@@ -18,7 +18,15 @@
     <license></license>
   </licenses>
   <developers>
-    <developer></developer>
+    <developer>
+      <id>tung</id>
+      <name>Tran Vo Son Tung</name>
+      <email>sontungexpt@gmail.com</email>
+      <roles>
+        <role>backend developer</role>
+      </roles>
+      <timezone>VietNam/Ho_Chi_Minh</timezone>
+    </developer>
   </developers>
   <scm>
     <connection></connection>
@@ -31,6 +39,10 @@
     <lombok.version>1.18.34</lombok.version>
     <therapi.version>0.15.0</therapi.version>
     <jjwt.version>0.12.6</jjwt.version>
+    <cloudinary.version>2.0.0</cloudinary.version>
+    <jnanoid.version>2.0.0</jnanoid.version>
+    <dotenv.version>4.0.0</dotenv.version>
+    <slugify.version>3.0.7</slugify.version>
   </properties>
   <dependencies>
     <dependency>
@@ -93,7 +105,7 @@
     <dependency>
       <groupId>me.paulschwarz</groupId>
       <artifactId>spring-dotenv</artifactId>
-      <version>4.0.0</version>
+      <version>${dotenv.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.java-json-tools</groupId>
@@ -127,7 +139,7 @@
     <dependency>
       <groupId>com.aventrix.jnanoid</groupId>
       <artifactId>jnanoid</artifactId>
-      <version>2.0.0</version>
+      <version>${jnanoid.version}</version>
     </dependency>
     <!-- JWT -->
     <dependency>
@@ -151,7 +163,13 @@
     <dependency>
       <groupId>com.github.slugify</groupId>
       <artifactId>slugify</artifactId>
-      <version>3.0.7</version>
+      <version>${slugify.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http5 -->
+    <dependency>
+      <groupId>com.cloudinary</groupId>
+      <artifactId>cloudinary-http5</artifactId>
+      <version>${cloudinary.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -15,6 +15,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.repository.CrudRepository;
 
 @Data
 @Builder
@@ -42,7 +43,7 @@ public class RefreshToken implements Persistable<String> {
 
   @Schema(description = "Date and time when the refresh token was revoked")
   @Indexed(
-      expireAfterSeconds = 10 * 24 * 60 * 60) // automatically delete after 10 days of revocation
+      expireAfterSeconds = 1 * 24 * 60 * 60) // automatically delete after 10 days of revocation
   private Instant revokedAt;
 
   @CreatedDate private Instant createdAt;
@@ -68,9 +69,30 @@ public class RefreshToken implements Persistable<String> {
     return !isExpired() && !revoked;
   }
 
+  /**
+   * Refresh the refresh token and revoke the current one
+   *
+   * <p>NOTE: This method does not save the new refresh token to the database
+   *
+   * @return a new refresh token
+   */
   public RefreshToken refresh() {
-    token = NanoIdUtils.randomNanoId();
-    return this;
+    revoke();
+    return new RefreshToken(userPubId, expiresAt);
+  }
+
+  /**
+   * Refresh the refresh token and revoke the current one directly in the database
+   *
+   * <p>NOTE: This method saves the new refresh token to the database
+   *
+   * @return a new refresh token
+   */
+  public RefreshToken refresh(CrudRepository<RefreshToken, String> repository) {
+    revoke(repository);
+    RefreshToken newRefreshToken = new RefreshToken(userPubId, expiresAt);
+    repository.save(newRefreshToken);
+    return newRefreshToken;
   }
 
   public RefreshToken revoke() {
@@ -78,6 +100,12 @@ public class RefreshToken implements Persistable<String> {
       revoked = true;
       revokedAt = Instant.now();
     }
+    return this;
+  }
+
+  public RefreshToken revoke(CrudRepository<RefreshToken, String> repository) {
+    revoke();
+    repository.save(this);
     return this;
   }
 

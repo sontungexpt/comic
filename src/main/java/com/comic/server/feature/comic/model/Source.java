@@ -10,6 +10,10 @@ import lombok.Data;
 @Builder
 public class Source {
 
+  private String idFromSource;
+
+  private String slugFromSource;
+
   @Schema(description = "The URL of the source where the comic was originally fetched")
   private String baseUrl;
 

@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.bson.types.ObjectId;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +52,10 @@ public record ComicDBInit(
       Map<String, Object> jsonMap = objectMapper.convertValue(jsonObject, Map.class);
       String name = (String) jsonMap.get("name");
       List originalNames = objectMapper.convertValue(jsonMap.get("origin_name"), List.class);
+
+      String id = (String) jsonMap.get("_id");
+      String slug = (String) jsonMap.get("slug");
+
       String status = (String) jsonMap.get("status");
       Comic.Status comicStatus;
 
@@ -64,14 +69,14 @@ public record ComicDBInit(
         comicStatus = Comic.Status.COMPLETED;
       }
       List categories = objectMapper.convertValue(jsonMap.get("category"), List.class);
-      List<String> categoryIds = new ArrayList<>();
+      List<ObjectId> categoryIds = new ArrayList<>();
 
       for (Object category : categories) {
         Map<String, Object> categoryMap = objectMapper.convertValue(category, Map.class);
         String categoryName = (String) categoryMap.get("name");
         ComicCategory comicCategory = comicCategoryRepository.findByName(categoryName).orElse(null);
         if (comicCategory != null) {
-          categoryIds.add(comicCategory.getId());
+          categoryIds.add(new ObjectId(comicCategory.getId()));
         }
       }
 
@@ -84,7 +89,12 @@ public record ComicDBInit(
               .thumbnailUrl(
                   "https://otruyenapi.com/uploads/comics/" + (String) jsonMap.get("thumb_url"))
               .originalSource(
-                  Source.builder().name("otruyen").baseUrl("https://otruyenapi.com").build())
+                  Source.builder()
+                      .idFromSource(id)
+                      .slugFromSource(slug)
+                      .name("otruyen")
+                      .baseUrl("https://otruyenapi.com")
+                      .build())
               .build();
 
       comics.add(comic);

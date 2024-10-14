@@ -1,21 +1,19 @@
 package com.comic.server.feature.comic.service.impl;
 
+import com.comic.server.exceptions.ResourceAlreadyInUseException;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.service.ComicCategoryService;
+import com.comic.server.utils.ConsoleUtils;
+import com.comic.server.utils.DuplicateKeyUtils;
+import com.comic.server.utils.DuplicateKeyUtils.KeyValue;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service
 public record ComicCategoryServiceImpl(ComicCategoryRepository comicCategoryRepository)
     implements ComicCategoryService {
-
-  @Override
-  public Page<ComicCategory> getAllComicCategories(Pageable pageable) {
-    return comicCategoryRepository.findByDeleted(false, pageable);
-  }
 
   @Override
   public List<ComicCategory> getAllComicCategories() {
@@ -24,12 +22,29 @@ public record ComicCategoryServiceImpl(ComicCategoryRepository comicCategoryRepo
 
   @Override
   public ComicCategory createComicCategory(ComicCategory category) {
-    return comicCategoryRepository.save(category);
+    try {
+      return comicCategoryRepository.save(category);
+    } catch (DuplicateKeyException e) {
+      throw new ResourceAlreadyInUseException(ComicCategory.class, "name", category.getName());
+    }
   }
 
   @Override
   public List<ComicCategory> createComicCategories(Iterable<ComicCategory> iterable) {
-    return comicCategoryRepository.saveAll(iterable);
+    try {
+      return comicCategoryRepository.saveAll(iterable);
+    } catch (DuplicateKeyException e) {
+      KeyValue keyValue =
+          DuplicateKeyUtils.extractDuplicateField(e.getMessage())
+              .orElseThrow(
+                  () -> new ResourceAlreadyInUseException(ComicCategory.class, "name", "unknown"));
+
+      ConsoleUtils.prettyPrint(keyValue.getKey());
+      ConsoleUtils.prettyPrint(keyValue.getValue());
+
+      throw new ResourceAlreadyInUseException(
+          ComicCategory.class, keyValue.getKey(), keyValue.getValue());
+    }
   }
 
   @Override

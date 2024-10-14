@@ -1,5 +1,6 @@
 package com.comic.server.feature.comic.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -7,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public abstract class Person {
 
-  private String name;
+  @NotBlank private String name;
 
   private String description;
 

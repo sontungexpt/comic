@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+  <property resource="application.yml"></property>
+  <property name="LOG_DIR" value="logs"></property>
+  <property name="LOG_PATH_INFO" value="${LOG_DIR}/infos"></property>
+  <property name="LOG_PATH_DEBUG" value="${LOG_DIR}/debugs"></property>
+  <property name="LOG_PATH_ERROR" value="${LOG_DIR}/errors"></property>
+  <property name="LOG_PATH_WARN" value="${LOG_DIR}/warns"></property>
+  <property name="LOG_PATH_HTTP_REQUEST" value="${LOG_DIR}/https"></property>
+  <!-- Pattern -->
+  <property name="LOG_FILE_PATTERN" value="%d{dd-MM-yyyy HH:mm:ss.SSS} %-5level --- [%thread] %logger{36}.%M : %msg%n"></property>
+  <property name="LOG_DATEFORMAT_PATTERN" value="dd-MM-yyyy'T'HH:mm:ss.SSSXXX"></property>
+  <!-- Include defuaults-->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"></include>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"></include>
+  <include resource="org/springframework/boot/logging/logback/file-appender.xml"></include>
+</included>

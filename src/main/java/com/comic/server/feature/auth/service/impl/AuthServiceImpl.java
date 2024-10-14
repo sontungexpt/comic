@@ -44,9 +44,7 @@ public record AuthServiceImpl(
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     final String accessToken = jwtService.generateAccessToken(user);
-    final RefreshToken refreshToken = jwtService.generateRefreshToken(user);
-
-    refreshTokenRepository.save(refreshToken);
+    final RefreshToken refreshToken = jwtService.generateRefreshTokenAndSaveToDB(user);
 
     log.info("Account with public id {} logged in successfully", user.getPubId());
 
@@ -81,20 +79,27 @@ public record AuthServiceImpl(
                 });
 
     if (savedRefreshToken.isRevoked()) {
+      handleRefreshtokenIntrusion(savedRefreshToken);
       throw new JwtTokenException(refreshToken, "Refresh token revoked");
     } else if (savedRefreshToken.isExpired()) {
-      refreshTokenRepository.save(savedRefreshToken.revoke());
+      savedRefreshToken.revoke(refreshTokenRepository);
       throw new JwtTokenException(refreshToken, "Refresh token expired");
     }
 
-    String newAccessToken = jwtService.generateAccessToken(savedRefreshToken.getUserPubId());
-    RefreshToken updatedRefreshToken = refreshTokenRepository.save(savedRefreshToken.refresh());
+    String userPubId = savedRefreshToken.getUserPubId();
+    String newAccessToken = jwtService.generateAccessToken(userPubId);
+
+    RefreshToken newRefreshToken = savedRefreshToken.refresh(refreshTokenRepository);
 
     log.info(
         "Refresh token {} refreshed successfully for user with public id {}",
         refreshToken,
         savedRefreshToken.getUserPubId());
 
-    return new JwtResponse(newAccessToken, updatedRefreshToken.getToken());
+    return new JwtResponse(newAccessToken, newRefreshToken.getToken());
+  }
+
+  public void handleRefreshtokenIntrusion(RefreshToken refreshToken) {
+    log.warn("Infiltration detected");
   }
 }

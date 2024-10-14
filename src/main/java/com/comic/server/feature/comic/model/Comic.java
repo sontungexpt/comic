@@ -1,16 +1,24 @@
 package com.comic.server.feature.comic.model;
 
 import com.comic.server.common.model.Sluggable;
+import com.comic.server.common.structure.BoundedPriorityQueue;
+import com.comic.server.feature.comic.model.chapter.Chapter;
+import com.comic.server.feature.comic.support.NewChapterComparator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.util.List;
+import java.util.Queue;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -43,9 +51,9 @@ public class Comic implements Sluggable {
 
   List<String> originalNames;
 
-  @Schema(description = "The short description of the comic")
+  @Schema(description = "The short summary of the comic")
   @NotBlank
-  private String description;
+  private String summary;
 
   @Schema(description = "The URL of the comic intro image")
   private String thumbnailUrl;
@@ -63,30 +71,30 @@ public class Comic implements Sluggable {
 
   @Default
   @Setter(AccessLevel.NONE)
+  @JsonIgnore
   private Instant statusUpdatedAt = Instant.now();
 
-  @Schema(description = "The publication date of the comic")
-  private Instant publicationDate;
-
   @Schema(description = "The rating of the comic")
-  private Double rating;
+  @Default
+  private Double rating = 0.0;
 
   @Schema(description = "The original source from which the comic was fetched")
   private Source originalSource;
 
-  private List<Author> authors;
+  private List<@Valid Author> authors;
 
-  private List<Artist> artists;
+  private List<@Valid Artist> artists;
 
-  private List<String> categoryIds;
+  @NotEmpty private List<ObjectId> categoryIds;
 
   private List<String> tags;
 
-  private Chapter lastChapter;
+  @Default
+  private Queue<Chapter> newChapters = new BoundedPriorityQueue<>(3, new NewChapterComparator());
 
-  private List<Character> characters;
+  private List<@Valid Character> characters;
 
-  @CreatedBy private String createdBy;
+  @CreatedBy private ObjectId createdBy;
 
   @CreatedDate private Instant createdAt;
 
