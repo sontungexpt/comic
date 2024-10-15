@@ -45,7 +45,14 @@ public class CustomComicRepository {
     @SuppressWarnings("unchecked")
     List<ComicDTO> comics =
         ((List<Map<String, Object>>) results.get("dataFacet"))
-            .stream().map(object -> objectMapper.convertValue(object, ComicDTO.class)).toList();
+            .stream()
+                .map(
+                    object -> {
+                      ComicDTO comic = objectMapper.convertValue(object, ComicDTO.class);
+                      comic.setId(object.get("_id").toString());
+                      return comic;
+                    })
+                .toList();
 
     @SuppressWarnings("unchecked")
     int totalCount =

@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,4 +27,6 @@ public class Source {
 
   @Schema(description = "Additional details about the source")
   private String description;
+
+  private Instant lastSyncedAt;
 }

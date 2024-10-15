@@ -65,5 +65,9 @@ public class ComicChapter extends Chapter {
     return file;
   }
 
+  public String getUploadPath() {
+    return "comic/" + getId();
+  }
+
   @NotEmpty List<Page> pages;
 }

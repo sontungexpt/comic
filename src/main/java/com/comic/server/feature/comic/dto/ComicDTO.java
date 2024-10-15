@@ -6,8 +6,6 @@ import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 
 @Getter
 @Setter
@@ -25,16 +22,6 @@ import org.bson.types.ObjectId;
 public class ComicDTO implements Serializable {
 
   private String id;
-
-  @JsonSetter("_id")
-  public void setId(ObjectId id) {
-    this.id = id.toHexString();
-  }
-
-  @JsonGetter("id")
-  public String getId() {
-    return id;
-  }
 
   private String name;
 

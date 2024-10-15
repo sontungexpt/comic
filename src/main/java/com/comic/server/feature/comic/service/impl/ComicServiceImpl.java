@@ -7,7 +7,9 @@ import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.repository.ChapterRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.CustomComicRepository;
+import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.feature.comic.service.GetComicService;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -20,8 +22,9 @@ public record ComicServiceImpl(
     MongoTemplate mongoTemplate,
     ComicRepository comicRepository,
     ChapterRepository chapterRepository,
-    CustomComicRepository customComicRepository)
-    implements ComicService {
+    CustomComicRepository customComicRepository,
+    OtruyenComicServiceImpl otruyenComicService)
+    implements ComicService, ChainGetComicService {
 
   @Override
   public Comic createComic(Comic comic) {
@@ -45,11 +48,33 @@ public record ComicServiceImpl(
 
   @Override
   public ComicDetailDTO getComicDetail(String comicId, Pageable pageable) {
-    return customComicRepository.findComicDetail(comicId, pageable);
+    ComicDetailDTO comicDetail = customComicRepository.findComicDetail(comicId, pageable);
+
+    // getNextService().getComicDetail(comicDetail.getOriginalSource().getSlugFromSource(),
+    // pageable);
+
+    return comicDetail;
   }
 
   @Override
   public List<ShortInfoChapter> getChaptersByComicId(String comicId) {
-    return chapterRepository.findByComicIdOrderByNumDesc(new ObjectId(comicId));
+    List<ShortInfoChapter> chapters =
+        chapterRepository.findByComicIdOrderByNumDesc(new ObjectId(comicId));
+
+    // ConsoleUtils.prettyPrint(
+    //     getNextService()
+    //         .getChaptersByComicId(
+    //             getComicDetail(comicId, Pageable.unpaged())
+    //                 .getOriginalSource()
+    //                 .getSlugFromSource()));
+
+    return chapters;
+
+    // ConsoleUtils.prettyPrint(object);
+  }
+
+  @Override
+  public GetComicService getNextService() {
+    return otruyenComicService;
   }
 }

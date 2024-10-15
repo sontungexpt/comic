@@ -44,11 +44,6 @@ public abstract class Chapter {
     this.id = id.toHexString();
   }
 
-  @JsonGetter("_id")
-  public void setId(String id) {
-    this.id = id;
-  }
-
   @JsonGetter("id")
   public String getId() {
     return id;
