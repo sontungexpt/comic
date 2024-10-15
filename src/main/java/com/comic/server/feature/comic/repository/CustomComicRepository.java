@@ -4,7 +4,11 @@ import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.user.repository.FollowedComicRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,23 +23,38 @@ public class CustomComicRepository {
   private final MongoTemplate mongoTemplate;
   private final ChapterRepository chapterRepository;
   private final FollowedComicRepository followedComicRepository;
+  private final ObjectMapper objectMapper;
 
   public Page<ComicDTO> findAllWithCategories(Pageable pageable) {
+
     Aggregation aggregation =
         Aggregation.newAggregation(
             Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
-            Aggregation.sort(pageable.getSort()),
-            Aggregation.skip(pageable.getOffset()),
-            Aggregation.limit(pageable.getPageSize() + 1));
+            Aggregation.facet(Aggregation.count().as("totalComics"))
+                .as("countFacet")
+                .and(
+                    Aggregation.sort(pageable.getSort()),
+                    Aggregation.skip(pageable.getOffset()),
+                    Aggregation.limit(pageable.getPageSize()),
+                    Aggregation.project(ComicDTO.class))
+                .as("dataFacet"));
 
-    var comics =
-        mongoTemplate.aggregate(aggregation, Comic.class, ComicDTO.class).getMappedResults();
+    var results =
+        mongoTemplate.aggregate(aggregation, Comic.class, Map.class).getUniqueMappedResult();
 
-    return new PageImpl<>(comics, pageable, comics.size());
+    @SuppressWarnings("unchecked")
+    List<ComicDTO> comics =
+        ((List<Map<String, Object>>) results.get("dataFacet"))
+            .stream().map(object -> objectMapper.convertValue(object, ComicDTO.class)).toList();
+
+    @SuppressWarnings("unchecked")
+    int totalCount =
+        (int) ((List<Map<String, Object>>) results.get("countFacet")).get(0).get("totalComics");
+
+    return new PageImpl<>(comics, pageable, totalCount);
   }
 
   public ComicDetailDTO findComicDetail(String comicId, Pageable pageable) {
-    var chapters = chapterRepository.findByComicId(comicId, pageable);
 
     Aggregation aggregation =
         Aggregation.newAggregation(
@@ -47,8 +66,10 @@ public class CustomComicRepository {
             .aggregate(aggregation, Comic.class, ComicDetailDTO.class)
             .getUniqueMappedResult();
 
+    comics.setChapters(
+        chapterRepository.findByComicIdOrderByNumDesc(new ObjectId(comicId), pageable));
+
     // comics.setFollowed(followedComicRepository.existsByUserIdAndComicId(userId, comicId));
-    comics.setChapters(chapters);
     return comics;
   }
 }

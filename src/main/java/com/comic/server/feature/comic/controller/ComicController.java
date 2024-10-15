@@ -37,4 +37,11 @@ public class ComicController {
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicDetail(comicId, pageable));
   }
+
+  @GetMapping("/{comicId}/chapters")
+  @PublicEndpoint
+  @Operation(summary = "Get chapters", description = "Get chapters by comicId")
+  public ResponseEntity<?> getChaptersByComicId(String comicId) {
+    return ResponseEntity.ok(comicService.getChaptersByComicId(comicId));
+  }
 }

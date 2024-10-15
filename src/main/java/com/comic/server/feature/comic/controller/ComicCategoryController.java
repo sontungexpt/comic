@@ -27,9 +27,7 @@ public class ComicCategoryController {
       summary = "Retrieve Categories of Comics",
       description =
           "This endpoint retrieves the categories associated with a specific comic. "
-              + "If the 'page' parameter is set to 0, all categories will be returned. "
-              + "If the 'page' parameter is set to a positive integer, pagination will be applied "
-              + "to return only the categories for that specific page.")
+              + "This endpoint is accessible to all users.")
   @GetMapping("")
   @PublicEndpoint
   public ResponseEntity<?> getAllCategories() {

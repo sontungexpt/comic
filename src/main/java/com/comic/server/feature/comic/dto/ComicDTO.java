@@ -5,30 +5,40 @@ import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
-import com.comic.server.feature.comic.model.chapter.Chapter;
-// import com.comic.server.feature.comic.model.chapter.Chapter;
-import com.comic.server.feature.user.model.FollowedComic;
+import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ComicDTO {
+@Builder
+public class ComicDTO implements Serializable {
 
   private String id;
 
+  @JsonSetter("_id")
+  public void setId(ObjectId id) {
+    this.id = id.toHexString();
+  }
+
+  @JsonGetter("id")
+  public String getId() {
+    return id;
+  }
+
   private String name;
 
-  List<String> originalNames;
+  private List<String> originalNames;
 
   private String summary;
 
@@ -48,18 +58,9 @@ public class ComicDTO {
 
   private List<ComicCategory> categories;
 
-  @JsonIgnore private List<FollowedComic> followedUsers;
-
   private List<String> tags;
 
-  private List<Chapter> newChapters;
+  private Iterable<ShortInfoChapter> newChapters;
 
   private List<Character> characters;
-
-  // private boolean isFollowed;
-
-  @JsonGetter("followed")
-  public boolean isFollowed() {
-    return followedUsers != null && !followedUsers.isEmpty();
-  }
 }

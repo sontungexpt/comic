@@ -1,5 +1,6 @@
 package com.comic.server.feature.comic.model.chapter;
 
+import com.cloudinary.StoredFile;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -56,6 +57,12 @@ public class ComicChapter extends Chapter {
     public String getImageFileName() {
       return "chapter-" + number + ".jpg";
     }
+  }
+
+  public StoredFile getUpload() {
+    StoredFile file = new StoredFile();
+    pages.forEach(page -> file.setPreloadedFile(page.getPath()));
+    return file;
   }
 
   @NotEmpty List<Page> pages;

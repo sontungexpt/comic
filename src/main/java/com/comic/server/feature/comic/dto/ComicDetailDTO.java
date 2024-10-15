@@ -5,7 +5,7 @@ import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
-import com.comic.server.feature.comic.model.chapter.Chapter;
+import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,9 +43,9 @@ public class ComicDetailDTO {
 
   private List<String> tags;
 
-  private List<Chapter> newChapters;
+  private List<ShortInfoChapter> newChapters;
 
-  private Page<Chapter> chapters;
+  private Page<ShortInfoChapter> chapters;
 
   private List<Character> characters;
 

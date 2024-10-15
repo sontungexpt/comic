@@ -1,4 +1,4 @@
-package com.inlaco.crewmgrservice.notify.mail;
+package com.comic.server.feature.notify.mail;
 
 /** EmailType */
 public enum EmailType {

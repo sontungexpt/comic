@@ -12,7 +12,7 @@ public class NewChapterComparator implements Comparator<Chapter> {
     } else if (o1 == null || o2 == null) {
       return 0;
     } else {
-      return o1.getNumber().compareTo(o2.getNumber());
+      return o1.getNum().compareTo(o2.getNum());
     }
   }
 }

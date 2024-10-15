@@ -3,11 +3,15 @@ package com.comic.server.feature.comic.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
+@Getter
+@Setter
 public class Source {
 
   private String idFromSource;

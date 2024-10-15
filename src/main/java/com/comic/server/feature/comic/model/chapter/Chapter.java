@@ -1,15 +1,17 @@
 package com.comic.server.feature.comic.model.chapter;
 
 import com.comic.server.feature.comic.model.Source;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +19,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
 @Document(collection = "chapters")
 @JsonIgnoreProperties(
     value = {
@@ -31,11 +32,38 @@ import org.springframework.data.mongodb.core.mapping.Document;
     property = "type",
     defaultImpl = ComicChapter.class)
 @SuperBuilder
+@Data
+@Getter
+@Setter
 public abstract class Chapter {
 
   @Id private String id;
 
-  @NotBlank private ObjectId comicId;
+  @JsonSetter("_id")
+  public void setId(ObjectId id) {
+    this.id = id.toHexString();
+  }
+
+  @JsonGetter("_id")
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  @JsonGetter("id")
+  public String getId() {
+    return id;
+  }
+
+  @NotNull private ObjectId comicId;
+
+  public String getComicId() {
+    return comicId.toHexString();
+  }
+
+  public void setComicId(@JsonSetter("comicId") ObjectId comicId) {
+
+    this.comicId = comicId;
+  }
 
   public void setComicId(@JsonSetter("comicId") String comicId) {
     this.comicId = new ObjectId(comicId);
@@ -50,7 +78,12 @@ public abstract class Chapter {
   @Schema(
       description = "The number of the chapter",
       examples = {"1", "2", "2.5"})
-  private Double number;
+  private Double num;
+
+  @JsonGetter("chapter")
+  public String getChapter() {
+    return "Chapter " + num;
+  }
 
   @Schema(description = "The name of the chapter", example = "The last hero")
   private String name;
