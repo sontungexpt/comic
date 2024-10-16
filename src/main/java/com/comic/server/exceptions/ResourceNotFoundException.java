@@ -1,5 +1,7 @@
 package com.comic.server.exceptions;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,9 +11,9 @@ import org.springframework.lang.NonNull;
 @Slf4j
 public class ResourceNotFoundException extends BaseException {
 
-  private final String resourceName;
-  private final String fieldName;
-  private final Object fieldValue;
+  private String resourceName;
+
+  private Map<String, Object> conflictFields = new HashMap<>();
 
   public <T> ResourceNotFoundException(
       Class<T> resourceName, String conflictFieldName, Object conflictFieldValue) {
@@ -34,13 +36,35 @@ public class ResourceNotFoundException extends BaseException {
       resourceName.getDeclaredField(conflictFieldName);
 
       this.resourceName = resourceName.getSimpleName();
-      this.fieldName = conflictFieldName;
-      this.fieldValue = conflictFieldValue;
+      this.conflictFields.put(conflictFieldName, conflictFieldValue);
     } catch (NoSuchFieldException e) {
       log.error("Field {} not found in class {}", conflictFieldName, resourceName.getSimpleName());
       throw new RuntimeException(
           String.format(
               "Field %s not found in class %s", conflictFieldName, resourceName.getSimpleName()));
     }
+  }
+
+  public <T> ResourceNotFoundException(Class<T> resourceName, Map<String, Object> conflictFields) {
+    this(
+        String.format("%s already in use with %s", resourceName, conflictFields.toString()),
+        resourceName,
+        conflictFields);
+  }
+
+  public <T> ResourceNotFoundException(
+      String message, @NonNull Class<T> resourceName, Map<String, Object> conflictFields) {
+    super(HttpStatus.CONFLICT, message);
+    this.resourceName = resourceName.getSimpleName();
+    this.conflictFields = conflictFields;
+  }
+
+  @Override
+  public Object getData() {
+    return new Object() {
+      public Map<String, Object> getConflictFields() {
+        return conflictFields;
+      }
+    };
   }
 }

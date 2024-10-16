@@ -41,20 +41,19 @@ spring:
       database: ${MONGO_DATABASE:comic-db}
       autoIndexCreation: true
 
-  # cache:
-  #   type: caffeine
-  #   caffeine:
-  #     spec: maximumSize=100000,expireAfterAccess=3600s
-  #   cache-names:
-  #     - rate-limit-buckets
-  #     - rate-limit-filter
-  #   jcache:
-  #     provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=3600s
+    # cache-names:
+    #   - rate-limit-buckets
+    #   - rate-limit-filter
+    jcache:
+      provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
   # redis:
   #   host: ${REDIS_HOST}
   #   port: ${REDIS_PORT}
   #   password: ${REDIS_PASSWORD:IxXNUvoIE4ZywfZ8PMZ0nmVxVzKwUeC3}
-  #
 
 cloudinary:
   cloud_name: ${CLOUDINARY_CLOUD_NAME}

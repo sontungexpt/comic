@@ -27,4 +27,8 @@ public abstract class BaseException extends RuntimeException {
   public int getStatusCode() {
     return status.value();
   }
+
+  public Object getData() {
+    return null;
+  }
 }

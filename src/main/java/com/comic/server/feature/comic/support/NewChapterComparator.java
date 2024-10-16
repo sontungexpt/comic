@@ -7,10 +7,10 @@ public class NewChapterComparator implements Comparator<Chapter> {
 
   @Override
   public int compare(Chapter o1, Chapter o2) {
-    if (o1 == o2) {
-      return 0;
-    } else if (o1 == null || o2 == null) {
-      return 0;
+
+    // update after 3 hours is considered new and be prioritized
+    if (o1.getUpdatedAt().minusSeconds(60 * 60 * 3).isAfter(o2.getUpdatedAt())) {
+      return 1;
     } else {
       return o1.getNum().compareTo(o2.getNum());
     }

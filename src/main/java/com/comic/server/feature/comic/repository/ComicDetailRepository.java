@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomComicRepository {
+public class ComicDetailRepository {
   private final MongoTemplate mongoTemplate;
   private final ChapterRepository chapterRepository;
   private final FollowedComicRepository followedComicRepository;

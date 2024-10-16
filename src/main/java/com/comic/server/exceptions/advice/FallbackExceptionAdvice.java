@@ -63,6 +63,7 @@ public class FallbackExceptionAdvice {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<?> handleUnwantedException(Exception e, HttpServletRequest request) {
+    e.printStackTrace();
     log.error(e.getClass().getSimpleName() + ": " + e.getMessage());
     return ExceptionResponse.builder(e, HttpStatus.INTERNAL_SERVER_ERROR)
         .request(request)

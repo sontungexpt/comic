@@ -1,14 +1,10 @@
 package com.comic.server.config;
 
-import com.comic.server.feature.auth.jwt.AuthEntryPointJwt;
-import com.comic.server.feature.auth.jwt.LazyJwtAuthTokenFilter;
-import com.comic.server.utils.ApiEndpointSecurityInspector;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -21,25 +17,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
-@Profile("prod")
-public class SecurityConfig {
-  private final LazyJwtAuthTokenFilter lazyJwtAuthTokenFilter;
+@Profile("dev")
+public class DevSecurityConfig {
   private final UserDetailsService userDetailsService;
-  private final AuthEntryPointJwt unauthorizedHandler;
-  private final ApiEndpointSecurityInspector apiEndpointSecurityInspector;
-  private final LogoutSuccessHandler logoutSuccessHandler;
-  private final LogoutHandler logoutHandler;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -56,6 +44,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers) {
+
     return new ProviderManager(providers);
   }
 
@@ -109,8 +98,6 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-    apiEndpointSecurityInspector.getPublicEndpoints().add("/v1/auth/**");
-    apiEndpointSecurityInspector.getPublicEndpoints().add("/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(
@@ -119,39 +106,13 @@ public class SecurityConfig {
               customizer.ignoringRequestMatchers("/**", "/actuator/**");
             })
 
-        // exception handling
-        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-
         // session management
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
         // authorize
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(
-                        apiEndpointSecurityInspector.getPublicEndpoints().toArray(String[]::new))
-                    .permitAll()
-                    .requestMatchers(
-                        HttpMethod.GET,
-                        apiEndpointSecurityInspector.getPublicGetEndpoints().toArray(String[]::new))
-                    .permitAll()
-                    .requestMatchers(
-                        HttpMethod.POST,
-                        apiEndpointSecurityInspector
-                            .getPublicPostEndpoints()
-                            .toArray(String[]::new))
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .authenticationProvider(authenticationProvider())
-        .addFilterBefore(lazyJwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout(
-            logout ->
-                logout
-                    .logoutUrl("/api/v1/auth/logout")
-                    .addLogoutHandler(logoutHandler)
-                    .logoutSuccessHandler(logoutSuccessHandler));
+            auth -> auth.requestMatchers("/**").permitAll().anyRequest().permitAll());
 
     return http.build();
   }

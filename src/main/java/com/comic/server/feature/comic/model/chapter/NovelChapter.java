@@ -10,7 +10,17 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Setter
-public class NovelChapter extends Chapter {
+public class NovelChapter extends AbstractChapter {
 
   @NotBlank private String content;
+
+  public NovelChapter() {
+    super();
+    setType(ChapterType.COMIC);
+  }
+
+  public NovelChapter(AbstractChapter chapter) {
+    super(chapter);
+    setType(ChapterType.COMIC);
+  }
 }

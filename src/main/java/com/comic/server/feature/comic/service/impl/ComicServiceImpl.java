@@ -5,26 +5,28 @@ import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.repository.ChapterRepository;
+import com.comic.server.feature.comic.repository.ComicDetailRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
-import com.comic.server.feature.comic.repository.CustomComicRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.comic.service.ComicService;
 import com.comic.server.feature.comic.service.GetComicService;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public record ComicServiceImpl(
-    MongoTemplate mongoTemplate,
-    ComicRepository comicRepository,
-    ChapterRepository chapterRepository,
-    CustomComicRepository customComicRepository,
-    OtruyenComicServiceImpl otruyenComicService)
-    implements ComicService, ChainGetComicService {
+@RequiredArgsConstructor
+public class ComicServiceImpl implements ComicService, ChainGetComicService {
+
+  private final ComicRepository comicRepository;
+  private final ChapterRepository chapterRepository;
+  private final ComicDetailRepository customComicRepository;
+  private final OtruyenComicServiceImpl otruyenComicService;
 
   @Override
   public Comic createComic(Comic comic) {
@@ -32,6 +34,7 @@ public record ComicServiceImpl(
   }
 
   @Override
+  @CacheEvict(value = "comics", allEntries = true)
   public List<Comic> createComics(Iterable<Comic> comics) {
     return comicRepository.saveAll(comics);
   }
@@ -42,6 +45,8 @@ public record ComicServiceImpl(
   }
 
   @Override
+  @Cacheable(value = "comics", key = "#pageable.pageNumber")
+  // @Cacheable(value = "comics", key = "#pageable.pageNumber")
   public Page<ComicDTO> getComicsWithCategories(Pageable pageable) {
     return customComicRepository.findAllWithCategories(pageable);
   }

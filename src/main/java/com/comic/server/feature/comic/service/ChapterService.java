@@ -1,10 +1,10 @@
 package com.comic.server.feature.comic.service;
 
-import com.comic.server.feature.comic.model.chapter.Chapter;
+import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 
 public interface ChapterService {
 
-  Chapter getChapterDetailById(String id);
+  AbstractChapter getChapterDetailById(String id);
 
-  Chapter createChapter(Chapter chapter);
+  AbstractChapter createChapter(AbstractChapter chapter);
 }

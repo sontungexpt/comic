@@ -8,12 +8,15 @@ import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,7 +45,8 @@ public class ComicCategoryController {
   @PostMapping("")
   @RolesAllowed(RoleType.Fields.ADMIN)
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
-  public ResponseEntity<?> createCategory(@RequestBody ComicCategory category) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<?> createCategory(@Valid @RequestBody ComicCategory category) {
     return ResponseEntity.ok().body(comicCategoryService.createComicCategory(category));
   }
 
@@ -54,7 +58,8 @@ public class ComicCategoryController {
   @PostMapping("/bulk")
   @RolesAllowed(RoleType.Fields.ADMIN)
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
-  public ResponseEntity<?> createCategories(@RequestBody Iterable<ComicCategory> categories) {
+  public ResponseEntity<?> createCategories(
+      @RequestBody Iterable<@Valid ComicCategory> categories) {
     return ResponseEntity.ok().body(comicCategoryService.createComicCategories(categories));
   }
 }

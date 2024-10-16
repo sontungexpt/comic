@@ -39,6 +39,7 @@ public class ExceptionResponse extends ApiResponse {
           .message(ex.getMessage())
           .status(ex.getStatus())
           .exception(ex.getClass().getSimpleName())
+          .data(ex.getData())
           .cause(ex.getCause() != null ? ex.getCause().getClass().getSimpleName() : null);
     }
   }

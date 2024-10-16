@@ -6,6 +6,7 @@ import com.comic.server.feature.comic.model.Source;
 import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.utils.ConsoleUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
@@ -13,11 +14,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public record ComicDBInit(
     ObjectMapper objectMapper,
     ComicService comicService,
@@ -33,10 +36,12 @@ public record ComicDBInit(
 
     try {
       String json = Files.readString(Paths.get("src/main/resources/static/raws/comic.json"));
+      List<Comic> comics = convert(json);
 
-      comicService.createComics(convert(json));
+      comicService.createComics(comics);
 
     } catch (Exception e) {
+      ConsoleUtils.prettyPrint(e);
       throw new RuntimeException("Error when create assetlinks");
     }
   }
@@ -98,6 +103,7 @@ public record ComicDBInit(
               .build();
 
       comics.add(comic);
+      log.info("Imported comic: {}", comic);
     }
 
     return comics;

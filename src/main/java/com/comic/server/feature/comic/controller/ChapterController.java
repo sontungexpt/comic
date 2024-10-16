@@ -1,7 +1,7 @@
 package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
-import com.comic.server.feature.comic.model.chapter.Chapter;
+import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.service.ChapterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,15 +22,9 @@ public class ChapterController {
   @GetMapping("/{chapterId}")
   @Operation(summary = "Get chapter by id", description = "Get chapter by id")
   @PublicEndpoint
-  public Chapter getChapterDetailById(@PathVariable("chapterId") String chapterId) {
+  public AbstractChapter getChapterDetailById(@PathVariable("chapterId") String chapterId) {
     return chapterService.getChapterDetailById(chapterId);
   }
-
-  // @PostMapping
-  // public ChapterResponse createChapter(
-  //     @PathVariable Long comicId, @RequestBody ChapterRequest chapterRequest) {
-  //   return chapterService.createChapter(comicId, chapterRequest);
-  // }
 
   // @PutMapping("/{chapterId}")
   // public ChapterResponse updateChapter(
