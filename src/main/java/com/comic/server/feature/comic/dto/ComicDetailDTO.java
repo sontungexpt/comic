@@ -6,7 +6,10 @@ import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
+import java.io.Serializable;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,13 +18,15 @@ import org.springframework.data.domain.Page;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ComicDetailDTO {
+@Builder
+@AllArgsConstructor
+public class ComicDetailDTO implements Serializable {
 
   private String id;
 
   private String name;
 
-  List<String> originalNames;
+  private List<String> alternativeNames;
 
   private String summary;
 

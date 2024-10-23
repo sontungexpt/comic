@@ -52,7 +52,7 @@ public class FollowedComicController {
   @GetMapping("")
   public ResponseEntity<?> getFollowedComics(
       @CurrentUser User user,
-      @PageableDefault(size = 20, page = 0, sort = "rating", direction = Sort.Direction.DESC)
+      @PageableDefault(size = 20, page = 0, sort = "dailyViews", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok(followedComicService.getFollowedComics(user.getId(), pageable));
   }

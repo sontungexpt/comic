@@ -2,6 +2,7 @@ package com.comic.server.feature.comic.dto;
 
 import com.comic.server.feature.comic.model.Artist;
 import com.comic.server.feature.comic.model.Author;
+import com.comic.server.feature.comic.model.Character;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.Source;
@@ -25,7 +26,7 @@ public class ComicDTO implements Serializable {
 
   private String name;
 
-  private List<String> originalNames;
+  private List<String> alternativeNames;
 
   private String summary;
 
@@ -34,8 +35,6 @@ public class ComicDTO implements Serializable {
   private String slug;
 
   private Status status;
-
-  private Double rating;
 
   private Source originalSource;
 

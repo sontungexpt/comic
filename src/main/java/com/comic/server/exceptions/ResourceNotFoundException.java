@@ -19,8 +19,7 @@ public class ResourceNotFoundException extends BaseException {
       Class<T> resourceName, String conflictFieldName, Object conflictFieldValue) {
     this(
         String.format(
-            "%s already in use with %s : '%s'",
-            resourceName, conflictFieldName, conflictFieldValue),
+            "%s not found with %s : '%s'", resourceName, conflictFieldName, conflictFieldValue),
         resourceName,
         conflictFieldName,
         conflictFieldValue);
@@ -47,7 +46,7 @@ public class ResourceNotFoundException extends BaseException {
 
   public <T> ResourceNotFoundException(Class<T> resourceName, Map<String, Object> conflictFields) {
     this(
-        String.format("%s already in use with %s", resourceName, conflictFields.toString()),
+        String.format("%s not found with %s", resourceName, conflictFields.toString()),
         resourceName,
         conflictFields);
   }

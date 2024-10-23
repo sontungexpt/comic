@@ -3,7 +3,6 @@ package com.comic.server.feature.comic.model.chapter;
 import com.comic.server.feature.comic.model.Source;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.Serializable;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +15,7 @@ import org.springframework.data.annotation.Transient;
 @Setter
 @SuperBuilder
 @AllArgsConstructor
-public class ShortInfoChapter implements Chapter, Serializable {
+public class ShortInfoChapter implements Chapter {
 
   private String id;
 
@@ -35,11 +34,6 @@ public class ShortInfoChapter implements Chapter, Serializable {
   private String thumbnailUrl;
 
   private Double num;
-
-  @JsonGetter("chapter")
-  public String getChapter() {
-    return "Chapter " + num;
-  }
 
   @Schema(description = "The name of the chapter", example = "The last hero")
   private String name;

@@ -1,42 +1,48 @@
 package com.comic.server.feature.comic.dto.otruyen;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 import java.util.List;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class OtruyenComic {
+@Getter
+@Setter
+public class OtruyenComic implements Serializable {
 
-  @JsonSetter("_id")
+  @JsonProperty("_id")
   private String id;
 
-  @JsonSetter("name")
+  @JsonProperty("name")
   private String name;
 
-  @JsonSetter("slug")
+  @JsonProperty("slug")
   private String slug;
 
-  @JsonSetter("origin_name")
+  @JsonProperty("origin_name")
   private List<String> originName;
 
-  @JsonSetter("content")
+  @JsonProperty("content")
   private String content;
 
-  @JsonSetter("status")
+  @JsonProperty("status")
   private String status;
 
-  @JsonSetter("thumb_url")
+  @JsonProperty("thumb_url")
   private String thumbUrl;
 
-  @JsonSetter("sub_docquyen")
+  @JsonProperty("sub_docquyen")
   private boolean subDocQuyen;
 
-  @JsonSetter("author")
+  @JsonProperty("author")
   private List<String> author;
 
-  @JsonSetter("category")
+  @JsonProperty("category")
   private List<OtruyenCategory> category;
 
-  @JsonSetter("chapters")
+  @JsonProperty("chapters")
   private List<OtruyenServerData> serverDatas;
+
+  @JsonProperty("chaptersLatest")
+  private List<OtruyenChapterShortInfo> chaptersLatest;
 }

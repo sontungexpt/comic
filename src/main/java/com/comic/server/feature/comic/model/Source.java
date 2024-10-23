@@ -1,32 +1,34 @@
 package com.comic.server.feature.comic.model;
 
+import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.Instant;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
 @Getter
 @Setter
-public class Source {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Source implements Serializable {
 
-  private String idFromSource;
+  @Schema(description = "The id of the document in the source's database")
+  private String id;
 
-  private String slugFromSource;
-
-  @Schema(description = "The URL of the source where the comic was originally fetched")
-  private String baseUrl;
+  @Schema(description = "The slug of the doucment in the source's database")
+  private String slug;
 
   @Schema(description = "The name of the source, such as the website name")
-  private String name;
+  private SourceName name;
 
   @Schema(description = "Additional details about the source")
   private String description;
 
-  private Instant lastSyncedAt;
+  public Source(SourceName name) {
+    this.name = name;
+  }
 }

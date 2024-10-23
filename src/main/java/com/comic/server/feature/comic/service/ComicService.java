@@ -7,7 +7,5 @@ public interface ComicService extends GetComicService {
 
   Comic createComic(Comic comic);
 
-  long countComics();
-
   List<Comic> createComics(Iterable<Comic> comics);
 }

@@ -13,6 +13,9 @@ jwt:
   refresh-token-expiration: 2592000000 # 30 days
 
 spring:
+  # jackson:
+  #   mapper:
+  #     accept-case-insensitive-enums: false
   application:
     name: "comic"
   profiles:

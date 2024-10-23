@@ -4,6 +4,7 @@ import com.comic.server.common.model.Sluggable;
 import com.comic.server.common.structure.BoundedPriorityQueue;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
+import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.support.NewChapterComparator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import lombok.AccessLevel;
@@ -41,14 +43,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
     allowGetters = true)
 @CompoundIndexes({
   @CompoundIndex(name = "category_status", def = "{'categoryIds': 1, 'status': 1}"),
+  @CompoundIndex(
+      name = "source_name_id",
+      def = "{'originalSource.name': 1, 'originalSource.id': 1}",
+      sparse = true),
 })
-public class Comic implements Sluggable {
+public class Comic implements Sluggable, Serializable {
 
   public enum Status {
     ONGOING,
     NEW,
     COMMING_SOON,
     COMPLETED,
+    UNKNOWN,
+    ;
   }
 
   @Id private String id;
@@ -57,7 +65,7 @@ public class Comic implements Sluggable {
   @NotBlank
   private String name;
 
-  List<String> originalNames;
+  private List<String> alternativeNames;
 
   @Schema(description = "The short summary of the comic")
   @NotBlank
@@ -82,15 +90,30 @@ public class Comic implements Sluggable {
   @JsonIgnore
   private Instant statusUpdatedAt = Instant.now();
 
-  @Schema(description = "The rating of the comic")
+  @Default private Integer dailyViews = 0;
+
+  @Default private Instant lastDailyReset = Instant.now();
+
+  @Default private Integer weeklyViews = 0;
+
+  @Default private Instant lastWeeklyReset = Instant.now();
+
+  @Default private Integer monthlyViews = 0;
+
+  @Default private Instant lastMonthlyReset = Instant.now();
+
+  @Default private Integer yearlyViews = 0;
+
+  @Default private Instant lastYearlyReset = Instant.now();
+
   @Default
-  private Double rating = 0.0;
-
   @Schema(description = "The original source from which the comic was fetched")
-  private Source originalSource;
+  private Source originalSource = new Source(SourceName.ROOT);
 
+  @Schema(description = "The authors of the comic")
   private List<@Valid Author> authors;
 
+  @Schema(description = "The artists of the comic")
   private List<@Valid Artist> artists;
 
   @NotEmpty private List<ObjectId> categoryIds;
@@ -107,6 +130,7 @@ public class Comic implements Sluggable {
 
   @Setter(AccessLevel.NONE)
   @Getter(AccessLevel.NONE)
+  @Schema(description = "The new chapters of the comic")
   private List<ShortInfoChapter> newChapters;
 
   public void addNewChapter(AbstractChapter chapter) {
@@ -114,11 +138,13 @@ public class Comic implements Sluggable {
       newChapters = List.of(new ShortInfoChapter(chapter));
     } else {
       var newChapters = new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters);
-      newChapters.add(chapter);
-      this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      if (newChapters.add(chapter)) {
+        this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      }
     }
   }
 
+  @Schema(description = "The characters in the comic")
   private List<@Valid Character> characters;
 
   @CreatedBy private ObjectId createdBy;

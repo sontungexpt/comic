@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.model.chapter;
 
 import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -65,7 +66,7 @@ public abstract class AbstractChapter implements Chapter {
     return id;
   }
 
-  @NonNull private ObjectId comicId;
+  @JsonIgnore @NonNull private ObjectId comicId;
 
   @JsonIgnore
   public ObjectId getComicIdAsObjectId() {
@@ -98,11 +99,6 @@ public abstract class AbstractChapter implements Chapter {
       examples = {"1", "2", "2.5"})
   private Double num;
 
-  @JsonGetter("chapter")
-  public String getChapter() {
-    return "Chapter " + num;
-  }
-
   @Schema(description = "The name of the chapter", example = "The last hero")
   private String name;
 
@@ -111,7 +107,7 @@ public abstract class AbstractChapter implements Chapter {
       example = "The first chapter of the comic")
   private String description;
 
-  @Default private Source originalSource = Source.builder().name("Comic").build();
+  @Default private Source originalSource = new Source(SourceName.ROOT);
 
   @CreatedDate private Instant createdAt;
 
@@ -150,6 +146,7 @@ public abstract class AbstractChapter implements Chapter {
     if (!(obj instanceof AbstractChapter)) {
       return false;
     }
+
     AbstractChapter chapter = (AbstractChapter) obj;
     return id.equals(chapter.id);
   }

@@ -2,13 +2,16 @@ package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
+import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
 import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -19,12 +22,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/comics")
 @RequiredArgsConstructor
+@Slf4j
 public class ComicController {
 
   private final ComicService comicService;
@@ -34,26 +39,50 @@ public class ComicController {
   @PublicEndpoint
   @Operation(summary = "Get all comics", description = "Get all comics with pagination")
   public ResponseEntity<?> getComics(
-      @PageableDefault(page = 0, size = 20, sort = "rating", direction = Sort.Direction.DESC)
+      @RequestParam(required = false) List<String> filterCategoryIds,
+      @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok(comicService.getComicsWithCategories(pageable));
+    return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
   }
+
+  // public CompletableFuture<ResponseEntity<Page<ComicDTO>>> getComics(
+  //     @RequestParam(required = false) List<String> filterCategoryIds,
+  //     @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
+  //         Pageable pageable) {
+  //   return comicService
+  //       .getComicsWithCategories(pageable, filterCategoryIds)
+  //       .thenApply(ResponseEntity::ok)
+  //       .exceptionally(
+  //           ex -> {
+  //             log.error("Failed to fetch comics: ", ex);
+  //             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Page.empty());
+  //           });
+  // }
 
   @GetMapping("/{comicId}")
   @PublicEndpoint
   @Operation(summary = "Get comic detail", description = "Get comic detail by comicId")
   public ResponseEntity<?> getComicDetail(
-      String comicId,
-      @PageableDefault(page = 0, size = 20, sort = "number", direction = Sort.Direction.ASC)
+      @PathVariable("comicId") String comicId,
+      @RequestParam(required = true) SourceName sourceName,
+      @PageableDefault(page = 0, size = 24, sort = "number", direction = Sort.Direction.ASC)
           Pageable pageable) {
-    return ResponseEntity.ok(comicService.getComicDetail(comicId, pageable));
+    return ResponseEntity.ok(comicService.getComicDetail(comicId, sourceName, pageable));
   }
 
   @GetMapping("/{comicId}/chapters")
   @PublicEndpoint
   @Operation(summary = "Get chapters", description = "Get chapters by comicId")
-  public ResponseEntity<?> getChaptersByComicId(String comicId) {
+  public ResponseEntity<?> getChaptersByComicId(@PathVariable("comicId") String comicId) {
     return ResponseEntity.ok(comicService.getChaptersByComicId(comicId));
+  }
+
+  @GetMapping("/{comicId}/chapters/{chapterId}")
+  @Operation(summary = "Get chapter by id", description = "Get chapter by id")
+  @PublicEndpoint
+  public AbstractChapter getChapterDetailById(
+      @PathVariable("comicId") String comicId, @PathVariable("chapterId") String chapterId) {
+    return chapterService.getChapterDetailById(chapterId);
   }
 
   @PostMapping("/{comicId}/chapters")

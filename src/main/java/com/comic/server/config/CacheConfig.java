@@ -47,7 +47,8 @@ public class CacheConfig {
   @Primary
   @Bean("caffeineCacheManager")
   public CacheManager caffeineCacheManager() {
-    CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager("comics", "comic");
+    CaffeineCacheManager caffeineCacheManager =
+        new CaffeineCacheManager("comics", "comic", "comic_chapters");
     caffeineCacheManager.setCaffeineSpec(
         CaffeineSpec.parse("maximumSize=3000,expireAfterAccess=30000s"));
 

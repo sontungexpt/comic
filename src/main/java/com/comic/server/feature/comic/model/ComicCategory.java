@@ -3,7 +3,11 @@ package com.comic.server.feature.comic.model;
 import com.comic.server.common.model.Sluggable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @Document(collection = "comic_categories")
-public class ComicCategory implements Sluggable {
+@Builder
+@AllArgsConstructor
+public class ComicCategory implements Sluggable, Serializable {
   @Id private String id;
 
   @Indexed(unique = true)
@@ -26,7 +32,7 @@ public class ComicCategory implements Sluggable {
 
   private String description;
 
-  @JsonIgnore private boolean deleted = false;
+  @Default @JsonIgnore private boolean deleted = false;
 
   private String slug;
 

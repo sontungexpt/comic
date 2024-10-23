@@ -9,22 +9,26 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CloudinaryConfig {
 
-  public static String CLOUD_NAME;
-
   @Value("${cloudinary.cloud-name}")
-  public void setCloudName(String cloudName) {
-    CLOUD_NAME = cloudName;
-  }
+  private String CLOUD_NAME;
+
+  // public static String CLOUD_NAME;
+
+  // @Value("${cloudinary.cloud-name}")
+  // public void setCloudName(String cloudName) {
+  //   CLOUD_NAME = cloudName;
+  // }
 
   @Value("${cloudinary.api-key}")
   private String API_KEY;
 
-  public static String API_SECRET;
-
   @Value("${cloudinary.api-secret}")
-  public void setApiSecret(String apiSecret) {
-    API_SECRET = apiSecret;
-  }
+  public String API_SECRET;
+
+  // @Value("${cloudinary.api-secret}")
+  // public void setApiSecret(String apiSecret) {
+  //   API_SECRET = apiSecret;
+  // }
 
   @Bean
   public Cloudinary getCloudinary() {
