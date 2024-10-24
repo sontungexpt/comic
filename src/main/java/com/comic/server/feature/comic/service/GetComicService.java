@@ -15,6 +15,8 @@ public interface GetComicService {
 
   Page<ComicDTO> getComicsWithCategories(Pageable pageable, List<String> filterCategoryIds);
 
+  Page<ComicDTO> searchComic(String keyword, Pageable pageable);
+
   // CompletableFuture<Page<ComicDTO>> getComicsWithCategories(
   //     Pageable pageable, List<String> filterCategoryIds);
 

@@ -45,6 +45,16 @@ public class ComicController {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
   }
 
+  @GetMapping("/searching")
+  @Operation(summary = "Search comics", description = "Search comics by keyword")
+  @PublicEndpoint
+  public ResponseEntity<?> searchComics(
+      @RequestParam String q,
+      @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok(comicService.searchComic(q, pageable));
+  }
+
   // public CompletableFuture<ResponseEntity<Page<ComicDTO>>> getComics(
   //     @RequestParam(required = false) List<String> filterCategoryIds,
   //     @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)

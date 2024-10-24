@@ -110,6 +110,11 @@ public class ComicServiceImpl implements ComicService, ChainGetComicService {
         comics.getContent(), pageable, comics.getTotalElements() + getNextService().countComics());
   }
 
+  @Override
+  public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
+    return comicDetailRepository.findComicDetailByKeyword(keyword, pageable);
+  }
+
   // @Override
   // public CompletableFuture<Page<ComicDTO>> getComicsWithCategories(
   //     Pageable pageable, List<String> filterCategoryIds) {

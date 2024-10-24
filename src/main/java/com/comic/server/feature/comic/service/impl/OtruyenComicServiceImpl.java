@@ -152,7 +152,6 @@ public class OtruyenComicServiceImpl implements GetComicService {
           var bulkOperation = mongoTemplate.bulkOps(BulkMode.UNORDERED, Comic.class);
           bulkOperation.insert(comics);
           var results = bulkOperation.execute();
-
           results
               .getInserts()
               .forEach(
@@ -387,5 +386,11 @@ public class OtruyenComicServiceImpl implements GetComicService {
     }
 
     return result.getTotalComics();
+  }
+
+  @Override
+  public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'searchComic'");
   }
 }
