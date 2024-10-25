@@ -53,4 +53,9 @@ public class ComicCategory implements Sluggable, Serializable {
   public String generateSlug() {
     return name;
   }
+
+  @Override
+  public boolean isCreatedFromUniqueString() {
+    return true;
+  }
 }

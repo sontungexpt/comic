@@ -41,4 +41,8 @@ public interface Sluggable {
       return null;
     }
   }
+
+  default boolean isCreatedFromUniqueString() {
+    return false;
+  }
 }

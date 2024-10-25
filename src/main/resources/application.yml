@@ -1,5 +1,4 @@
 debug: false
-
 comic:
 
 caching:
@@ -39,8 +38,8 @@ spring:
             enable: true
   data:
     mongodb:
-      uri: mongodb://localhost:27017
-      # uri: mongodb+srv://${MONGO_USER:admin}:${MONGO_PASSWORD}@${MONGO_DATABASE:comic-db}.mmm13.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_DATABASE:comic-db}
+      # uri: mongodb://localhost:27017
+      uri: mongodb+srv://${MONGO_USER:admin}:${MONGO_PASSWORD}@${MONGO_DATABASE:comic-db}.mmm13.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_DATABASE:comic-db}
       database: ${MONGO_DATABASE:comic-db}
       autoIndexCreation: true
 

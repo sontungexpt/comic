@@ -22,7 +22,11 @@ public class SluggableModelListener extends AbstractMongoEventListener<Sluggable
       String sourceString = sluggable.generateSlug();
       if (StringUtils.hasText(sourceString)) {
         final Slugify slg = Slugify.builder().locale(Locale.ENGLISH).build();
-        slug = slg.slugify(sourceString) + "-" + NanoIdUtils.randomNanoId();
+        if (sluggable.isCreatedFromUniqueString()) {
+          slug = slg.slugify(sourceString);
+        } else {
+          slug = slg.slugify(sourceString) + "-" + NanoIdUtils.randomNanoId();
+        }
       } else {
         throw new IllegalArgumentException("Slug is required");
       }
