@@ -21,15 +21,13 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
     servers = {
       @Server(url = "http://localhost:8080"),
-      @Server(url = "https://comic-production.up.railway.app"),
+      @Server(url = "comic.com"),
     },
     info =
         @Info(
             title = "Comic API",
             version = "1.0",
-            description =
-                "Documentation Comic Service API v1.0, Base URL:"
-                    + " https://comic-production.up.railway.app",
+            description = "Documentation Comic Service API v1.0, Base URL:" + " https://comic.com",
             termsOfService = "http://swagger.io/terms/",
             contact = @Contact(name = "Comic", email = "comic @gmail.com")))
 @SecurityScheme(
