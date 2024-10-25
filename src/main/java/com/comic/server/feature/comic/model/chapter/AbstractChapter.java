@@ -55,7 +55,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 })
 public abstract class AbstractChapter implements Chapter {
 
-  @Id private String id;
+  @Schema(
+      description = "The unique identifier of the chapter",
+      example = "60f3b3b3b3b3b3b3b3b3b3b3")
+  @Id
+  private String id;
 
   public void setId(ObjectId id) {
     this.id = id.toHexString();
@@ -66,7 +70,9 @@ public abstract class AbstractChapter implements Chapter {
     return id;
   }
 
-  @JsonIgnore @NonNull private ObjectId comicId;
+  @Schema(description = "The unique identifier of the comic", example = "60f3b3b3b3b3b3b3b3b3b3")
+  @NonNull
+  private ObjectId comicId;
 
   @JsonIgnore
   public ObjectId getComicIdAsObjectId() {
@@ -88,8 +94,12 @@ public abstract class AbstractChapter implements Chapter {
     this.comicId = new ObjectId(comicId);
   }
 
+  @Schema(description = "The type of the chapter", example = "COMIC")
   private ChapterType type;
 
+  @Schema(
+      description = "The URL of the thumbnail of the chapter",
+      example = "https://example.com/thumbnail.jpg")
   private String thumbnailUrl;
 
   @NotNull
@@ -107,7 +117,12 @@ public abstract class AbstractChapter implements Chapter {
       example = "The first chapter of the comic")
   private String description;
 
-  @Default private Source originalSource = new Source(SourceName.ROOT);
+  @Schema(
+      description = "The source of the chapter",
+      example = "ROOT",
+      allowableValues = {"ROOT", "OTRUYEN", "MANGADEX"})
+  @Default
+  private Source originalSource = new Source(SourceName.ROOT);
 
   @CreatedDate private Instant createdAt;
 

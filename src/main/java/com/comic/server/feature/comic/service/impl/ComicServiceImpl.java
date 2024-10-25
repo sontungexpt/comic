@@ -1,5 +1,6 @@
 package com.comic.server.feature.comic.service.impl;
 
+import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
@@ -10,8 +11,8 @@ import com.comic.server.feature.comic.repository.ComicDetailRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.comic.service.ComicService;
-import com.comic.server.feature.comic.service.GetComicService;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ComicServiceImpl implements ComicService, ChainGetComicService {
+public class ComicServiceImpl implements ComicService {
 
   private final ComicRepository comicRepository;
   private final ChapterRepository chapterRepository;
@@ -51,6 +52,7 @@ public class ComicServiceImpl implements ComicService, ChainGetComicService {
   }
 
   @Override
+  @Cacheable(value = "comic", key = "'comicId:' + #comicId")
   public ComicDetailDTO getComicDetail(String comicId, SourceName sourceName, Pageable pageable) {
     if (sourceName == SourceName.ROOT) {
       return comicDetailRepository.findComicDetail(comicId, pageable);
@@ -70,16 +72,15 @@ public class ComicServiceImpl implements ComicService, ChainGetComicService {
   }
 
   @Override
-  public GetComicService getNextService() {
+  public ChainGetComicService getNextService() {
     return otruyenComicService;
   }
 
-  // @Cacheable(
-  //     value = "comics",
-  //     key =
-  //         "'page:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' +
-  // #pageable.sort"
-  //             + " + 'filter:' + #filterCategoryIds")
+  @Cacheable(
+      value = "comics",
+      key =
+          "'page:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort"
+              + " + 'filter:' + #filterCategoryIds")
   @Override
   public Page<ComicDTO> getComicsWithCategories(Pageable pageable, List<String> filterCategoryIds) {
 
@@ -111,8 +112,46 @@ public class ComicServiceImpl implements ComicService, ChainGetComicService {
   }
 
   @Override
+  @Cacheable(
+      value = "comics",
+      key =
+          "'page:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' +"
+              + " #pageable.sort"
+              + " + 'keyword:' + #keyword")
   public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
-    return comicDetailRepository.findComicDetailByKeyword(keyword, pageable);
+
+    Page<ComicDTO> comics = comicDetailRepository.findComicDetailByKeyword(keyword, pageable);
+
+    int pageSize = pageable.getPageSize();
+    int currentNumberOfElements = comics.getNumberOfElements();
+
+    if (comics.isLast()) {
+      int remainingSize = pageSize - currentNumberOfElements;
+      Page<ComicDTO> nextComics =
+          getNextService()
+              .searchComic(keyword, PageRequest.of(0, remainingSize, pageable.getSort()));
+      var returnComics = new HashSet<>(comics.getContent());
+
+      returnComics.addAll(nextComics.getContent());
+
+      return new PageImpl<>(
+          new ArrayList<>(returnComics),
+          pageable,
+          comics.getTotalElements() + nextComics.getTotalElements());
+    }
+    return comics;
+  }
+
+  @Override
+  public boolean existsById(String id) {
+    return comicRepository.existsById(id);
+  }
+
+  @Override
+  public Comic getComicById(String comicId) {
+    return comicRepository
+        .findById(comicId)
+        .orElseThrow(() -> new ResourceNotFoundException(Comic.class, "id", comicId));
   }
 
   // @Override

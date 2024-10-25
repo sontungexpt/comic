@@ -14,11 +14,12 @@ import com.comic.server.feature.comic.model.thirdparty.OtruyenMetadata;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.ThirdPartyMetadataRepository;
-import com.comic.server.feature.comic.service.GetComicService;
+import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.utils.ConsoleUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.ErrorCategory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -35,6 +36,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.BulkOperationException;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OtruyenComicServiceImpl implements GetComicService {
+public class OtruyenComicServiceImpl implements ChainGetComicService {
 
   private String BASE_URL = "https://otruyenapi.com/v1/api";
   private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads";
@@ -102,6 +104,64 @@ public class OtruyenComicServiceImpl implements GetComicService {
     return null;
   }
 
+  private List<ComicDTO> proccessComics(JsonNode data) {
+    List<OtruyenComic> items =
+        objectMapper.convertValue(data.get("items"), new TypeReference<List<OtruyenComic>>() {});
+
+    if (!items.isEmpty()) {
+      List<ComicWithCategories> comicsResult = new ArrayList<>();
+      List<Comic> comics = new ArrayList<>();
+
+      for (OtruyenComic comic : items) {
+        ComicWithCategories comicWithCategories = otruyenComicAdapter.convertToComic(comic, false);
+        comicsResult.add(comicWithCategories);
+        comics.add(comicWithCategories.getComic());
+      }
+
+      List<ComicDTO> comicDTOs = new ArrayList<>();
+
+      try {
+        var bulkOperation = mongoTemplate.bulkOps(BulkMode.UNORDERED, Comic.class);
+        bulkOperation.insert(comics);
+        var results = bulkOperation.execute();
+        results
+            .getInserts()
+            .forEach(
+                result -> {
+                  int index = result.getIndex();
+                  Comic comic = comics.get(index);
+                  comic.setId(result.getId().asObjectId().getValue().toHexString());
+                  comicDTOs.add(
+                      ComicDTO.builder()
+                          .id(comic.getId())
+                          .name(comic.getName())
+                          .authors(comic.getAuthors())
+                          .artists(comic.getArtists())
+                          .categories(comicsResult.get(index).getCategories())
+                          .tags(comic.getTags())
+                          .characters(comic.getCharacters())
+                          .newChapters(comic.getNewChaptersInfo())
+                          .status(comic.getStatus())
+                          .alternativeNames(comic.getAlternativeNames())
+                          .summary(comic.getSummary())
+                          .thumbnailUrl(comic.getThumbnailUrl())
+                          .originalSource(comic.getOriginalSource())
+                          .build());
+                });
+      } catch (BulkOperationException e) {
+        for (var error : e.getErrors()) {
+          if (error.getCategory() != ErrorCategory.DUPLICATE_KEY) {
+            throw e;
+          }
+        }
+      } catch (DuplicateKeyException e) {
+      }
+
+      return comicDTOs;
+    }
+    return List.of();
+  }
+
   @Override
   public Page<ComicDTO> getComicsWithCategories(Pageable pageable, List<String> filterCategoryIds) {
     OtruyenMetadata metadata =
@@ -125,89 +185,53 @@ public class OtruyenComicServiceImpl implements GetComicService {
             .GET()
             .build();
 
-    try {
-      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    var pageResult =
+        client
+            .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body)
+            .thenApply(
+                body -> {
+                  try {
+                    JsonNode map = objectMapper.readTree(body);
+                    var data = map.get("data");
 
-      JsonNode map = objectMapper.readTree(response.body());
+                    List<ComicDTO> comicDTOs = proccessComics(data);
 
-      var data = map.get("data");
+                    if (!comicDTOs.isEmpty()) {
+                      JsonNode pagination = data.get("params").get("pagination");
+                      long totalComics = pagination.get("totalItems").asLong();
+                      long itemsPerPage = pagination.get("totalItemsPerPage").asLong();
+                      long totalComicsForPageImpl =
+                          totalComics - itemsPerPage * metadata.getCurrentSyncedPage();
 
-      List<OtruyenComic> items =
-          objectMapper.convertValue(data.get("items"), new TypeReference<List<OtruyenComic>>() {});
+                      metadata.setTotalComics(totalComics);
+                      metadata.setTotalItemsPerPage(itemsPerPage);
+                      metadata.setCurrentSyncedPage(nextPage);
 
-      if (!items.isEmpty()) {
-        List<ComicWithCategories> comicsResult = new ArrayList<>();
-        List<Comic> comics = new ArrayList<>();
+                      thirdPartyMetadataRepository.save(metadata);
+                      log.info(
+                          "Updated metadata: totalComics = {}, totalItemsPerPage = {},"
+                              + " currentSyncedPage = {}",
+                          totalComics,
+                          itemsPerPage,
+                          nextPage);
 
-        for (OtruyenComic comic : items) {
-          ComicWithCategories comicWithCategories =
-              otruyenComicAdapter.convertToComic(comic, false);
-          comicsResult.add(comicWithCategories);
-          comics.add(comicWithCategories.getComic());
-        }
+                      return new PageImpl<>(
+                          comicDTOs.stream()
+                              .skip(pageable.getOffset())
+                              .limit(pageable.getPageSize())
+                              .toList(),
+                          pageable,
+                          totalComicsForPageImpl);
+                    }
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                  return new PageImpl<ComicDTO>(List.of(), pageable, 0);
+                })
+            .join();
 
-        List<ComicDTO> comicDTOs = new ArrayList<>();
-
-        try {
-          var bulkOperation = mongoTemplate.bulkOps(BulkMode.UNORDERED, Comic.class);
-          bulkOperation.insert(comics);
-          var results = bulkOperation.execute();
-          results
-              .getInserts()
-              .forEach(
-                  result -> {
-                    int index = result.getIndex();
-                    Comic comic = comics.get(index);
-                    comic.setId(result.getId().asObjectId().getValue().toHexString());
-                    comicDTOs.add(
-                        ComicDTO.builder()
-                            .id(comic.getId())
-                            .name(comic.getName())
-                            .authors(comic.getAuthors())
-                            .artists(comic.getArtists())
-                            .categories(comicsResult.get(index).getCategories())
-                            .tags(comic.getTags())
-                            .characters(comic.getCharacters())
-                            .newChapters(comic.getNewChaptersInfo())
-                            .status(comic.getStatus())
-                            .alternativeNames(comic.getAlternativeNames())
-                            .summary(comic.getSummary())
-                            .thumbnailUrl(comic.getThumbnailUrl())
-                            .originalSource(comic.getOriginalSource())
-                            .build());
-                  });
-        } catch (DuplicateKeyException e) {
-        }
-
-        JsonNode pagination = data.get("params").get("pagination");
-        long totalComics = pagination.get("totalItems").asLong();
-        long itemsPerPage = pagination.get("totalItemsPerPage").asLong();
-        long totalComicsForPageImpl = totalComics - itemsPerPage * metadata.getCurrentSyncedPage();
-
-        metadata.setTotalComics(totalComics);
-        metadata.setTotalItemsPerPage(itemsPerPage);
-        metadata.setCurrentSyncedPage(nextPage);
-
-        thirdPartyMetadataRepository.save(metadata);
-        log.info(
-            "Updated metadata: totalComics = {}, totalItemsPerPage = {}, currentSyncedPage = {}",
-            totalComics,
-            itemsPerPage,
-            nextPage);
-
-        return new PageImpl<>(
-            comicDTOs.stream().skip(pageable.getOffset()).limit(pageable.getPageSize()).toList(),
-            pageable,
-            totalComicsForPageImpl);
-      }
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-
-    return Page.empty();
+    return pageResult;
   }
 
   // @Override
@@ -390,7 +414,35 @@ public class OtruyenComicServiceImpl implements GetComicService {
 
   @Override
   public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'searchComic'");
+
+    var client = HttpClient.newHttpClient();
+    var request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(BASE_URL + "/tim-kiem?keyword=" + keyword))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+
+    return client
+        .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        .thenApply(HttpResponse::body)
+        .thenApply(
+            body -> {
+              try {
+
+                JsonNode map = objectMapper.readTree(body);
+                var data = map.get("data");
+                List<ComicDTO> comicDTOs = proccessComics(data);
+                return new PageImpl<>(comicDTOs, pageable, comicDTOs.size());
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .join();
+  }
+
+  @Override
+  public ChainGetComicService getNextService() {
+    return null;
   }
 }

@@ -102,7 +102,7 @@ public class ComicController {
   @PublicEndpoint
   public AbstractChapter getChapterDetailById(
       @PathVariable("comicId") String comicId, @PathVariable("chapterId") String chapterId) {
-    return chapterService.getChapterDetailById(chapterId);
+    return chapterService.getChapterDetailById(comicId, chapterId);
   }
 
   @PostMapping("/{comicId}/chapters")

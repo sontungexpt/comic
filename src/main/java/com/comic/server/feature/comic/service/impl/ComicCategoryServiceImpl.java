@@ -8,14 +8,19 @@ import com.comic.server.utils.ConsoleUtils;
 import com.comic.server.utils.DuplicateKeyUtils;
 import com.comic.server.utils.DuplicateKeyUtils.KeyValue;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service
-public record ComicCategoryServiceImpl(ComicCategoryRepository comicCategoryRepository)
-    implements ComicCategoryService {
+@RequiredArgsConstructor
+public class ComicCategoryServiceImpl implements ComicCategoryService {
+
+  private final ComicCategoryRepository comicCategoryRepository;
 
   @Override
+  @Cacheable(value = "comic_categories", key = "comic_categories:all")
   public List<ComicCategory> getAllComicCategories() {
     return comicCategoryRepository.findByDeleted(false);
   }

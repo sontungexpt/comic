@@ -45,7 +45,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
   @CompoundIndex(name = "category_status", def = "{'categoryIds': 1, 'status': 1}"),
   @CompoundIndex(
       name = "source_name_id",
-      def = "{'originalSource.name': 1, 'originalSource.id': 1}",
+      def = "{'originalSource.name': 1, 'originalSource.slug': 1}",
+      unique = true,
       sparse = true),
 })
 public class Comic implements Sluggable, Serializable {
@@ -158,5 +159,42 @@ public class Comic implements Sluggable, Serializable {
   @Override
   public String generateSlug() {
     return name;
+  }
+
+  @Override
+  public int hashCode() {
+    int code = 17;
+    if (id != null) {
+      code = 31 * code + id.hashCode();
+    }
+
+    if (originalSource != null) {
+      code = 31 * code + originalSource.getName().hashCode();
+      if (originalSource.getId() != null) {
+        code = 31 * code + originalSource.getId().hashCode();
+      } else if (originalSource.getSlug() != null) {
+        code = 31 * code + originalSource.getSlug().hashCode();
+      }
+    }
+
+    return code;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    final Comic other = (Comic) obj;
+    if (other != null && this.id != null) {
+      return other.id.equals(this.id);
+    } else if (originalSource.getName().equals(other.originalSource.getName())) {
+      if (originalSource.getId() != null && other.originalSource.getId() != null) {
+        return originalSource.getId().equals(other.originalSource.getId());
+      } else if (originalSource.getSlug() != null && other.originalSource.getSlug() != null) {
+        return originalSource.getSlug().equals(other.originalSource.getSlug());
+      }
+    }
+    return false;
   }
 }

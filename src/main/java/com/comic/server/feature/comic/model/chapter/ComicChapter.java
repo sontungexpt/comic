@@ -3,6 +3,10 @@ package com.comic.server.feature.comic.model.chapter;
 import com.comic.server.feature.comic.model.chapter.ComicChapter.ResourceInfo.PathType;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -56,12 +60,18 @@ public class ComicChapter extends AbstractChapter {
     }
   }
 
-  // @NotNull private ResourceInfo sourceInfo;
+  @Schema(
+      description =
+          "The information of the image source of the chapter, If the source is absolute, the path"
+              + " will be the full URL of the image, otherwise, it will be the relative path to the"
+              + " base URL example: baseUrl + /images/chapter-1.jpg(relative path)")
+  @NotNull
+  private ResourceInfo sourceInfo;
 
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class Page {
+  public static class ImagePage {
 
     private int number;
 
@@ -92,5 +102,5 @@ public class ComicChapter extends AbstractChapter {
   //   return "comic/" + getId();
   // }
 
-  // @NotEmpty List<Page> pages;
+  @NotEmpty List<ImagePage> imagePages;
 }
