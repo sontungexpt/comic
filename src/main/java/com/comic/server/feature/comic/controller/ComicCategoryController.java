@@ -6,6 +6,7 @@ import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.service.ComicCategoryService;
 import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -33,6 +34,15 @@ public class ComicCategoryController {
               + "This endpoint is accessible to all users.")
   @GetMapping("")
   @PublicEndpoint
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved the categories of comics.",
+      content = {
+        @io.swagger.v3.oas.annotations.media.Content(
+            mediaType = "application/json",
+            schema =
+                @io.swagger.v3.oas.annotations.media.Schema(implementation = ComicCategory.class))
+      })
   public ResponseEntity<?> getAllCategories() {
     return ResponseEntity.ok().body(comicCategoryService.getAllComicCategories());
   }

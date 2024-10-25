@@ -6,9 +6,11 @@ import com.comic.server.feature.user.enums.RoleType;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.service.FollowedComicService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -50,9 +52,11 @@ public class FollowedComicController {
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   @RolesAllowed(RoleType.Fields.READER)
   @GetMapping("")
+  @PageableAsQueryParam
   public ResponseEntity<?> getFollowedComics(
       @CurrentUser User user,
-      @PageableDefault(size = 20, page = 0, sort = "dailyViews", direction = Sort.Direction.DESC)
+      @PageableDefault(size = 24, page = 0, sort = "dailyViews", direction = Sort.Direction.DESC)
+          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(followedComicService.getFollowedComics(user.getId(), pageable));
   }

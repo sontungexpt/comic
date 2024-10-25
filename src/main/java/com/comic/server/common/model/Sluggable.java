@@ -42,6 +42,7 @@ public interface Sluggable {
     }
   }
 
+  @JsonIgnore
   default boolean isCreatedFromUniqueString() {
     return false;
   }

@@ -7,11 +7,13 @@ import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
 import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -38,9 +40,13 @@ public class ComicController {
   @GetMapping("")
   @PublicEndpoint
   @Operation(summary = "Get all comics", description = "Get all comics with pagination")
+  @PageableAsQueryParam
   public ResponseEntity<?> getComics(
-      @RequestParam(required = false) List<String> filterCategoryIds,
+      @Parameter(description = "The category ids to filter", required = false)
+          @RequestParam(required = false)
+          List<String> filterCategoryIds,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
+          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
   }
@@ -48,9 +54,11 @@ public class ComicController {
   @GetMapping("/searching")
   @Operation(summary = "Search comics", description = "Search comics by keyword")
   @PublicEndpoint
+  @PageableAsQueryParam
   public ResponseEntity<?> searchComics(
       @RequestParam String q,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
+          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.searchComic(q, pageable));
   }
@@ -72,10 +80,12 @@ public class ComicController {
   @GetMapping("/{comicId}")
   @PublicEndpoint
   @Operation(summary = "Get comic detail", description = "Get comic detail by comicId")
+  @PageableAsQueryParam
   public ResponseEntity<?> getComicDetail(
       @PathVariable("comicId") String comicId,
       @RequestParam(required = true) SourceName sourceName,
       @PageableDefault(page = 0, size = 24, sort = "number", direction = Sort.Direction.ASC)
+          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicDetail(comicId, sourceName, pageable));
   }
