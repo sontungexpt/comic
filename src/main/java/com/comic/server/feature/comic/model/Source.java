@@ -14,18 +14,19 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema
 public class Source implements Serializable {
 
-  @Schema(description = "The id of the document in the source's database")
+  @Schema(description = "The id of the document in the source's database", hidden = true)
   private String id;
 
-  @Schema(description = "The slug of the doucment in the source's database")
+  @Schema(description = "The slug of the doucment in the source's database", hidden = true)
   private String slug;
 
-  @Schema(description = "The name of the source, such as the website name")
+  @Schema(description = "The name of the source, such as the website name", example = "Website")
   private SourceName name;
 
-  @Schema(description = "Additional details about the source")
+  @Schema(description = "Additional details about the source", example = "This is a website")
   private String description;
 
   public Source(SourceName name) {
