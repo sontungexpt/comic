@@ -78,7 +78,7 @@ public class OtruyenComicAdapter {
                     StringUtils.hasText(comic.getThumbUrl())
                             && comic.getThumbUrl().startsWith("http")
                         ? comic.getThumbUrl()
-                        : CDN_IMAGE_URL + comic.getThumbUrl())
+                        : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
                 .originalSource(
                     Source.builder()
                         .name(SourceName.OTRUYEN)
@@ -114,7 +114,7 @@ public class OtruyenComicAdapter {
         .thumbnailUrl(
             comic.getThumbUrl().startsWith("http")
                 ? comic.getThumbUrl()
-                : CDN_IMAGE_URL + comic.getThumbUrl())
+                : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
         .originalSource(
             Source.builder()
                 .name(SourceName.OTRUYEN)
@@ -174,7 +174,7 @@ public class OtruyenComicAdapter {
         .thumbnailUrl(
             comic.getThumbUrl().startsWith("http")
                 ? comic.getThumbUrl()
-                : CDN_IMAGE_URL + comic.getThumbUrl())
+                : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
         .chapters(
             new PageImpl<>(
                 chapters.stream().skip(pageable.getOffset()).limit(pageable.getPageSize()).toList(),
