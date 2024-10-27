@@ -60,10 +60,12 @@ public class ComicCategory implements Sluggable, Serializable {
 
   @Schema(hidden = true)
   @CreatedDate
+  @JsonIgnore
   private Instant createdAt;
 
   @Schema(hidden = true)
   @LastModifiedDate
+  @JsonIgnore
   private Instant updatedAt;
 
   @Override
