@@ -7,7 +7,7 @@ public class OtruyenComicStatusAdapter {
   private static final String NEW = "new";
   private static final String ONGOING = "ongoing";
   private static final String COMPLETED = "completed";
-  private static final String COMMING_SOOM = "comming_soon";
+  private static final String COMING_SOON = "coming_soon";
 
   public static Status convertToStatus(String status) {
     if (status.equals(NEW)) {
@@ -16,7 +16,7 @@ public class OtruyenComicStatusAdapter {
       return Status.ONGOING;
     } else if (status.equals(COMPLETED)) {
       return Status.COMPLETED;
-    } else if (status.equals(COMMING_SOOM)) {
+    } else if (status.equals(COMING_SOON)) {
       return Status.COMMING_SOON;
     }
     return Status.UNKNOWN;
