@@ -9,6 +9,7 @@ import com.comic.server.utils.DuplicateKeyUtils;
 import com.comic.server.utils.DuplicateKeyUtils.KeyValue;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,13 @@ public class ComicCategoryServiceImpl implements ComicCategoryService {
   private final ComicCategoryRepository comicCategoryRepository;
 
   @Override
-  @Cacheable(value = "comic_categories", key = "comic_categories:all")
+  @Cacheable(value = "comic_categories", unless = "#result == null || #result.isEmpty()")
   public List<ComicCategory> getAllComicCategories() {
     return comicCategoryRepository.findByDeleted(false);
   }
 
   @Override
+  @CacheEvict(value = "comic_categories", allEntries = true)
   public ComicCategory createComicCategory(ComicCategory category) {
     try {
       return comicCategoryRepository.save(category);
@@ -35,6 +37,7 @@ public class ComicCategoryServiceImpl implements ComicCategoryService {
   }
 
   @Override
+  @CacheEvict(value = "comic_categories", allEntries = true)
   public List<ComicCategory> createComicCategories(Iterable<ComicCategory> iterable) {
     try {
       return comicCategoryRepository.saveAll(iterable);

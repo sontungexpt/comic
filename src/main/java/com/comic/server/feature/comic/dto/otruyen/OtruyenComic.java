@@ -1,5 +1,6 @@
 package com.comic.server.feature.comic.dto.otruyen;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
@@ -8,6 +9,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@JsonIncludeProperties({
+  "id",
+  "name",
+  "slug",
+  "originName",
+  "content",
+  "status",
+  "thumbUrl",
+  "subDocQuyen",
+  "author",
+  "category",
+  "serverDatas",
+  "chaptersLatest"
+})
 public class OtruyenComic implements Serializable {
 
   @JsonProperty("_id")

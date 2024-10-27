@@ -10,13 +10,13 @@ public class OtruyenComicStatusAdapter {
   private static final String COMMING_SOOM = "comming_soon";
 
   public static Status convertToStatus(String status) {
-    if (status == NEW) {
+    if (status.equals(NEW)) {
       return Status.NEW;
-    } else if (status == ONGOING) {
+    } else if (status.equals(ONGOING)) {
       return Status.ONGOING;
-    } else if (status == COMPLETED) {
+    } else if (status.equals(COMPLETED)) {
       return Status.COMPLETED;
-    } else if (status == COMMING_SOOM) {
+    } else if (status.equals(COMMING_SOOM)) {
       return Status.COMMING_SOON;
     }
     return Status.UNKNOWN;

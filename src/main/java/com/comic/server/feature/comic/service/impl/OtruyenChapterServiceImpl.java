@@ -2,7 +2,9 @@ package com.comic.server.feature.comic.service.impl;
 
 import com.comic.server.feature.comic.dto.otruyen.OtruyenChapterDetail;
 import com.comic.server.feature.comic.dto.otruyen.OtruyenComicChapterAdapter;
+import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
+import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterChainService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +23,7 @@ public class OtruyenChapterServiceImpl implements ChapterChainService {
 
   private String CHAPTER_API_BASE_URL = "https://sv1.otruyencdn.com/v1/api/chapter";
   // private final ComicService nextService;
-  private final ObjectMapper objectMapper;
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public ChapterChainService getNextService() {
@@ -29,7 +31,7 @@ public class OtruyenChapterServiceImpl implements ChapterChainService {
   }
 
   @Override
-  public AbstractChapter getChapterDetailById(String comicId, String chapterId) {
+  public AbstractChapter fetchChapterDetail(Comic comic, String chapterId) {
 
     var client = HttpClient.newHttpClient();
 
@@ -57,7 +59,7 @@ public class OtruyenChapterServiceImpl implements ChapterChainService {
                         data.get("domain_cdn").asText() + chapterDetail.getChapterPath();
 
                     return OtruyenComicChapterAdapter.convertToComicChapter(
-                        chapterDetail, comicId, imageBaseUrl);
+                        chapterDetail, comic.getId(), imageBaseUrl);
                   } catch (JsonProcessingException e) {
                     throw new RuntimeException("Error when parsing chapter detail");
                   }
@@ -66,10 +68,15 @@ public class OtruyenChapterServiceImpl implements ChapterChainService {
 
     if (chapter == null) {
       if (getNextService() != null) {
-        return getNextService().getChapterDetailById(comicId, chapterId);
+        return getNextService().fetchChapterDetail(comic, chapterId);
       }
     }
 
     return chapter;
+  }
+
+  @Override
+  public boolean canHandle(SourceName sourceName) {
+    return sourceName == SourceName.OTRUYEN;
   }
 }

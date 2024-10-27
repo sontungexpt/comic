@@ -6,6 +6,7 @@ import com.comic.server.feature.user.enums.UserStatus;
 import com.comic.server.validation.annotation.OptimizedName;
 import com.comic.server.validation.annotation.Password;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -37,6 +38,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Document(collection = "users")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
+@JsonIgnoreProperties(
+    value = {"id", "pubId", "authorities"},
+    allowGetters = true)
 public class User implements UserDetails, Persistable<String> {
   @JsonIgnore @Id private String id;
 

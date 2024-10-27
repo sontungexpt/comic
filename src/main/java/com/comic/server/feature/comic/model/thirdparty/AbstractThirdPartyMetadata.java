@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.model.thirdparty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
 import java.time.Instant;
@@ -19,6 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "sourceName")
+@JsonIgnoreProperties(
+    value = {"id"},
+    allowGetters = true)
 public abstract class AbstractThirdPartyMetadata implements Serializable, Persistable<String> {
 
   @Id private String id;

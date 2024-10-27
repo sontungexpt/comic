@@ -48,7 +48,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
 
   private String BASE_URL = "https://otruyenapi.com/v1/api";
   private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads";
-  private final ObjectMapper objectMapper;
+  private ObjectMapper objectMapper = new ObjectMapper();
   private final ComicRepository comicRepository;
   private final ThirdPartyMetadataRepository thirdPartyMetadataRepository;
   private final OtruyenComicAdapter otruyenComicAdapter;
@@ -124,6 +124,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
         var bulkOperation = mongoTemplate.bulkOps(BulkMode.UNORDERED, Comic.class);
         bulkOperation.insert(comics);
         var results = bulkOperation.execute();
+
         results
             .getInserts()
             .forEach(
@@ -150,6 +151,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                 });
       } catch (BulkOperationException e) {
         for (var error : e.getErrors()) {
+          ConsoleUtils.prettyPrint(error);
           if (error.getCategory() != ErrorCategory.DUPLICATE_KEY) {
             throw e;
           }
@@ -191,41 +193,47 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
             .thenApply(HttpResponse::body)
             .thenApply(
                 body -> {
+                  JsonNode map = null;
                   try {
-                    JsonNode map = objectMapper.readTree(body);
-                    var data = map.get("data");
-
-                    List<ComicDTO> comicDTOs = proccessComics(data);
-
-                    if (!comicDTOs.isEmpty()) {
-                      JsonNode pagination = data.get("params").get("pagination");
-                      long totalComics = pagination.get("totalItems").asLong();
-                      long itemsPerPage = pagination.get("totalItemsPerPage").asLong();
-                      long totalComicsForPageImpl =
-                          totalComics - itemsPerPage * metadata.getCurrentSyncedPage();
-
-                      metadata.setTotalComics(totalComics);
-                      metadata.setTotalItemsPerPage(itemsPerPage);
-                      metadata.setCurrentSyncedPage(nextPage);
-
-                      thirdPartyMetadataRepository.save(metadata);
-                      log.info(
-                          "Updated metadata: totalComics = {}, totalItemsPerPage = {},"
-                              + " currentSyncedPage = {}",
-                          totalComics,
-                          itemsPerPage,
-                          nextPage);
-
-                      return new PageImpl<>(
-                          comicDTOs.stream()
-                              .skip(pageable.getOffset())
-                              .limit(pageable.getPageSize())
-                              .toList(),
-                          pageable,
-                          totalComicsForPageImpl);
-                    }
+                    map = objectMapper.readTree(body);
                   } catch (Exception e) {
+                    log.error("Error parsing response body", e);
                     throw new RuntimeException(e);
+                  }
+
+                  if (map == null) {
+                    return new PageImpl<ComicDTO>(List.of(), pageable, 0);
+                  }
+                  var data = map.get("data");
+
+                  List<ComicDTO> comicDTOs = proccessComics(data);
+
+                  if (!comicDTOs.isEmpty()) {
+                    JsonNode pagination = data.get("params").get("pagination");
+                    long totalComics = pagination.get("totalItems").asLong();
+                    long itemsPerPage = pagination.get("totalItemsPerPage").asLong();
+                    long totalComicsForPageImpl =
+                        totalComics - itemsPerPage * metadata.getCurrentSyncedPage();
+
+                    metadata.setTotalComics(totalComics);
+                    metadata.setTotalItemsPerPage(itemsPerPage);
+                    metadata.setCurrentSyncedPage(nextPage);
+
+                    thirdPartyMetadataRepository.save(metadata);
+                    log.info(
+                        "Updated metadata: totalComics = {}, totalItemsPerPage = {},"
+                            + " currentSyncedPage = {}",
+                        totalComics,
+                        itemsPerPage,
+                        nextPage);
+
+                    return new PageImpl<>(
+                        comicDTOs.stream()
+                            .skip(pageable.getOffset())
+                            .limit(pageable.getPageSize())
+                            .toList(),
+                        pageable,
+                        totalComicsForPageImpl);
                   }
                   return new PageImpl<ComicDTO>(List.of(), pageable, 0);
                 })
@@ -383,7 +391,6 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                         OtruyenComic.class, "slug", comic.getOriginalSource().getSlug()));
 
     var serverData = souceComic.getServerDatas();
-    ConsoleUtils.prettyPrint(serverData);
 
     if (serverData.isEmpty()) {
       return List.of();

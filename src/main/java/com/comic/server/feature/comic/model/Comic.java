@@ -37,8 +37,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @JsonIgnoreProperties(
     value = {
-      "newChapters",
       "statusUpdatedAt",
+      "dailyViews",
+      "lastDailyReset",
+      "originalSource",
+      "weeklyViews",
+      "newChapters",
     },
     allowGetters = true)
 @CompoundIndexes({

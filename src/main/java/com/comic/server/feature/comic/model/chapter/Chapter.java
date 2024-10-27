@@ -2,9 +2,15 @@ package com.comic.server.feature.comic.model.chapter;
 
 import com.comic.server.feature.comic.model.Source;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
 
+@JsonIgnoreProperties(
+    value = {
+      "chapter",
+    },
+    allowGetters = true)
 public interface Chapter extends Serializable {
 
   String getId();

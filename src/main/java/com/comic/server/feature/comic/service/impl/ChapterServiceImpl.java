@@ -11,6 +11,7 @@ import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +26,10 @@ public class ChapterServiceImpl implements ChapterService {
 
   @Override
   @Transactional
+  @Cacheable(value = "chapter", key = "'chapterId:' + #chapterId" + " + '-comicId:' + #comicId")
   public AbstractChapter getChapterDetailById(String comicId, String chapterId) {
     Comic comic = comicService.getComicById(comicId);
-    if (comic.getOriginalSource().getName() == SourceName.ROOT) {
-      return chapterRepository
-          .findById(chapterId)
-          .orElseThrow(() -> new ResourceNotFoundException(AbstractChapter.class, "id", chapterId));
-    } else {
-      return getNextService().getChapterDetailById(comicId, chapterId);
-    }
+    return fetchChapterDetail(comic, chapterId);
   }
 
   @Override
@@ -51,5 +47,21 @@ public class ChapterServiceImpl implements ChapterService {
   @Override
   public ChapterChainService getNextService() {
     return otruyenChapterService;
+  }
+
+  @Override
+  public AbstractChapter fetchChapterDetail(Comic comic, String chapterId) {
+    if (canHandle(comic.getOriginalSource().getName())) {
+      return chapterRepository
+          .findById(chapterId)
+          .orElseThrow(() -> new ResourceNotFoundException(AbstractChapter.class, "id", chapterId));
+    } else {
+      return getNextService().fetchChapterDetail(comic, chapterId);
+    }
+  }
+
+  @Override
+  public boolean canHandle(SourceName sourceName) {
+    return sourceName == SourceName.ROOT;
   }
 }

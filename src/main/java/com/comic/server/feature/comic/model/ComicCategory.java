@@ -2,6 +2,7 @@ package com.comic.server.feature.comic.model;
 
 import com.comic.server.common.model.Sluggable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -25,7 +26,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @AllArgsConstructor
 @Schema(description = "Model for Comic Category")
+@JsonIgnoreProperties(
+    value = {"deleted"},
+    allowGetters = true)
 public class ComicCategory implements Sluggable, Serializable {
+
   @Id private String id;
 
   @Indexed(unique = true)

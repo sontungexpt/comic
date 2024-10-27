@@ -1,17 +1,17 @@
 package com.comic.server.feature.comic.dto.otruyen;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.io.Serializable;
 import lombok.Data;
 
 @Data
 public class OtruyenCategory implements Serializable {
-  @JsonProperty("id")
+  @JsonSetter("id")
   private String id;
 
-  @JsonProperty("name")
+  @JsonSetter("name")
   private String name;
 
-  @JsonProperty("slug")
+  @JsonSetter("slug")
   private String slug;
 }
