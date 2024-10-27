@@ -25,7 +25,7 @@ public class OtruyenComicAdapter {
 
   private final OtruyenComicCategoryAdapter otruyenComicCategoryAdapter;
 
-  private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads";
+  private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads/comics";
 
   @Getter
   @Setter
