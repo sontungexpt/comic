@@ -48,10 +48,12 @@ public class OtruyenComicAdapter {
                   return otruyenComicCategoryAdapter.convertToComicCategory(category);
                 })
             .toList();
+
+    ObjectId comic_id = new ObjectId();
     var result =
         new ComicWithCategories(
             Comic.builder()
-                .id(includedId ? new ObjectId().toHexString() : null)
+                .id(includedId ? comic_id.toHexString() : null)
                 .name(comic.getName())
                 .authors(
                     comic.getAuthor() != null
@@ -68,7 +70,7 @@ public class OtruyenComicAdapter {
                             .map(
                                 chapter ->
                                     OtruyenComicChapterAdapter.convertToShortInfoChapter(
-                                        chapter, null))
+                                        chapter, includedId ? comic_id : null))
                             .toList()
                         : List.of())
                 .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))

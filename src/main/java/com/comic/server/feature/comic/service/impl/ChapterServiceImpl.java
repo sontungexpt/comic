@@ -26,7 +26,9 @@ public class ChapterServiceImpl implements ChapterService {
 
   @Override
   @Transactional
-  @Cacheable(value = "chapter", key = "'chapterId:' + #chapterId" + " + '-comicId:' + #comicId")
+  @Cacheable(
+      value = "comic_chapter",
+      key = "'chapterId:' + #chapterId" + " + '-comicId:' + #comicId")
   public AbstractChapter getChapterDetailById(String comicId, String chapterId) {
     Comic comic = comicService.getComicById(comicId);
     return fetchChapterDetail(comic, chapterId);

@@ -113,7 +113,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
       List<Comic> comics = new ArrayList<>();
 
       for (OtruyenComic comic : items) {
-        ComicWithCategories comicWithCategories = otruyenComicAdapter.convertToComic(comic, false);
+        ComicWithCategories comicWithCategories = otruyenComicAdapter.convertToComic(comic, true);
         comicsResult.add(comicWithCategories);
         comics.add(comicWithCategories.getComic());
       }
@@ -131,7 +131,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                 result -> {
                   int index = result.getIndex();
                   Comic comic = comics.get(index);
-                  comic.setId(result.getId().asObjectId().getValue().toHexString());
+                  // comic.setId(result.getId().asObjectId().getValue().toHexString());
                   comicDTOs.add(
                       ComicDTO.builder()
                           .id(comic.getId())

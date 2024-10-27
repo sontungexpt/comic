@@ -10,17 +10,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIncludeProperties({
-  "id",
+  "_id",
   "name",
   "slug",
-  "originName",
+  "origin_name",
   "content",
   "status",
-  "thumbUrl",
-  "subDocQuyen",
+  "thumb_url",
+  "sub_docquyen",
   "author",
   "category",
-  "serverDatas",
+  "chapters",
   "chaptersLatest"
 })
 public class OtruyenComic implements Serializable {
