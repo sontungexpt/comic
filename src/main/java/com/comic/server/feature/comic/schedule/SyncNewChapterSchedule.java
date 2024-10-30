@@ -6,19 +6,22 @@ import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.service.impl.OtruyenComicServiceImpl;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public record SyncNewChapterSchedule(
-    MongoTemplate mongoTemplate,
-    ComicRepository comicRepository,
-    OtruyenComicServiceImpl otruyenComicService) {
+@RequiredArgsConstructor
+public class SyncNewChapterSchedule {
+
+  private final ComicRepository comicRepository;
+  private final OtruyenComicServiceImpl otruyenComicService;
 
   @Scheduled(cron = "0 0 0 * * *")
+  @Async
   public void syncNewChaptersFromOtruyen() {
 
     List<Comic> comics = comicRepository.findByOriginalSourceName(SourceName.OTRUYEN);

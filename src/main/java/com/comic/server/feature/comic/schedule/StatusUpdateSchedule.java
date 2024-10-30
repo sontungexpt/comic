@@ -7,16 +7,22 @@ import static org.springframework.data.mongodb.core.query.Update.update;
 import com.comic.server.feature.comic.model.Comic;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public record StatusUpdateSchedule(MongoTemplate mongoTemplate) {
+@RequiredArgsConstructor
+public class StatusUpdateSchedule {
+
+  private final MongoTemplate mongoTemplate;
 
   @Scheduled(cron = "0 0 0 * * *")
+  @Async
   public void updateStatuses() {
     Instant duration = Instant.now().minus(10, ChronoUnit.DAYS);
 
