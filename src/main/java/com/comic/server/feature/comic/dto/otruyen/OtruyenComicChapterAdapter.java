@@ -16,18 +16,17 @@ public class OtruyenComicChapterAdapter {
   public static ShortInfoChapter convertToShortInfoChapter(
       OtruyenChapterShortInfo chapter, ObjectId comicId) {
 
-    String chapterApiData = chapter.getChapterApiData();
-    String id = chapterApiData.substring(chapterApiData.lastIndexOf("/") + 1);
+    // String chapterApiData = chapter.getChapterApiData();
 
     return ShortInfoChapter.builder()
-        .id(id)
+        .id(chapter.getId())
         .thumbnailUrl("")
         .comicId(comicId)
         .type(ChapterType.COMIC)
         .originalSource(
             Source.builder()
                 .name(SourceName.OTRUYEN)
-                .id(id)
+                .id(chapter.getId())
                 .description("Chapter được lấy từ otruyenapi.com")
                 .build())
         .name(chapter.getChapterTitle())

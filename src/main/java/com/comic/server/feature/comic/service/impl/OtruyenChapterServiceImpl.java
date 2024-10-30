@@ -56,7 +56,7 @@ public class OtruyenChapterServiceImpl implements ChapterChainService {
                     OtruyenChapterDetail chapterDetail =
                         objectMapper.treeToValue(data.get("item"), OtruyenChapterDetail.class);
                     String imageBaseUrl =
-                        data.get("domain_cdn").asText() + chapterDetail.getChapterPath();
+                        data.get("domain_cdn").asText() + "/" + chapterDetail.getChapterPath();
 
                     return OtruyenComicChapterAdapter.convertToComicChapter(
                         chapterDetail, comic.getId(), imageBaseUrl);

@@ -30,7 +30,7 @@ public class ResourceNotFoundException extends BaseException {
       @NonNull Class<T> resourceName,
       @NonNull String conflictFieldName,
       Object conflictFieldValue) {
-    super(HttpStatus.CONFLICT, message);
+    super(HttpStatus.NOT_FOUND, message);
     try {
       resourceName.getDeclaredField(conflictFieldName);
 
@@ -53,7 +53,7 @@ public class ResourceNotFoundException extends BaseException {
 
   public <T> ResourceNotFoundException(
       String message, @NonNull Class<T> resourceName, Map<String, Object> conflictFields) {
-    super(HttpStatus.CONFLICT, message);
+    super(HttpStatus.NOT_FOUND, message);
     this.resourceName = resourceName.getSimpleName();
     this.conflictFields = conflictFields;
   }
