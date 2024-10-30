@@ -383,6 +383,11 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                         Comic.class,
                         Map.of("id", comicId, "originalSource.name", SourceName.OTRUYEN)));
 
+    return getChaptersByComic(comic);
+  }
+
+  public List<ShortInfoChapter> getChaptersByComic(Comic comic) {
+
     var souceComic =
         getOtruyenComicBySlug(comic.getOriginalSource().getSlug())
             .orElseThrow(
@@ -402,7 +407,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
         .map(
             chapter ->
                 OtruyenComicChapterAdapter.convertToShortInfoChapter(
-                    chapter, new ObjectId(comicId)))
+                    chapter, new ObjectId(comic.getId())))
         .toList();
   }
 

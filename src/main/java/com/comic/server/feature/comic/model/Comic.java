@@ -2,7 +2,7 @@ package com.comic.server.feature.comic.model;
 
 import com.comic.server.common.model.Sluggable;
 import com.comic.server.common.structure.BoundedPriorityQueue;
-import com.comic.server.feature.comic.model.chapter.AbstractChapter;
+import com.comic.server.feature.comic.model.chapter.Chapter;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.support.NewChapterComparator;
@@ -138,11 +138,12 @@ public class Comic implements Sluggable, Serializable {
   @Schema(description = "The new chapters of the comic")
   private List<ShortInfoChapter> newChapters;
 
-  public void addNewChapter(AbstractChapter chapter) {
+  public void addNewChapter(Chapter chapter) {
     if (newChapters == null) {
       newChapters = List.of(new ShortInfoChapter(chapter));
     } else {
-      var newChapters = new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters);
+      var newChapters =
+          new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters, true);
       if (newChapters.add(chapter)) {
         this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
       }
@@ -192,12 +193,8 @@ public class Comic implements Sluggable, Serializable {
     final Comic other = (Comic) obj;
     if (other != null && this.id != null) {
       return other.id.equals(this.id);
-    } else if (originalSource.getName().equals(other.originalSource.getName())) {
-      if (originalSource.getId() != null && other.originalSource.getId() != null) {
-        return originalSource.getId().equals(other.originalSource.getId());
-      } else if (originalSource.getSlug() != null && other.originalSource.getSlug() != null) {
-        return originalSource.getSlug().equals(other.originalSource.getSlug());
-      }
+    } else if (originalSource != null && other.originalSource != null) {
+      return originalSource.equals(other.originalSource);
     }
     return false;
   }

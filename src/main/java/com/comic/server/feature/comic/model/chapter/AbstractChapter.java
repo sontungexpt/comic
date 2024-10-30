@@ -157,12 +157,16 @@ public abstract class AbstractChapter implements Chapter {
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;
-    }
-    if (!(obj instanceof AbstractChapter)) {
+    } else if (!(obj instanceof AbstractChapter)) {
       return false;
     }
 
-    AbstractChapter chapter = (AbstractChapter) obj;
-    return id.equals(chapter.id);
+    AbstractChapter that = (AbstractChapter) obj;
+    if (id != null && that.id == null) {
+      return id.equals(that.id);
+    } else if (originalSource != null && that.originalSource == null) {
+      return originalSource.equals(that.originalSource);
+    }
+    return false;
   }
 }

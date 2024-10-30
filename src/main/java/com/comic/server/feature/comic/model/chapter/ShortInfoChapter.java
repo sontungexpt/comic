@@ -66,4 +66,26 @@ public class ShortInfoChapter implements Chapter {
   }
 
   public ShortInfoChapter() {}
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    } else if (!(obj instanceof ShortInfoChapter)) {
+      return false;
+    }
+
+    ShortInfoChapter that = (ShortInfoChapter) obj;
+    if (id != null && that.id == null) {
+      return id.equals(that.id);
+    } else if (originalSource != null && that.originalSource == null) {
+      return originalSource.equals(that.originalSource);
+    }
+    return false;
+  }
 }

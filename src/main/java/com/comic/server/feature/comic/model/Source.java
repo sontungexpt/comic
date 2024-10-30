@@ -32,4 +32,29 @@ public class Source implements Serializable {
   public Source(SourceName name) {
     this.name = name;
   }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (obj == null || !(obj instanceof Source)) {
+      return false;
+    }
+    Source that = (Source) obj;
+
+    boolean equal = this.name.equals(that.name);
+
+    if (this.id != null && that.id != null) {
+      equal = equal && this.id.equals(that.id);
+    } else if (this.slug != null && that.slug != null) {
+      equal = equal && this.slug.equals(that.slug);
+    }
+
+    return equal;
+  }
 }
