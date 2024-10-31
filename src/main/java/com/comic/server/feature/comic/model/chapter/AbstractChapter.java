@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Objects;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Getter;
@@ -28,10 +29,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "chapters")
 @JsonIgnoreProperties(
-    value = {
-      "comicId",
-      "originalSource",
-    },
+    value = {"id", "comicId", "originalSource", "createdAt", "updatedAt", "createdBy", "updatedBy"},
     allowGetters = true)
 @JsonTypeInfo(
     include = JsonTypeInfo.As.PROPERTY,
@@ -57,7 +55,8 @@ public abstract class AbstractChapter implements Chapter {
 
   @Schema(
       description = "The unique identifier of the chapter",
-      example = "60f3b3b3b3b3b3b3b3b3b3b3")
+      example = "60f3b3b3b3b3b3b3b3b3b3b3",
+      hidden = true)
   @Id
   private String id;
 
@@ -124,14 +123,18 @@ public abstract class AbstractChapter implements Chapter {
   @Default
   private Source originalSource = new Source(SourceName.ROOT);
 
-  @CreatedDate private Instant createdAt;
+  @Schema(hidden = true)
+  @CreatedDate
+  private Instant createdAt;
 
   @JsonGetter("updatedDate")
   public Instant getUpdatedDate() {
     return updatedAt;
   }
 
-  @LastModifiedDate private Instant updatedAt;
+  @Schema(hidden = true)
+  @LastModifiedDate
+  private Instant updatedAt;
 
   public AbstractChapter(AbstractChapter chapter) {
     this.id = chapter.id;
@@ -150,7 +153,7 @@ public abstract class AbstractChapter implements Chapter {
 
   @Override
   public int hashCode() {
-    return id.hashCode();
+    return Objects.hash(id, originalSource);
   }
 
   @Override

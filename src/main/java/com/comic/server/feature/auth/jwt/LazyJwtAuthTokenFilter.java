@@ -13,11 +13,13 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Slf4j
@@ -42,7 +44,7 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    return apiEndpointSecurityInspector.isUnsecureRequest(request);
+    return apiEndpointSecurityInspector.isUnsecureJwtRequest(request);
   }
 
   @Override
@@ -50,10 +52,19 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
+    boolean isOptionalJwtSecurityPath =
+        apiEndpointSecurityInspector.isOptionalJwtSecurityPath(request);
+
     try {
       SecurityContext context = SecurityContextHolder.getContext();
-      if (context.getAuthentication() == null) {
+
+      Authentication authentication = context.getAuthentication();
+
+      if (authentication == null
+          || (authentication.getName() == "anonymousUser" && isOptionalJwtSecurityPath)) {
+
         String jwtToken = HttpHeaderUtils.extractBearerToken(request);
+
         String userPubId = jwtService.extractSubject(jwtToken);
 
         if (userPubId != null) {
@@ -65,16 +76,24 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
                   .orElseThrow(() -> new JwtTokenException(jwtToken, "User not found"));
 
           if (jwtService.isAccessTokenValid(jwtToken, user)) {
-            UsernamePasswordAuthenticationToken authentication =
+            UsernamePasswordAuthenticationToken usernameAuthentication =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            context.setAuthentication(authentication);
+            usernameAuthentication.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request));
+            context.setAuthentication(usernameAuthentication);
             log.debug("User {} successfully authenticated with pubId {}", user.getId(), userPubId);
           }
         }
       }
       filterChain.doFilter(request, response);
+
+    } catch (MissingServletRequestPartException e) {
+      if (isOptionalJwtSecurityPath) {
+        filterChain.doFilter(request, response);
+      } else {
+        resolver.resolveException(request, response, null, e);
+      }
     } catch (Exception e) {
       resolver.resolveException(request, response, null, e);
     }

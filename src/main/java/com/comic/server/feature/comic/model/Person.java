@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public abstract class Person implements Serializable {
 
   @Schema(description = "The name of the person", example = "John Doe")
@@ -23,6 +23,9 @@ public abstract class Person implements Serializable {
 
   @Schema(description = "The image URL of the person", example = "https://example.com/image.jpg")
   private String imageUrl;
+
+  // @Schema(description = "The type of the person", example = "ARTIST", enumAsRef = true)
+  // private PersonType type;
 
   public Person(String name) {
     this.name = name;

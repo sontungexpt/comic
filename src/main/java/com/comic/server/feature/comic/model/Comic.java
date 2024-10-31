@@ -11,16 +11,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedBy;
@@ -37,22 +41,31 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @JsonIgnoreProperties(
     value = {
+      "id",
+      "slug",
+      "statusUpdatedAt",
       "statusUpdatedAt",
       "dailyViews",
       "lastDailyReset",
       "originalSource",
       "weeklyViews",
       "newChapters",
+      "updatedAt",
+      "updatedBy",
+      "createdAt",
+      "createdBy",
     },
     allowGetters = true)
 @CompoundIndexes({
   @CompoundIndex(name = "category_status", def = "{'categoryIds': 1, 'status': 1}"),
   @CompoundIndex(
-      name = "source_name_id",
+      name = "source_name_slug",
       def = "{'originalSource.name': 1, 'originalSource.slug': 1}",
       unique = true,
-      sparse = true),
+      partialFilter = "{ 'originalSource.slug': { $exists: true } }"),
 })
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comic implements Sluggable, Serializable {
 
   public enum Status {
@@ -64,7 +77,12 @@ public class Comic implements Sluggable, Serializable {
     ;
   }
 
-  @Id private String id;
+  @Schema(
+      description = "The unique identifier of the comic",
+      example = "60f3b3b3b3b3b3b3b3b3b3",
+      hidden = true)
+  @Id
+  private String id;
 
   @Schema(description = "The name of the comic")
   @NotBlank
@@ -81,7 +99,7 @@ public class Comic implements Sluggable, Serializable {
 
   private String slug;
 
-  @Schema(description = "The status of the comic")
+  @Schema(description = "The status of the comic", defaultValue = "NEW")
   @Default
   private Status status = Status.NEW;
 
@@ -94,6 +112,11 @@ public class Comic implements Sluggable, Serializable {
   @Setter(AccessLevel.NONE)
   @JsonIgnore
   private Instant statusUpdatedAt = Instant.now();
+
+  @Schema(description = "The number of days the comic has been ongoing", example = "7")
+  @Default
+  @Min(1)
+  private int preOngoingDays = 7;
 
   @Default private Integer dailyViews = 0;
 
@@ -115,10 +138,14 @@ public class Comic implements Sluggable, Serializable {
   @Schema(description = "The original source from which the comic was fetched")
   private Source originalSource = new Source(SourceName.ROOT);
 
-  @Schema(description = "The authors of the comic")
+  @Schema(
+      description = "The authors of the comic",
+      exampleClasses = {Author.class})
   private List<@Valid Author> authors;
 
-  @Schema(description = "The artists of the comic")
+  @Schema(
+      description = "The artists of the comic",
+      exampleClasses = {Artist.class})
   private List<@Valid Artist> artists;
 
   @NotEmpty private List<ObjectId> categoryIds;
@@ -126,6 +153,7 @@ public class Comic implements Sluggable, Serializable {
   private List<String> tags;
 
   @JsonGetter("newChapters")
+  @Schema(hidden = true)
   public List<ShortInfoChapter> getNewChaptersInfo() {
     if (newChapters == null) {
       return List.of();
@@ -135,7 +163,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Setter(AccessLevel.NONE)
   @Getter(AccessLevel.NONE)
-  @Schema(description = "The new chapters of the comic")
+  @Schema(hidden = true)
   private List<ShortInfoChapter> newChapters;
 
   public void addNewChapter(Chapter chapter) {
@@ -153,13 +181,24 @@ public class Comic implements Sluggable, Serializable {
   @Schema(description = "The characters in the comic")
   private List<@Valid Character> characters;
 
-  @CreatedBy private ObjectId createdBy;
+  @Schema(hidden = true)
+  @CreatedBy
+  private ObjectId createdBy;
 
-  @CreatedDate private Instant createdAt;
+  @Schema(hidden = true)
+  @JsonIgnore
+  @CreatedDate
+  private Instant createdAt;
 
-  @LastModifiedBy private String updatedBy;
+  @Schema(hidden = true)
+  @JsonIgnore
+  @LastModifiedBy
+  private String updatedBy;
 
-  @LastModifiedDate private Instant updatedAt;
+  @Schema(hidden = true)
+  @JsonIgnore
+  @LastModifiedDate
+  private Instant updatedAt;
 
   @Override
   public String generateSlug() {
@@ -168,21 +207,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Override
   public int hashCode() {
-    int code = 17;
-    if (id != null) {
-      code = 31 * code + id.hashCode();
-    }
-
-    if (originalSource != null) {
-      code = 31 * code + originalSource.getName().hashCode();
-      if (originalSource.getId() != null) {
-        code = 31 * code + originalSource.getId().hashCode();
-      } else if (originalSource.getSlug() != null) {
-        code = 31 * code + originalSource.getSlug().hashCode();
-      }
-    }
-
-    return code;
+    return Objects.hash(id, originalSource);
   }
 
   @Override

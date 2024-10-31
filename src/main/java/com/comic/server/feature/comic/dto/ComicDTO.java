@@ -9,6 +9,7 @@ import com.comic.server.feature.comic.model.Source;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,21 +53,7 @@ public class ComicDTO implements Serializable {
 
   @Override
   public int hashCode() {
-    int code = 17;
-    if (id != null) {
-      code = 31 * code + id.hashCode();
-    }
-
-    if (originalSource != null) {
-      code = 31 * code + originalSource.getName().hashCode();
-      if (originalSource.getId() != null) {
-        code = 31 * code + originalSource.getId().hashCode();
-      } else if (originalSource.getSlug() != null) {
-        code = 31 * code + originalSource.getSlug().hashCode();
-      }
-    }
-
-    return code;
+    return Objects.hash(id, originalSource);
   }
 
   @Override
@@ -77,12 +64,8 @@ public class ComicDTO implements Serializable {
     final ComicDTO other = (ComicDTO) obj;
     if (other != null && this.id != null) {
       return other.id.equals(this.id);
-    } else if (originalSource.getName().equals(other.originalSource.getName())) {
-      if (originalSource.getId() != null && other.originalSource.getId() != null) {
-        return originalSource.getId().equals(other.originalSource.getId());
-      } else if (originalSource.getSlug() != null && other.originalSource.getSlug() != null) {
-        return originalSource.getSlug().equals(other.originalSource.getSlug());
-      }
+    } else if (originalSource != null && other.originalSource != null) {
+      return originalSource.equals(other.originalSource);
     }
     return false;
   }

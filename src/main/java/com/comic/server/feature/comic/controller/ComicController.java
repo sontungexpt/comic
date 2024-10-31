@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
+import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterService;
@@ -49,6 +50,21 @@ public class ComicController {
           @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
+  }
+
+  @PostMapping("")
+  @PublicEndpoint(
+      profiles = {"dev"},
+      filterJwt = true)
+  @Operation(summary = "Create new comic", description = "Create new comic")
+  public ResponseEntity<?> createNewComic(@RequestBody @Valid Comic comic) {
+    try {
+
+      return ResponseEntity.ok(comicService.createComic(comic));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
   }
 
   @GetMapping("/searching")

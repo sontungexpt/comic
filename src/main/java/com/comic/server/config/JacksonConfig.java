@@ -1,7 +1,5 @@
 package com.comic.server.config;
 
-import com.comic.server.common.mixin.IgnoreFieldsMixin;
-import com.comic.server.common.mixin.IgnoreSetterFieldsMixin;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -35,8 +33,6 @@ public class JacksonConfig {
 
     return mapper
         // .setSerializerProvider(sp)
-        .addMixIn(Object.class, IgnoreSetterFieldsMixin.class)
-        .addMixIn(Object.class, IgnoreFieldsMixin.class)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         // https://stackoverflow.com/questions/45662820/how-to-set-format-of-string-for-java-time-instant-using-objectmapper

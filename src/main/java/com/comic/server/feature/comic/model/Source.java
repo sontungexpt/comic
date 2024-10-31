@@ -3,6 +3,7 @@ package com.comic.server.feature.comic.model;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class Source implements Serializable {
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hash(name, id, slug);
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.comic.server.config;
 import com.comic.server.feature.auth.jwt.AuthEntryPointJwt;
 import com.comic.server.feature.auth.jwt.LazyJwtAuthTokenFilter;
 import com.comic.server.utils.ApiEndpointSecurityInspector;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -109,8 +110,8 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-    apiEndpointSecurityInspector.getPublicEndpoints().add("/v1/auth/**");
-    apiEndpointSecurityInspector.getPublicEndpoints().add("/actuator/**");
+    apiEndpointSecurityInspector.addPublicEndpoint("/v1/auth/**");
+    apiEndpointSecurityInspector.addPublicEndpoint("/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(
@@ -128,22 +129,17 @@ public class SecurityConfig {
 
         // authorize
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(
-                        apiEndpointSecurityInspector.getPublicEndpoints().toArray(String[]::new))
-                    .permitAll()
-                    .requestMatchers(
-                        HttpMethod.GET,
-                        apiEndpointSecurityInspector.getPublicGetEndpoints().toArray(String[]::new))
-                    .permitAll()
-                    .requestMatchers(
-                        HttpMethod.POST,
-                        apiEndpointSecurityInspector
-                            .getPublicPostEndpoints()
-                            .toArray(String[]::new))
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
+            auth -> {
+              Arrays.stream(HttpMethod.values())
+                  .forEach(
+                      method ->
+                          auth.requestMatchers(
+                                  method,
+                                  apiEndpointSecurityInspector.getPublicSecurityPaths(method))
+                              .permitAll());
+
+              auth.anyRequest().authenticated();
+            })
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(lazyJwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(
