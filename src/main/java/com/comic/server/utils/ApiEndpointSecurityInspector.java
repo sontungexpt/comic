@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -164,9 +165,10 @@ public class ApiEndpointSecurityInspector {
             // if (handlerMethod.hasMethodAnnotation(PublicEndpoint.class)
             //     || handlerMethod.getBeanType().isAnnotationPresent(PublicEndpoint.class)) {
 
-            String[] profiles = annotation.profiles();
+            List<String> profilesList = Arrays.asList(annotation.profiles());
             boolean filterJwt = annotation.filterJwt();
-            if (Arrays.asList(profiles).contains(PROFILE)) {
+
+            if (profilesList.isEmpty() || profilesList.contains(PROFILE)) {
               final Set<String> apiPaths = requestInfo.getPatternValues();
               final Set<PathWithCondition> apiPathsWithCondition =
                   apiPaths.stream()
@@ -175,18 +177,10 @@ public class ApiEndpointSecurityInspector {
 
               requestInfo.getMethodsCondition().getMethods().stream()
                   .forEach(
-                      httpMethod -> {
-                        switch (httpMethod) {
-                          case GET:
-                            publicEndpoints.get(GET).addAll(apiPathsWithCondition);
-                            break;
-                          case POST:
-                            publicEndpoints.get(POST).addAll(apiPathsWithCondition);
-                            break;
-                          default:
-                            break;
-                        }
-                      });
+                      httpMethod ->
+                          publicEndpoints
+                              .get(httpMethod.asHttpMethod())
+                              .addAll(apiPathsWithCondition));
             }
           }
         });
