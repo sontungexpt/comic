@@ -1,9 +1,13 @@
 package com.comic.server.feature.comic.model.chapter;
 
-import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.OriginalSource;
+import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -21,7 +25,7 @@ public interface Chapter extends Serializable {
 
   @Schema(
       description = "The unique identifier of the chapter",
-      example = "60f3b3b3b3b3b3b3b3b3b3",
+      example = "60f3b3b3b3b3b3b3b3b3b333",
       hidden = true)
   String getId();
 
@@ -54,5 +58,13 @@ public interface Chapter extends Serializable {
 
   String getDescription();
 
-  Source getOriginalSource();
+  @JsonSerialize(using = NullSerializer.class)
+  ThirdPartySource getThirdPartySource();
+
+  @Schema(
+      description = "The original source of the chapter",
+      example =
+          "{\"name\":\"MangaDex\",\"description\":\"MangaDex\", \"link\":\"https://mangadex.org\"}",
+      requiredMode = RequiredMode.NOT_REQUIRED)
+  OriginalSource getOriginalSource();
 }

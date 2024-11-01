@@ -1,7 +1,11 @@
 package com.comic.server.feature.comic.model.chapter;
 
-import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.OriginalSource;
+import com.comic.server.feature.comic.model.ThirdPartySource;
+import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -40,7 +44,21 @@ public class ShortInfoChapter implements Chapter {
 
   private String description;
 
-  private Source originalSource;
+  private ThirdPartySource thirdPartySource;
+
+  @Override
+  @JsonSerialize(using = NullSerializer.class)
+  public ThirdPartySource getThirdPartySource() {
+    return thirdPartySource;
+  }
+
+  private OriginalSource originalSource;
+
+  @Override
+  @JsonGetter("originalSource")
+  public OriginalSource getOriginalSource() {
+    return SourceHelper.resolveOriginalSource(originalSource, thirdPartySource);
+  }
 
   @Transient private Instant createdAt;
 
@@ -61,6 +79,7 @@ public class ShortInfoChapter implements Chapter {
     this.name = chapter.getName();
     this.description = chapter.getDescription();
     this.originalSource = chapter.getOriginalSource();
+    this.thirdPartySource = chapter.getThirdPartySource();
     this.createdAt = chapter.getCreatedAt();
     this.updatedAt = chapter.getUpdatedAt();
   }
@@ -83,8 +102,8 @@ public class ShortInfoChapter implements Chapter {
     ShortInfoChapter that = (ShortInfoChapter) obj;
     if (id != null && that.id == null) {
       return id.equals(that.id);
-    } else if (originalSource != null && that.originalSource == null) {
-      return originalSource.equals(that.originalSource);
+    } else if (thirdPartySource != null && that.thirdPartySource == null) {
+      return thirdPartySource.equals(that.thirdPartySource);
     }
     return false;
   }

@@ -27,12 +27,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Schema(description = "Model for Comic Category")
 @JsonIgnoreProperties(
-    value = {"deleted", "createdAt", "updatedAt", "slug", "id", "createdBy", "updatedBy"},
+    value = {"deleted", "createdAt", "updatedAt", "createdBy", "updatedBy", "slug", "id"},
     allowGetters = true)
 public class ComicCategory implements Sluggable, Serializable {
 
-  @Schema(hidden = true)
   @Id
+  @Schema(hidden = true)
   private String id;
 
   @Indexed(unique = true)

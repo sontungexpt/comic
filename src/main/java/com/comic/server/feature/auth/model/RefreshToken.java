@@ -24,7 +24,9 @@ import org.springframework.data.repository.CrudRepository;
 @Document(collection = "refresh_tokens")
 public class RefreshToken implements Persistable<String> {
 
-  @Id private String id;
+  @Schema(hidden = true)
+  @Id
+  private String id;
 
   @JsonIgnore
   @Schema(description = "User public ID of the user associated with the refresh token")

@@ -24,7 +24,7 @@ public class SyncNewChapterSchedule {
   @Async
   public void syncNewChaptersFromOtruyen() {
 
-    List<Comic> comics = comicRepository.findByOriginalSourceName(SourceName.OTRUYEN);
+    List<Comic> comics = comicRepository.findByThirdPartySourceName(SourceName.OTRUYEN);
 
     comics.forEach(
         comic -> {

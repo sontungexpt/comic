@@ -53,7 +53,7 @@ public class ChapterServiceImpl implements ChapterService {
 
   @Override
   public AbstractChapter fetchChapterDetail(Comic comic, String chapterId) {
-    if (canHandle(comic.getOriginalSource().getName())) {
+    if (canHandle(comic.getThirdPartySource().getName())) {
       return chapterRepository
           .findById(chapterId)
           .orElseThrow(() -> new ResourceNotFoundException(AbstractChapter.class, "id", chapterId));

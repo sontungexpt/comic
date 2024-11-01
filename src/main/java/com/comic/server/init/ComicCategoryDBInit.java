@@ -3,12 +3,12 @@ package com.comic.server.init;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.service.ComicCategoryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -26,14 +26,9 @@ public record ComicCategoryDBInit(
     try {
 
       String json = Files.readString(Paths.get("src/main/resources/static/raws/category.json"));
-
       comicCategoryService.createComicCategories(convert(json));
-
-      // ConsoleUtils.prettyPrint(list);
-
-      // return new ObjectMapper().readValue(json, Object.class);
     } catch (Exception e) {
-      throw new RuntimeException("Error when create assetlinks");
+      throw new RuntimeException("Error when create comic categories", e);
     }
   }
 
@@ -42,13 +37,15 @@ public record ComicCategoryDBInit(
     List<ComicCategory> categories = new ArrayList<>();
 
     // Parse the JSON string to an array of JSON objects
-    List<Object> jsonObjectList = objectMapper.readValue(jsonString, List.class);
 
-    // Iterate through each JSON object and map it to a ComicCategory object
-    for (Object jsonObject : jsonObjectList) {
-      Map<String, Object> jsonMap = objectMapper.convertValue(jsonObject, Map.class);
-      String name = (String) jsonMap.get("name");
-      ComicCategory category = new ComicCategory(name);
+    JsonNode jsonObjectList = objectMapper.readTree(jsonString);
+
+    for (int i = 0; i < jsonObjectList.size(); i++) {
+      JsonNode jsonObject = jsonObjectList.get(i);
+      String name = jsonObject.get("name").asText();
+      JsonNode descriptionNode = jsonObject.get("description");
+      String description = descriptionNode != null ? descriptionNode.asText() : "";
+      ComicCategory category = new ComicCategory(name, description);
       categories.add(category);
     }
 
