@@ -12,9 +12,14 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Slf4j
 @Component
-public record AuthEntryPointJwt(
-    @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver)
-    implements AuthenticationEntryPoint {
+public class AuthEntryPointJwt implements AuthenticationEntryPoint {
+
+  private final HandlerExceptionResolver resolver;
+
+  public AuthEntryPointJwt(
+      @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+    this.resolver = resolver;
+  }
 
   @Override
   public void commence(
