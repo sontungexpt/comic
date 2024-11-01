@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,17 +85,20 @@ public class ApiEndpointSecurityInspector {
   }
 
   private final Map<HttpMethod, Set<PathWithCondition>> publicEndpoints =
-      Map.of(
-          GET,
+      new HashMap<>() {
+        {
+          put(
+              GET,
               new HashSet<PathWithCondition>() {
-
                 {
                   add(new PathWithCondition("/v3/api-docs**/**"));
                   add(new PathWithCondition("/swagger-ui**/**"));
                   add(new PathWithCondition("/.well-known**/**"));
                 }
-              },
-          POST, new HashSet<PathWithCondition>());
+              });
+          put(POST, new HashSet<PathWithCondition>());
+        }
+      };
 
   /**
    * Adds a public endpoint that is accessible via any HTTP method.
@@ -135,9 +139,11 @@ public class ApiEndpointSecurityInspector {
    * @param filterJwt Whether to filter JWT for the endpoint.
    */
   public void addPublicEndpoint(HttpMethod httpMethod, String path, boolean filterJwt) {
-    publicEndpoints
-        .putIfAbsent(httpMethod, new HashSet<PathWithCondition>())
-        .add(new PathWithCondition(path, filterJwt));
+
+    if (publicEndpoints.get(httpMethod) == null) {
+      publicEndpoints.put(httpMethod, new HashSet<PathWithCondition>());
+    }
+    publicEndpoints.get(httpMethod).add(new PathWithCondition(path, filterJwt));
   }
 
   /**

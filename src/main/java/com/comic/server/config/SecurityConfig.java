@@ -6,6 +6,7 @@ import com.comic.server.utils.ApiEndpointSecurityInspector;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -30,15 +31,19 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@Slf4j
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
 @Profile("prod")
 public class SecurityConfig {
-  private final LazyJwtAuthTokenFilter lazyJwtAuthTokenFilter;
+
   private final UserDetailsService userDetailsService;
+
+  private final LazyJwtAuthTokenFilter lazyJwtAuthTokenFilter;
   private final AuthEntryPointJwt unauthorizedHandler;
   private final ApiEndpointSecurityInspector apiEndpointSecurityInspector;
+
   private final LogoutSuccessHandler logoutSuccessHandler;
   private final LogoutHandler logoutHandler;
 
@@ -56,7 +61,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers) {
+  public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers)
+      throws Exception {
     return new ProviderManager(providers);
   }
 
@@ -110,6 +116,7 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+
     apiEndpointSecurityInspector.addPublicEndpoint("/v1/auth/**");
     apiEndpointSecurityInspector.addPublicEndpoint("/actuator/**");
 
@@ -132,12 +139,11 @@ public class SecurityConfig {
             auth -> {
               Arrays.stream(HttpMethod.values())
                   .forEach(
-                      method ->
-                          auth.requestMatchers(
-                                  method,
-                                  apiEndpointSecurityInspector.getPublicSecurityPaths(method))
-                              .permitAll());
-
+                      method -> {
+                        auth.requestMatchers(
+                                method, apiEndpointSecurityInspector.getPublicSecurityPaths(method))
+                            .permitAll();
+                      });
               auth.anyRequest().authenticated();
             })
         .authenticationProvider(authenticationProvider())
