@@ -1,6 +1,6 @@
 package com.comic.server.feature.comic.dto.otruyen;
 
-import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ChapterType;
 import com.comic.server.feature.comic.model.chapter.ComicChapter;
 import com.comic.server.feature.comic.model.chapter.ComicChapter.ImagePage;
@@ -23,8 +23,8 @@ public class OtruyenComicChapterAdapter {
         .thumbnailUrl("")
         .comicId(comicId)
         .type(ChapterType.COMIC)
-        .originalSource(
-            Source.builder()
+        .thirdPartySource(
+            ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
                 .id(chapter.getId())
                 .description("Chapter được lấy từ otruyenapi.com")
@@ -47,8 +47,8 @@ public class OtruyenComicChapterAdapter {
         .thumbnailUrl("")
         .comicId(new ObjectId(comicId))
         .type(ChapterType.COMIC)
-        .originalSource(
-            Source.builder()
+        .thirdPartySource(
+            ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
                 .id(chapter.getId())
                 .description("Chapter được lấy từ otruyenapi.com")

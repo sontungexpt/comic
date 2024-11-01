@@ -87,15 +87,15 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
     if (sourceName == SourceName.OTRUYEN) {
       Comic comic =
           comicRepository
-              .findByIdAndOriginalSourceName(comicId, SourceName.OTRUYEN)
+              .findByIdAndThirdPartySourceName(comicId, SourceName.OTRUYEN)
               .orElseThrow(
                   () ->
                       new ResourceNotFoundException(
                           Comic.class,
-                          Map.of("id", comicId, "originalSource.name", SourceName.OTRUYEN)));
+                          Map.of("id", comicId, "thirdPartySource.name", SourceName.OTRUYEN)));
 
       return otruyenComicAdapter.convertToComicDetailDTO(
-          getOtruyenComicBySlug(comic.getOriginalSource().getSlug())
+          getOtruyenComicBySlug(comic.getThirdPartySource().getSlug())
               .orElseThrow(
                   () -> new ResourceNotFoundException(OtruyenComic.class, "slug", comicId)),
           comicId,
@@ -146,7 +146,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                           .alternativeNames(comic.getAlternativeNames())
                           .summary(comic.getSummary())
                           .thumbnailUrl(comic.getThumbnailUrl())
-                          .originalSource(comic.getOriginalSource())
+                          .thirdPartySource(comic.getThirdPartySource())
                           .build());
                 });
       } catch (BulkOperationException e) {
@@ -337,7 +337,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   //                         .alternativeNames(comic.getAlternativeNames())
   //                         .summary(comic.getSummary())
   //                         .thumbnailUrl(comic.getThumbnailUrl())
-  //                         .originalSource(comic.getOriginalSource())
+  //                         .thirdPartySource(comic.getOriginalSource())
   //                         .build());
   //               });
   //     } catch (DuplicateKeyException e) {
@@ -376,12 +376,12 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
 
     Comic comic =
         comicRepository
-            .findByIdAndOriginalSourceName(comicId, SourceName.OTRUYEN)
+            .findByIdAndThirdPartySourceName(comicId, SourceName.OTRUYEN)
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
                         Comic.class,
-                        Map.of("id", comicId, "originalSource.name", SourceName.OTRUYEN)));
+                        Map.of("id", comicId, "thirdPartySource.name", SourceName.OTRUYEN)));
 
     return getChaptersByComic(comic);
   }
@@ -389,11 +389,11 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   public List<ShortInfoChapter> getChaptersByComic(Comic comic) {
 
     var souceComic =
-        getOtruyenComicBySlug(comic.getOriginalSource().getSlug())
+        getOtruyenComicBySlug(comic.getThirdPartySource().getSlug())
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
-                        OtruyenComic.class, "slug", comic.getOriginalSource().getSlug()));
+                        OtruyenComic.class, "slug", comic.getThirdPartySource().getSlug()));
 
     var serverData = souceComic.getServerDatas();
 

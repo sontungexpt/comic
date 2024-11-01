@@ -82,6 +82,7 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
             usernameAuthentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request));
             context.setAuthentication(usernameAuthentication);
+
             log.debug("User {} successfully authenticated with pubId {}", user.getId(), userPubId);
           }
         }

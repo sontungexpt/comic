@@ -64,7 +64,7 @@ public class ComicServiceImpl implements ComicService {
   @Override
   @Cacheable(value = "comic_chapters", key = "'comicId:' + #comicId")
   public List<ShortInfoChapter> getChaptersByComicId(String comicId) {
-    if (comicRepository.existsByIdAndOriginalSourceName(comicId, SourceName.ROOT)) {
+    if (comicRepository.existsByIdAndThirdPartySourceName(comicId, SourceName.ROOT)) {
       log.info("Fetching chapters from ROOT source");
       return chapterRepository.findByComicIdOrderByNumDesc(new ObjectId(comicId));
     }

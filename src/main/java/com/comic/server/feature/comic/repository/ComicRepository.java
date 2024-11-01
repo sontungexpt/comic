@@ -14,9 +14,9 @@ public interface ComicRepository extends MongoRepository<Comic, String> {
 
   Optional<Comic> findByName(String name);
 
-  Optional<Comic> findByIdAndOriginalSourceName(String id, SourceName sourceName);
+  Optional<Comic> findByIdAndThirdPartySourceName(String id, SourceName sourceName);
 
-  List<Comic> findByOriginalSourceName(SourceName sourceName);
+  List<Comic> findByThirdPartySourceName(SourceName sourceName);
 
-  boolean existsByIdAndOriginalSourceName(String id, SourceName sourceName);
+  boolean existsByIdAndThirdPartySourceName(String id, SourceName sourceName);
 }

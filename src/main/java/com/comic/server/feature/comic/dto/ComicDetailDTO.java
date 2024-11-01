@@ -4,8 +4,13 @@ import com.comic.server.feature.comic.model.Artist;
 import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
-import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.OriginalSource;
+import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
+import com.comic.server.utils.SourceHelper;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -38,7 +43,19 @@ public class ComicDetailDTO implements Serializable {
 
   private Double rating;
 
-  private Source originalSource;
+  private ThirdPartySource thirdPartySource;
+
+  @JsonSerialize(using = NullSerializer.class)
+  public ThirdPartySource getThirdPartySource() {
+    return thirdPartySource;
+  }
+
+  private OriginalSource originalSource;
+
+  @JsonGetter("originalSource")
+  public OriginalSource getOriginalSource() {
+    return SourceHelper.resolveOriginalSource(originalSource, thirdPartySource);
+  }
 
   private List<Author> authors;
 

@@ -1,13 +1,16 @@
 package com.comic.server.feature.comic.model.chapter;
 
-import com.comic.server.feature.comic.model.Source;
-import com.comic.server.feature.comic.model.thirdparty.SourceName;
+import com.comic.server.feature.comic.model.OriginalSource;
+import com.comic.server.feature.comic.model.ThirdPartySource;
+import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.mongodb.lang.NonNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -29,7 +32,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "chapters")
 @JsonIgnoreProperties(
-    value = {"id", "comicId", "originalSource", "createdAt", "updatedAt", "createdBy", "updatedBy"},
+    value = {
+      "id",
+      "comicId",
+      "thirdPartySource",
+      "createdAt",
+      "updatedAt",
+      "createdBy",
+      "updatedBy"
+    },
     allowGetters = true)
 @JsonTypeInfo(
     include = JsonTypeInfo.As.PROPERTY,
@@ -117,11 +128,29 @@ public abstract class AbstractChapter implements Chapter {
   private String description;
 
   @Schema(
+      description = "The source of the chapter, if the user get the chapter from a other source",
+      example = "ROOT",
+      allowableValues = {"ROOT", "OTRUYEN", "MANGADEX"})
+  private OriginalSource originalSource;
+
+  @Schema(
       description = "The source of the chapter",
       example = "ROOT",
       allowableValues = {"ROOT", "OTRUYEN", "MANGADEX"})
   @Default
-  private Source originalSource = new Source(SourceName.ROOT);
+  private ThirdPartySource thirdPartySource = ThirdPartySource.defaultSource();
+
+  @Override
+  @JsonSerialize(using = NullSerializer.class)
+  public ThirdPartySource getThirdPartySource() {
+    return thirdPartySource;
+  }
+
+  @Override
+  @JsonGetter("originalSource")
+  public OriginalSource getOriginalSource() {
+    return SourceHelper.resolveOriginalSource(originalSource, thirdPartySource);
+  }
 
   @Schema(hidden = true)
   @CreatedDate
@@ -145,6 +174,7 @@ public abstract class AbstractChapter implements Chapter {
     this.name = chapter.name;
     this.description = chapter.description;
     this.originalSource = chapter.originalSource;
+    this.thirdPartySource = chapter.thirdPartySource;
     this.createdAt = chapter.createdAt;
     this.updatedAt = chapter.updatedAt;
   }
@@ -153,7 +183,7 @@ public abstract class AbstractChapter implements Chapter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, originalSource);
+    return Objects.hash(id, thirdPartySource);
   }
 
   @Override
@@ -167,8 +197,8 @@ public abstract class AbstractChapter implements Chapter {
     AbstractChapter that = (AbstractChapter) obj;
     if (id != null && that.id == null) {
       return id.equals(that.id);
-    } else if (originalSource != null && that.originalSource == null) {
-      return originalSource.equals(that.originalSource);
+    } else if (thirdPartySource != null && that.thirdPartySource == null) {
+      return thirdPartySource.equals(that.thirdPartySource);
     }
     return false;
   }

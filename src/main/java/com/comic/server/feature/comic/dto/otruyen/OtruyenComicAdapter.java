@@ -5,7 +5,7 @@ import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.ComicCategory;
-import com.comic.server.feature.comic.model.Source;
+import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import java.util.List;
@@ -81,8 +81,8 @@ public class OtruyenComicAdapter {
                             && comic.getThumbUrl().startsWith("http")
                         ? comic.getThumbUrl()
                         : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
-                .originalSource(
-                    Source.builder()
+                .thirdPartySource(
+                    ThirdPartySource.builder()
                         .name(SourceName.OTRUYEN)
                         .id(comic.getId())
                         .slug(comic.getSlug())
@@ -117,8 +117,8 @@ public class OtruyenComicAdapter {
             comic.getThumbUrl().startsWith("http")
                 ? comic.getThumbUrl()
                 : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
-        .originalSource(
-            Source.builder()
+        .thirdPartySource(
+            ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
                 .id(comic.getId())
                 .slug(comic.getSlug())
@@ -182,8 +182,8 @@ public class OtruyenComicAdapter {
                 chapters.stream().skip(pageable.getOffset()).limit(pageable.getPageSize()).toList(),
                 pageable,
                 chapters.size()))
-        .originalSource(
-            Source.builder()
+        .thirdPartySource(
+            ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
                 .id(comic.getId())
                 .slug(comic.getSlug())

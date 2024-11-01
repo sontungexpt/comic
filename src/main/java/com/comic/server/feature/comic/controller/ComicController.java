@@ -1,6 +1,7 @@
 package com.comic.server.feature.comic.controller;
 
 import com.comic.server.annotation.PublicEndpoint;
+import com.comic.server.config.OpenApiConfig;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
@@ -9,6 +10,7 @@ import com.comic.server.feature.comic.service.ComicService;
 import com.comic.server.feature.user.enums.RoleType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -53,13 +55,11 @@ public class ComicController {
   }
 
   @PostMapping("")
-  @PublicEndpoint(
-      profiles = {"dev"},
-      filterJwt = true)
+  @PublicEndpoint(profiles = {"dev"})
   @Operation(summary = "Create new comic", description = "Create new comic")
+  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> createNewComic(@RequestBody @Valid Comic comic) {
     try {
-
       return ResponseEntity.ok(comicService.createComic(comic));
     } catch (Exception e) {
       e.printStackTrace();

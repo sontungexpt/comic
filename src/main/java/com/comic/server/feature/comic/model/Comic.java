@@ -4,12 +4,13 @@ import com.comic.server.common.model.Sluggable;
 import com.comic.server.common.structure.BoundedPriorityQueue;
 import com.comic.server.feature.comic.model.chapter.Chapter;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
-import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.support.NewChapterComparator;
+import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -47,7 +48,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
       "statusUpdatedAt",
       "dailyViews",
       "lastDailyReset",
-      "originalSource",
+      "thirdPartySource",
       "weeklyViews",
       "newChapters",
       "updatedAt",
@@ -60,9 +61,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
   @CompoundIndex(name = "category_status", def = "{'categoryIds': 1, 'status': 1}"),
   @CompoundIndex(
       name = "source_name_slug",
-      def = "{'originalSource.name': 1, 'originalSource.slug': 1}",
+      def = "{'thirdPartySource.name': 1, 'thirdPartySource.slug': 1}",
       unique = true,
-      partialFilter = "{ 'originalSource.slug': { $exists: true } }"),
+      partialFilter = "{ 'thirdPartySource.slug': { $exists: true } }"),
 })
 @NoArgsConstructor
 @AllArgsConstructor
@@ -77,26 +78,27 @@ public class Comic implements Sluggable, Serializable {
     ;
   }
 
-  @Schema(
-      description = "The unique identifier of the comic",
-      example = "60f3b3b3b3b3b3b3b3b3b3",
-      hidden = true)
   @Id
+  @Schema(hidden = true)
   private String id;
 
-  @Schema(description = "The name of the comic")
+  @Schema(description = "The name of the comic", example = "One Piece")
   @NotBlank
   private String name;
 
+  @Schema(
+      description = "The alternative names of the comic",
+      examples = {"Vua hải tặc", "ワンピース"})
   private List<String> alternativeNames;
 
-  @Schema(description = "The short summary of the comic")
+  @Schema(description = "The short summary of the comic", example = "The story of Luffy")
   @NotBlank
   private String summary;
 
-  @Schema(description = "The URL of the comic intro image")
+  @Schema(description = "The URL of the comic intro image", hidden = true)
   private String thumbnailUrl;
 
+  @Schema(hidden = true)
   private String slug;
 
   @Schema(description = "The status of the comic", defaultValue = "NEW")
@@ -111,6 +113,7 @@ public class Comic implements Sluggable, Serializable {
   @Default
   @Setter(AccessLevel.NONE)
   @JsonIgnore
+  @Schema(hidden = true)
   private Instant statusUpdatedAt = Instant.now();
 
   @Schema(description = "The number of days the comic has been ongoing", example = "7")
@@ -118,25 +121,60 @@ public class Comic implements Sluggable, Serializable {
   @Min(1)
   private int preOngoingDays = 7;
 
-  @Default private Integer dailyViews = 0;
+  @Schema(description = "The number of views the comic has received", hidden = true)
+  @Default
+  private Integer dailyViews = 0;
 
-  @Default private Instant lastDailyReset = Instant.now();
+  @Schema(description = "The last time the daily views were reset", hidden = true)
+  @Default
+  private Instant lastDailyReset = Instant.now();
 
-  @Default private Integer weeklyViews = 0;
+  @Schema(
+      description = "The number of views the comic has received in the last week",
+      hidden = true)
+  @Default
+  private Integer weeklyViews = 0;
 
-  @Default private Instant lastWeeklyReset = Instant.now();
+  @Schema(description = "The last time the weekly views were reset", hidden = true)
+  @Default
+  private Instant lastWeeklyReset = Instant.now();
 
-  @Default private Integer monthlyViews = 0;
+  @Schema(
+      description = "The number of views the comic has received in the last month",
+      hidden = true)
+  @Default
+  private Integer monthlyViews = 0;
 
-  @Default private Instant lastMonthlyReset = Instant.now();
+  @Schema(description = "The last time the monthly views were reset", hidden = true)
+  @Default
+  private Instant lastMonthlyReset = Instant.now();
 
-  @Default private Integer yearlyViews = 0;
+  @Schema(
+      description = "The number of views the comic has received in the last year",
+      hidden = true)
+  @Default
+  private Integer yearlyViews = 0;
 
-  @Default private Instant lastYearlyReset = Instant.now();
+  @Schema(description = "The last time the yearly views were reset", hidden = true)
+  @Default
+  private Instant lastYearlyReset = Instant.now();
+
+  @Schema(
+      description = "The original source of the comic",
+      example =
+          "{\"name\":\"MangaDex\",\"description\":\"MangaDex\", \"link\":\"https://mangadex.org\"}",
+      requiredMode = RequiredMode.NOT_REQUIRED)
+  private OriginalSource originalSource;
+
+  @JsonGetter("originalSource")
+  public OriginalSource getOriginalSource() {
+    return SourceHelper.resolveOriginalSource(originalSource, thirdPartySource);
+  }
 
   @Default
-  @Schema(description = "The original source from which the comic was fetched")
-  private Source originalSource = new Source(SourceName.ROOT);
+  @Schema(description = "The original source from which the comic was fetched", hidden = true)
+  @JsonIgnore
+  private ThirdPartySource thirdPartySource = ThirdPartySource.defaultSource();
 
   @Schema(
       description = "The authors of the comic",
@@ -148,8 +186,15 @@ public class Comic implements Sluggable, Serializable {
       exampleClasses = {Artist.class})
   private List<@Valid Artist> artists;
 
-  @NotEmpty private List<ObjectId> categoryIds;
+  @Schema(
+      description = "The category ids of the comic",
+      examples = {"6718cb6a65f0056b56c6682a"})
+  @NotEmpty
+  private List<ObjectId> categoryIds;
 
+  @Schema(
+      description = "The tags of the comic to help with recommendations",
+      examples = {"action", "adventure"})
   private List<String> tags;
 
   @JsonGetter("newChapters")
@@ -207,7 +252,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, originalSource);
+    return Objects.hash(id, thirdPartySource);
   }
 
   @Override
@@ -218,8 +263,8 @@ public class Comic implements Sluggable, Serializable {
     final Comic other = (Comic) obj;
     if (other != null && this.id != null) {
       return other.id.equals(this.id);
-    } else if (originalSource != null && other.originalSource != null) {
-      return originalSource.equals(other.originalSource);
+    } else if (thirdPartySource != null && other.thirdPartySource != null) {
+      return thirdPartySource.equals(other.thirdPartySource);
     }
     return false;
   }
