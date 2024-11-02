@@ -17,7 +17,6 @@ import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.ThirdPartyMetadataRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
-import com.comic.server.utils.ConsoleUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -186,71 +186,84 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
       return Page.empty();
     }
 
+    var remainingPages = comicPaginationMetadata.getRemainingPages();
+
+    final long MAX_REQUEST = remainingPages > 2 ? 2 : 1;
+
     var client = HttpClient.newHttpClient();
 
-    var request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + "/danh-sach/truyen-moi?page=" + nextPage))
-            .header("Accept", "application/json")
-            .GET()
-            .build();
+    List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>((int) MAX_REQUEST);
 
-    var pageResult =
-        client
-            .sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .thenApply(HttpResponse::body)
-            .thenApply(
-                body -> {
-                  JsonNode map = null;
-                  try {
-                    map = objectMapper.readTree(body);
-                  } catch (Exception e) {
-                    log.error("Error parsing response body", e);
-                    throw new RuntimeException(e);
-                  }
+    for (int i = 0; i < MAX_REQUEST; i++) {
+      var request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(BASE_URL + "/danh-sach/truyen-moi?page=" + nextPage + i))
+              .header("Accept", "application/json")
+              .GET()
+              .build();
+      log.info("Sending request to " + request.uri());
+      futures.add(client.sendAsync(request, HttpResponse.BodyHandlers.ofString()));
+    }
 
-                  if (map == null) {
-                    return new PageImpl<ComicDTO>(List.of(), pageable, 0);
-                  }
+    return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+        .thenApply(
+            v -> {
+              List<ComicDTO> comicDTOs = new ArrayList<>();
+              long totalComicsForPageImpl = 0;
+              for (int i = 0; i < MAX_REQUEST; i++) {
+                try {
+                  var future = futures.get(i);
+                  var response = future.get();
+                  JsonNode map = objectMapper.readTree(response.body());
                   var data = map.get("data");
 
-                  List<ComicDTO> comicDTOs = proccessComics(data);
+                  List<ComicDTO> comicDTOs_i = proccessComics(data);
 
-                  long comicDTOsSize = comicDTOs.size();
-
-                  if (comicDTOsSize > 0) {
-                    metadata.incrementTotalSyncedItems(comicDTOsSize);
+                  if (!comicDTOs_i.isEmpty()) {
+                    comicDTOs.addAll(comicDTOs_i);
+                    metadata.incrementTotalSyncedItems(comicDTOs_i.size());
 
                     JsonNode pagination = data.get("params").get("pagination");
                     long totalComics = pagination.get("totalItems").asLong();
                     long itemsPerPage = pagination.get("totalItemsPerPage").asLong();
-                    long totalComicsForPageImpl = totalComics - metadata.getTotalSyncedItems();
+                    totalComicsForPageImpl =
+                        (totalComicsForPageImpl > 0 ? totalComicsForPageImpl : totalComics)
+                            - metadata.getTotalSyncedItems();
 
                     comicPaginationMetadata.setTotalComics(totalComics);
                     comicPaginationMetadata.setTotalItemsPerPage(itemsPerPage);
-                    comicPaginationMetadata.setCurrentSyncedPage(nextPage);
+                    comicPaginationMetadata.setCurrentSyncedPage(nextPage + i);
 
-                    thirdPartyMetadataRepository.save(metadata);
                     log.info(
                         "Updated metadata: totalComics = {}, totalItemsPerPage = {},"
                             + " currentSyncedPage = {}",
                         totalComics,
                         itemsPerPage,
-                        nextPage);
-
-                    return new PageImpl<>(
-                        comicDTOs.stream()
-                            .skip(pageable.getOffset())
-                            .limit(pageable.getPageSize())
-                            .toList(),
-                        pageable,
-                        totalComicsForPageImpl);
+                        nextPage + i);
                   }
-                  return new PageImpl<ComicDTO>(List.of(), pageable, 0);
-                })
-            .join();
+                } catch (Exception e) {
+                  log.error("Error processing response", e);
+                }
+              }
 
-    return pageResult;
+              log.info(
+                  "Saving updated metadata to repository with source name" + SourceName.OTRUYEN);
+              thirdPartyMetadataRepository.save(metadata);
+
+              return new PageImpl<>(
+                  comicDTOs.stream()
+                      .skip(pageable.getOffset())
+                      .limit(pageable.getPageSize())
+                      .toList(),
+                  pageable,
+                  totalComicsForPageImpl);
+            })
+        .exceptionally(
+            e -> {
+              log.error("Error processing response", e);
+              return new PageImpl<ComicDTO>(List.of(), pageable, 0);
+            })
+        .join();
   }
 
   private Page<ComicDTO> getComicsWithCategories(List<String> filterCategoryIds) {
@@ -268,6 +281,9 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
     List<String> otruyenCategoriesSlugValid =
         otruyenCategoriesSlug.stream()
             .filter(slug -> metadata.getCategoryPagination(slug).getNextPage() > 0)
+            .toList()
+            .stream()
+            .limit(8) // limit request to 8
             .toList();
 
     var client = HttpClient.newHttpClient();
@@ -286,10 +302,14 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                           .header("Accept", "application/json")
                           .GET()
                           .build();
+
+                  log.info("Sending request to " + request.uri());
                   return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
                 })
             .filter(future -> future != null)
             .toList();
+
+    log.info("Sent {} requests to fetch comics data contains categories id", futures.size());
 
     var result =
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -303,7 +323,6 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                       var response = future.get();
                       JsonNode map = objectMapper.readTree(response.body());
                       var data = map.get("data");
-                      ConsoleUtils.prettyPrint(map);
 
                       List<ComicDTO> comicDTOs_i = proccessComics(data);
                       metadata.incrementTotalSyncedItems(comicDTOs_i.size());
@@ -334,26 +353,34 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                       comicDTOs.stream()
                           .filter(
                               comicDTO -> {
-                                var categories = comicDTO.getCategories();
-                                return otruyenCategoriesSlug.stream()
-                                    .allMatch(
-                                        slug ->
-                                            categories.stream()
-                                                .anyMatch((c) -> c.getSlug().equals(slug)));
+                                Set<String> comicCategorySlugs =
+                                    comicDTO.getCategories().stream()
+                                        .map((c) -> c.getSlug())
+                                        .collect(Collectors.toSet());
+
+                                return comicCategorySlugs.containsAll(otruyenCategoriesSlug);
                               })
                           .toList();
                   int comicDTOsListSize = comicDTOs.size();
-
-                  ConsoleUtils.prettyPrint(metadata);
 
                   return new PageImpl<ComicDTO>(
                       new ArrayList<>(comicDTOsList),
                       PageRequest.ofSize(comicDTOsListSize > 0 ? comicDTOsListSize : 1),
                       comicDTOsListSize);
                 })
+            .exceptionally(
+                e -> {
+                  log.error("Error processing response", e);
+                  return new PageImpl<ComicDTO>(List.of(), PageRequest.ofSize(1), 0);
+                })
             .join();
 
+    log.info("Saving updated metadata to repository with source name" + SourceName.OTRUYEN);
     thirdPartyMetadataRepository.save(metadata);
+
+    log.info(
+        "Completed getComicsWithCategories filter by categories id with {} comics",
+        result.getContent().size());
 
     return result;
   }

@@ -52,6 +52,13 @@ public class OtruyenMetadata extends AbstractThirdPartyMetadata {
       }
       return -1;
     }
+
+    public long getRemainingPages() {
+      if (totalComics == 0 && totalItemsPerPage == 0 && currentSyncedPage == 0) {
+        return -1; // First time sync
+      }
+      return (totalComics - currentSyncedPage * totalItemsPerPage) / totalItemsPerPage;
+    }
   }
 
   private long totalSyncedItems = 0;
