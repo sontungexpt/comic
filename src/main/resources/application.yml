@@ -42,7 +42,6 @@ spring:
       database: ${MONGO_DATABASE:comic-db}
       autoIndexCreation: true
     redis:
-      database: comic
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
