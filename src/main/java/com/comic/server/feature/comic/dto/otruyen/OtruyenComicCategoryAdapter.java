@@ -3,7 +3,6 @@ package com.comic.server.feature.comic.dto.otruyen;
 import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.repository.ComicCategoryRepository;
-import com.comic.server.utils.ConsoleUtils;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,7 @@ public class OtruyenComicCategoryAdapter {
 
   private final ComicCategoryRepository comicCategoryRepository;
 
+  /** Map from otruyen category name to real category name */
   Map<String, String> categoryNameMap =
       new HashMap<>() {
         {
@@ -72,6 +72,68 @@ public class OtruyenComicCategoryAdapter {
         }
       };
 
+  // Map from real category name to otruyen category slug
+  Map<String, String> otruyenSlugMap =
+      new HashMap<>() {
+        {
+          // convert from all names above to slug;
+          put("Action", "action");
+          put("Adventure", "adventure");
+          put("Anime", "anime");
+          put("Chuyển Sinh", "chuyen-sinh");
+          put("Comedy", "comedy");
+          put("Comic", "comic");
+          put("Cooking", "cooking");
+          put("Doujinshi", "doujinshi");
+          put("Drama", "drama");
+          put("Đam Mỹ", "dam-my");
+          put("Ecchi", "ecchi");
+          put("Fantasy", "fantasy");
+          put("Ecchi", "ecchi");
+          put("Fantasy", "fantasy");
+          put("Gender Bender", "gender-bender");
+          put("Harem", "harem");
+          put("Historical", "historical");
+          put("Horror", "horror");
+          put("Josei", "josei");
+          put("Live action", "live-action");
+          put("Manga", "manga");
+          put("Manhua", "manhua");
+          put("Manhwa", "manhwa");
+          put("Martial Arts", "martial-arts");
+          put("Mature", "mature");
+          put("Mecha", "mecha");
+          put("Mystery", "mystery");
+          put("One shot", "one-shot");
+          put("Psychological", "psychological");
+          put("Romance", "romance");
+          put("School Life", "school-life");
+          put("Sci-fi", "sci-fi");
+          put("Seinen", "seinen");
+          put("Shoujo", "shoujo");
+          put("Shoujo Ai", "shoujo-ai");
+          put("Shounen", "shounen");
+          put("Shounen Ai", "shounen-ai");
+          put("Slice of Life", "slice-of-life");
+          put("Smut", "smut");
+          put("Soft Yaoi", "soft-yaoi");
+          put("Soft Yuri", "soft-yuri");
+          put("Sports", "sports");
+          put("Supernatural", "supernatural");
+          put("Tạp Chí Truyện Tranh", "tap-chi-truyen-tranh");
+          put("Thiếu Nhi", "thieu-nhi");
+          put("Tragedy", "tragedy");
+          put("Trinh Thám", "trinh-tham");
+          put("Truyện Chữ", "truyen-chu");
+          put("Truyện Màu", "truyen-mau");
+          put("Việt Nam", "viet-nam");
+          put("Webtoon", "webtoon");
+          put("Xuyên Không", "xuyen-khong");
+          put("16+", "16-plus");
+          put("Unknown", "unknown");
+        }
+      };
+
   Map<String, ComicCategory> categoryCache = new HashMap<>();
 
   public ComicCategory getUnknownCategory() {
@@ -93,10 +155,8 @@ public class OtruyenComicCategoryAdapter {
 
   public ComicCategory convertToComicCategory(String categoryName) {
     if (categoryCache.containsKey(categoryName)) {
-      ConsoleUtils.prettyPrint("Cache hit");
       return categoryCache.get(categoryName);
     }
-
     String mappedCategoryName = categoryNameMap.get(categoryName);
     if (mappedCategoryName != null) {
       ComicCategory returnCategory =
@@ -116,5 +176,17 @@ public class OtruyenComicCategoryAdapter {
 
   public ComicCategory convertToComicCategory(OtruyenCategory category) {
     return convertToComicCategory(category.getName());
+  }
+
+  public String getSlugFromCategoryName(String categoryName) {
+    String mappedCategoryName = categoryNameMap.get(categoryName);
+    if (mappedCategoryName != null) {
+      return otruyenSlugMap.get(mappedCategoryName);
+    }
+    return otruyenSlugMap.get("Unknown");
+  }
+
+  public String getSlugFromCategory(ComicCategory category) {
+    return getSlugFromCategoryName(category.getName());
   }
 }

@@ -11,6 +11,8 @@ import com.comic.server.feature.comic.repository.ComicDetailRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.utils.ConsoleUtils;
+import com.comic.server.utils.SortUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,8 +49,8 @@ public class ComicServiceImpl implements ComicService {
   }
 
   @Override
-  public long countComics() {
-    return comicRepository.count();
+  public long countComics(List<String> filterCategoryIds) {
+    return comicDetailRepository.countComicDTOs(filterCategoryIds);
   }
 
   @Override
@@ -89,7 +91,8 @@ public class ComicServiceImpl implements ComicService {
 
     int pageSize = pageable.getPageSize();
     int currentNumberOfElements = comics.getNumberOfElements();
-    if (currentNumberOfElements < pageSize) {
+
+    if (currentNumberOfElements < pageSize || comics.isLast()) {
       log.info("Fetching more comics from next service");
 
       int remainingSize = pageSize - currentNumberOfElements;
@@ -99,16 +102,21 @@ public class ComicServiceImpl implements ComicService {
               .getComicsWithCategories(
                   PageRequest.of(0, remainingSize, pageable.getSort()), filterCategoryIds);
 
-      var returnComics = new ArrayList<>(comics.getContent());
-
+      var returnComics = new HashSet<>(comics.getContent());
       returnComics.addAll(nextComics.getContent());
 
       return new PageImpl<>(
-          returnComics, pageable, comics.getTotalElements() + nextComics.getTotalElements());
+          SortUtils.sort(new ArrayList<>(returnComics), pageable).stream().limit(pageSize).toList(),
+          pageable,
+          comics.getTotalElements() + nextComics.getTotalElements());
     }
 
+    ConsoleUtils.prettyPrint(pageable);
+
     return new PageImpl<>(
-        comics.getContent(), pageable, comics.getTotalElements() + getNextService().countComics());
+        comics.getContent(),
+        pageable,
+        comics.getTotalElements() + getNextService().countComics(filterCategoryIds));
   }
 
   @Override
@@ -130,12 +138,12 @@ public class ComicServiceImpl implements ComicService {
       Page<ComicDTO> nextComics =
           getNextService()
               .searchComic(keyword, PageRequest.of(0, remainingSize, pageable.getSort()));
-      var returnComics = new HashSet<>(comics.getContent());
 
+      var returnComics = new HashSet<>(comics.getContent());
       returnComics.addAll(nextComics.getContent());
 
       return new PageImpl<>(
-          new ArrayList<>(returnComics),
+          SortUtils.sort(new ArrayList<>(returnComics), pageable).stream().limit(pageSize).toList(),
           pageable,
           comics.getTotalElements() + nextComics.getTotalElements());
     }
@@ -153,44 +161,4 @@ public class ComicServiceImpl implements ComicService {
         .findById(comicId)
         .orElseThrow(() -> new ResourceNotFoundException(Comic.class, "id", comicId));
   }
-
-  // @Override
-  // public CompletableFuture<Page<ComicDTO>> getComicsWithCategories(
-  //     Pageable pageable, List<String> filterCategoryIds) {
-
-  //   return CompletableFuture.supplyAsync(
-  //           () -> comicDetailRepository.findAllWithCategories(pageable, filterCategoryIds))
-  //       .thenCompose(
-  //           comics -> {
-  //             int pageSize = pageable.getPageSize();
-  //             int currentElements = comics.getNumberOfElements();
-  //             ConsoleUtils.prettyPrint(pageSize);
-  //             ConsoleUtils.prettyPrint(currentElements);
-
-  //             // If no additional comics are needed, return the result as-is
-  //             if (currentElements == pageSize) {
-  //               return CompletableFuture.completedFuture(
-  //                   new PageImpl<>(comics.getContent(), pageable, comics.getTotalElements()));
-  //             }
-
-  //             // Otherwise, fetch the remaining comics from the next service
-  //             int remainingSize = pageSize - currentElements;
-
-  //             return getNextService()
-  //                 .getComicsWithCategories(
-  //                     PageRequest.of(0, remainingSize, pageable.getSort()), filterCategoryIds)
-  //                 .thenApply(
-  //                     nextComics -> {
-  //                       // Combine the results
-  //                       var combinedComics = new ArrayList<>(comics.getContent());
-  //                       combinedComics.addAll(nextComics.getContent());
-
-  //                       // Return a new PageImpl with combined data
-  //                       return new PageImpl<>(
-  //                           combinedComics,
-  //                           pageable,
-  //                           comics.getTotalElements() + nextComics.getTotalElements());
-  //                     });
-  //           });
-  // }
 }

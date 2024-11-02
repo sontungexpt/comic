@@ -13,7 +13,7 @@ public interface ChainGetComicService {
 
   ChainGetComicService getNextService();
 
-  long countComics();
+  long countComics(List<String> filterCategoryIds);
 
   ComicDetailDTO getComicDetail(String comicId, SourceName sourceName, Pageable pageable);
 
