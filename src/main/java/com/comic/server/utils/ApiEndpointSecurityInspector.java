@@ -106,7 +106,16 @@ public class ApiEndpointSecurityInspector {
    * @param path The path of the public endpoint.
    */
   public void addPublicEndpoint(String path) {
-    addPublicEndpoint(path, false);
+    addPublicEndpoint(false, path);
+  }
+
+  /**
+   * Adds a public endpoint that is accessible via any HTTP method.
+   *
+   * @param paths The paths of the public endpoints.
+   */
+  public void addPublicEndpoint(String... paths) {
+    Arrays.stream(paths).forEach(path -> addPublicEndpoint(path));
   }
 
   /**
@@ -115,12 +124,21 @@ public class ApiEndpointSecurityInspector {
    * @param path The path of the public endpoint.
    * @param filterJwt Whether to filter JWT for the endpoint.
    */
-  public void addPublicEndpoint(String path, boolean filterJwt) {
+  public void addPublicEndpoint(boolean filterJwt, String path) {
     Arrays.stream(HttpMethod.values())
         .forEach(
             httpMethod -> {
-              addPublicEndpoint(httpMethod, path, filterJwt);
+              addPublicEndpoint(httpMethod, filterJwt, path);
             });
+  }
+
+  /**
+   * Adds a public endpoint that is accessible via any HTTP method.
+   *
+   * @param paths The paths of the public endpoints.
+   */
+  public void addPublicEndpoint(boolean filterJwt, String... paths) {
+    Arrays.stream(paths).forEach(path -> addPublicEndpoint(filterJwt, path));
   }
 
   /**
@@ -129,7 +147,7 @@ public class ApiEndpointSecurityInspector {
    * @param path The path of the public endpoint.
    */
   public void addPublicEndpoint(HttpMethod httpMethod, String path) {
-    addPublicEndpoint(httpMethod, path, false);
+    addPublicEndpoint(httpMethod, false, path);
   }
 
   /**
@@ -138,12 +156,32 @@ public class ApiEndpointSecurityInspector {
    * @param path The path of the public endpoint.
    * @param filterJwt Whether to filter JWT for the endpoint.
    */
-  public void addPublicEndpoint(HttpMethod httpMethod, String path, boolean filterJwt) {
+  public void addPublicEndpoint(HttpMethod httpMethod, String... paths) {
+    Arrays.stream(paths).forEach(path -> addPublicEndpoint(httpMethod, path));
+  }
+
+  /**
+   * Adds a public endpoint that is accessible via any HTTP method.
+   *
+   * @param paths The paths of the public endpoints.
+   */
+  public void addPublicEndpoint(HttpMethod httpMethod, boolean filterJwt, String... paths) {
+    Arrays.stream(paths).forEach(path -> addPublicEndpoint(httpMethod, filterJwt, path));
+  }
+
+  /**
+   * Adds a public endpoint that is accessible via any HTTP method.
+   *
+   * @param path The path of the public endpoint.
+   * @param filterJwt Whether to filter JWT for the endpoint.
+   */
+  public void addPublicEndpoint(HttpMethod httpMethod, boolean filterJwt, String path) {
 
     if (publicEndpoints.get(httpMethod) == null) {
       publicEndpoints.put(httpMethod, new HashSet<PathWithCondition>());
     }
     publicEndpoints.get(httpMethod).add(new PathWithCondition(path, filterJwt));
+    log.info("Added public endpoint: " + path + " for " + httpMethod);
   }
 
   /**

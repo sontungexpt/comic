@@ -6,7 +6,6 @@ caching:
     userListTTL: 60000
 
 jwt:
-  # inlaco.JWT-secret-key
   secret-key: ${JWT_SECRET_KEY}
   access-token-expiration: 36000000 # 5 mins
   refresh-token-expiration: 2592000000 # 30 days
@@ -18,7 +17,7 @@ spring:
   application:
     name: "comic"
   profiles:
-    active: prod
+    active: dev
   mail:
     host: smtp.gmail.com
     port: 587
@@ -52,10 +51,21 @@ spring:
     #   - rate-limit-filter
     jcache:
       provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-  # redis:
-  #   host: ${REDIS_HOST}
-  #   port: ${REDIS_PORT}
-  #   password: ${REDIS_PASSWORD:IxXNUvoIE4ZywfZ8PMZ0nmVxVzKwUeC3}
+  redis:
+    database:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password:
+    # ssl:
+    # timeout:
+    # connectTimeout:
+    # clientName:
+    # cluster:
+    #   nodes:
+    # sentinel:
+    #   master:
+    #   nodes:
+    # password: ${REDIS_PASSWORD}
 
 cloudinary:
   cloud_name: ${CLOUDINARY_CLOUD_NAME}

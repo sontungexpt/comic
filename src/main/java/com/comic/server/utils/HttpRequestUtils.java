@@ -1,7 +1,7 @@
-// package com.comic.server.utils;
+// package com.inlaco.crewmgrservice.utils;
 
 // import com.fasterxml.jackson.databind.ObjectMapper;
-// import com.comic.server.exceptions.HttpRequestException;
+// import com.inlaco.crewmgrservice.exceptions.HttpRequestException;
 
 // import java.io.IOException;
 // import java.io.OutputStreamWriter;

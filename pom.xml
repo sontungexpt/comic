@@ -192,6 +192,15 @@
       <groupId>com.github.ben-manes.caffeine</groupId>
       <artifactId>jcache</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson-spring-boot-starter</artifactId>
+      <version>3.38.1</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

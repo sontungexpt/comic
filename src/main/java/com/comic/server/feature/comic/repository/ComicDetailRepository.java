@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -108,5 +109,18 @@ public class ComicDetailRepository {
         Criteria.where("alternativeNames").regex(keyword, "i"));
 
     return executeComicAggregation(criteria, pageable);
+  }
+
+  public long countComicDTOs(List<String> filterCategoryIds) {
+    Query query = new Query();
+
+    if (!filterCategoryIds.isEmpty()) {
+      query.addCriteria(
+          new Criteria()
+              .and("categoryIds")
+              .all(filterCategoryIds.stream().map(ObjectId::new).toList()));
+    }
+
+    return mongoTemplate.count(query, Comic.class);
   }
 }
