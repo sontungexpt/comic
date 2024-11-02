@@ -187,6 +187,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
     }
 
     var client = HttpClient.newHttpClient();
+
     var request =
         HttpRequest.newBuilder()
             .uri(URI.create(BASE_URL + "/danh-sach/truyen-moi?page=" + nextPage))
