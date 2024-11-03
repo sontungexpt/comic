@@ -55,7 +55,7 @@ public class CacheConfig {
         new CaffeineCacheManager(
             "comics", "comic", "comic_chapters", "comic_chapter", "comic_categories");
     caffeineCacheManager.setCaffeineSpec(
-        CaffeineSpec.parse("maximumSize=3000,expireAfterAccess=30000s"));
+        CaffeineSpec.parse("maximumSize=8000,expireAfterAccess=30000s"));
 
     // caffeineCacheManager.registerCustomCache(
     //     "productCategories",
