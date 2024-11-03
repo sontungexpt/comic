@@ -2,6 +2,7 @@ package com.comic.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
@@ -11,6 +12,9 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 @Configuration
 @EnableCaching
@@ -51,7 +55,7 @@ public class CacheConfig {
         new CaffeineCacheManager(
             "comics", "comic", "comic_chapters", "comic_chapter", "comic_categories");
     caffeineCacheManager.setCaffeineSpec(
-        CaffeineSpec.parse("maximumSize=3000,expireAfterAccess=30000s"));
+        CaffeineSpec.parse("maximumSize=8000,expireAfterAccess=30000s"));
 
     // caffeineCacheManager.registerCustomCache(
     //     "productCategories",
@@ -64,15 +68,15 @@ public class CacheConfig {
     return caffeineCacheManager;
   }
 
-  // @Bean
-  // public RedisCacheConfiguration redisCacheConfiguration() {
-  //   return RedisCacheConfiguration.defaultCacheConfig()
-  //       .entryTtl(Duration.ofMinutes(5))
-  //       .disableCachingNullValues()
-  //       .serializeValuesWith(
-  //           RedisSerializationContext.SerializationPair.fromSerializer(
-  //               new GenericJackson2JsonRedisSerializer(objectMapper)));
-  // }
+  @Bean
+  public RedisCacheConfiguration redisCacheConfiguration() {
+    return RedisCacheConfiguration.defaultCacheConfig()
+        .entryTtl(Duration.ofMinutes(5))
+        .disableCachingNullValues()
+        .serializeValuesWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(
+                new GenericJackson2JsonRedisSerializer(objectMapper)));
+  }
 
   // @Bean("redisCacheManager")
   // public CacheManager redisCacheManager(
