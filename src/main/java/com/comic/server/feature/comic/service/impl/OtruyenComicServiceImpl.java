@@ -17,11 +17,12 @@ import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.ThirdPartyMetadataRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
+import com.comic.server.feature.user.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.ErrorCategory;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -52,8 +53,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OtruyenComicServiceImpl implements ChainGetComicService {
 
-  private String BASE_URL = "https://otruyenapi.com/v1/api";
-  private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads";
+  public static final String BASE_URL = "https://otruyenapi.com/v1/api";
+
   private ObjectMapper objectMapper = new ObjectMapper();
   private final ComicRepository comicRepository;
   private final ComicCategoryRepository comicCategoryRepository;
@@ -75,12 +76,10 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
 
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       JsonNode map = objectMapper.readTree(response.body());
-
       OtruyenComic comic =
           objectMapper.convertValue((map.get("data")).get("item"), OtruyenComic.class);
 
-      comic.setThumbUrl(CDN_IMAGE_URL + "/comics/" + comic.getThumbUrl());
-
+      log.info("Get comic from " + SourceName.OTRUYEN + " successfully");
       return Optional.of(comic);
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -91,7 +90,8 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   }
 
   @Override
-  public ComicDetailDTO getComicDetail(String comicId, SourceName sourceName, Pageable pageable) {
+  public ComicDetailDTO getComicDetail(
+      String comicId, SourceName sourceName, Pageable pageable, User user) {
     if (sourceName == SourceName.OTRUYEN) {
       Comic comic =
           comicRepository
@@ -132,6 +132,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
     List<ComicDTO> comicDTOs = new ArrayList<>();
 
     try {
+      log.info("Save new comics from {} to database ", SourceName.OTRUYEN);
       var bulkOperation = mongoTemplate.bulkOps(BulkMode.UNORDERED, Comic.class);
       bulkOperation.insert(comics);
       var results = bulkOperation.execute();
@@ -143,22 +144,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                 int index = result.getIndex();
                 Comic comic = comics.get(index);
                 // comic.setId(result.getId().asObjectId().getValue().toHexString());
-                comicDTOs.add(
-                    ComicDTO.builder()
-                        .id(comic.getId())
-                        .name(comic.getName())
-                        .authors(comic.getAuthors())
-                        .artists(comic.getArtists())
-                        .categories(comicsResult.get(index).getCategories())
-                        .tags(comic.getTags())
-                        .characters(comic.getCharacters())
-                        .newChapters(comic.getNewChaptersInfo())
-                        .status(comic.getStatus())
-                        .alternativeNames(comic.getAlternativeNames())
-                        .summary(comic.getSummary())
-                        .thumbnailUrl(comic.getThumbnailUrl())
-                        .thirdPartySource(comic.getThirdPartySource())
-                        .build());
+                comicDTOs.add(new ComicDTO(comic, comicsResult.get(index).getCategories()));
               });
     } catch (BulkOperationException e) {
       for (var error : e.getErrors()) {
@@ -235,7 +221,9 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                     comicPaginationMetadata.setCurrentSyncedPage(nextPage + i);
 
                     log.info(
-                        "Updated metadata: totalComics = {}, totalItemsPerPage = {},"
+                        "Updated metadata:"
+                            + " totalComics = {},"
+                            + " totalItemsPerPage = {},"
                             + " currentSyncedPage = {}",
                         totalComics,
                         itemsPerPage,
@@ -260,7 +248,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
             })
         .exceptionally(
             e -> {
-              log.error("Error processing response", e);
+              e.printStackTrace();
               return new PageImpl<ComicDTO>(List.of(), pageable, 0);
             })
         .join();
@@ -469,13 +457,14 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
             .GET()
             .build();
 
+    log.info("Sending request to " + request.uri());
+
     return client
         .sendAsync(request, HttpResponse.BodyHandlers.ofString())
         .thenApply(HttpResponse::body)
         .thenApply(
             body -> {
               try {
-
                 JsonNode map = objectMapper.readTree(body);
                 var data = map.get("data");
                 List<ComicDTO> comicDTOs = proccessComics(data);
@@ -489,9 +478,9 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                   metadata.incrementTotalSyncedItems(comicDTOs.size());
                   thirdPartyMetadataRepository.save(metadata);
                 }
-
                 return new PageImpl<>(comicDTOs, pageable, comicDTOs.size());
-              } catch (IOException e) {
+              } catch (JsonProcessingException e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
               }
             })

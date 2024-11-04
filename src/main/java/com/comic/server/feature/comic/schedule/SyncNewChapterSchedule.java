@@ -20,36 +20,31 @@ public class SyncNewChapterSchedule {
   private final ComicRepository comicRepository;
   private final OtruyenComicServiceImpl otruyenComicService;
 
-  @Scheduled(cron = "0 0 0 * * *")
   @Async
+  @Scheduled(cron = "0 0 0 * * *")
   public void syncNewChaptersFromOtruyen() {
 
     List<Comic> comics = comicRepository.findByThirdPartySourceName(SourceName.OTRUYEN);
 
-    comics.forEach(
-        comic -> {
-          try {
-            List<ShortInfoChapter> chapters = otruyenComicService.getChaptersByComic(comic);
-            if (chapters.isEmpty()) {
-              return;
-            }
+    for (Comic comic : comics) {
+      try {
+        List<ShortInfoChapter> chapters = otruyenComicService.getChaptersByComic(comic);
+        if (chapters == null || chapters.isEmpty()) {
+          return;
+        }
 
-            // get  three lastest chapter at the end of list
-            int size = chapters.size();
-            if (size > 3) {
-              List<ShortInfoChapter> lastestChapters = chapters.subList(size - 3, size);
-              for (ShortInfoChapter chapter : lastestChapters) {
-                comic.addNewChapter(chapter);
-              }
-            } else {
-              for (ShortInfoChapter chapter : chapters) {
-                comic.addNewChapter(chapter);
-              }
-            }
-          } catch (Exception e) {
-            log.error("Error when sync new chapters for comic: {}", comic.getName(), e);
-          }
-        });
+        // get three lastest chapter at the end of list
+        int size = chapters.size();
+        List<ShortInfoChapter> lastestChapters =
+            size > 3 ? chapters.subList(size - 3, size) : chapters;
+
+        for (ShortInfoChapter chapter : lastestChapters) {
+          comic.addNewChapter(chapter);
+        }
+      } catch (Exception e) {
+        log.error("Error when sync new chapters for comic: {}", comic.getName(), e);
+      }
+    }
 
     comicRepository.saveAll(comics);
   }

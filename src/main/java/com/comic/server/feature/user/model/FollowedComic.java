@@ -11,11 +11,13 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
 @Document(collection = "followed_comics")
+@CompoundIndex(name = "user_comic", def = "{'userId': 1, 'comicId': 1}", unique = true)
 public class FollowedComic {
 
   @Id private String id;
@@ -28,6 +30,10 @@ public class FollowedComic {
   }
 
   @NotBlank private ObjectId comicId;
+
+  @CreatedDate private Instant createdAt;
+
+  @LastModifiedDate private Instant updatedAt;
 
   @JsonGetter("comicId")
   public String getComicId() {
@@ -45,8 +51,4 @@ public class FollowedComic {
     this.userId = new ObjectId(userId);
     this.comicId = new ObjectId(comicId);
   }
-
-  @CreatedDate private Instant createdAt;
-
-  @LastModifiedDate private Instant updatedAt;
 }

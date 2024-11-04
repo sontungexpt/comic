@@ -4,7 +4,6 @@ import com.comic.server.exceptions.ResourceAlreadyInUseException;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.service.ComicCategoryService;
-import com.comic.server.utils.ConsoleUtils;
 import com.comic.server.utils.DuplicateKeyUtils;
 import com.comic.server.utils.DuplicateKeyUtils.KeyValue;
 import java.util.List;
@@ -46,9 +45,6 @@ public class ComicCategoryServiceImpl implements ComicCategoryService {
           DuplicateKeyUtils.extractDuplicateField(e.getMessage())
               .orElseThrow(
                   () -> new ResourceAlreadyInUseException(ComicCategory.class, "name", "unknown"));
-
-      ConsoleUtils.prettyPrint(keyValue.getKey());
-      ConsoleUtils.prettyPrint(keyValue.getValue());
 
       throw new ResourceAlreadyInUseException(
           ComicCategory.class, keyValue.getKey(), keyValue.getValue());

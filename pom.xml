@@ -12,7 +12,7 @@
   <artifactId>server</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>server</name>
-  <description>Demo project for Spring Boot</description>
+  <description>The web service for comic application</description>
   <url></url>
   <licenses>
     <license></license>

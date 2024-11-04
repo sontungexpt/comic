@@ -3,6 +3,7 @@ package com.comic.server.feature.comic.dto;
 import com.comic.server.feature.comic.model.Artist;
 import com.comic.server.feature.comic.model.Author;
 import com.comic.server.feature.comic.model.Character;
+import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.OriginalSource;
@@ -67,6 +68,24 @@ public class ComicDTO implements Serializable {
   private Iterable<ShortInfoChapter> newChapters;
 
   private List<Character> characters;
+
+  public ComicDTO(Comic comic, List<ComicCategory> categories) {
+    this.id = comic.getId();
+    this.name = comic.getName();
+    this.alternativeNames = comic.getAlternativeNames();
+    this.summary = comic.getSummary();
+    this.thumbnailUrl = comic.getThumbnailUrl();
+    this.slug = comic.getSlug();
+    this.status = comic.getStatus();
+    this.originalSource = comic.getOriginalSource();
+    this.thirdPartySource = comic.getThirdPartySource();
+    this.authors = comic.getAuthors();
+    this.artists = comic.getArtists();
+    this.categories = categories;
+    this.tags = comic.getTags();
+    this.newChapters = comic.getNewChaptersInfo();
+    this.characters = comic.getCharacters();
+  }
 
   @Override
   public int hashCode() {

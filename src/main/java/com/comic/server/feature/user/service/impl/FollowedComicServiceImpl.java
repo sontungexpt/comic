@@ -1,26 +1,38 @@
 package com.comic.server.feature.user.service.impl;
 
+import com.comic.server.exceptions.ResourceAlreadyInUseException;
 import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.user.model.FollowedComic;
 import com.comic.server.feature.user.repository.CustomFollowedComicRepository;
 import com.comic.server.feature.user.repository.FollowedComicRepository;
 import com.comic.server.feature.user.service.FollowedComicService;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
-public record FollowedComicServiceImpl(
-    FollowedComicRepository followedComicRepository,
-    CustomFollowedComicRepository customFollowedComicRepository)
-    implements FollowedComicService {
+public class FollowedComicServiceImpl implements FollowedComicService {
+  private final FollowedComicRepository followedComicRepository;
+  private final CustomFollowedComicRepository customFollowedComicRepository;
 
   @Override
+  @CacheEvict(value = "comic", allEntries = true)
   public void followComic(String userId, String comicId) {
-    followedComicRepository.save(new FollowedComic(userId, comicId));
+    try {
+      followedComicRepository.insert(new FollowedComic(userId, comicId));
+    } catch (DuplicateKeyException e) {
+      throw new ResourceAlreadyInUseException(
+          FollowedComic.class, Map.of("userId", userId, "comicId", comicId));
+    }
   }
 
   @Override
+  @CacheEvict(value = "comic", allEntries = true)
   public void unfollowComic(String userId, String comicId) {
     followedComicRepository.deleteByUserIdAndComicId(userId, comicId);
   }

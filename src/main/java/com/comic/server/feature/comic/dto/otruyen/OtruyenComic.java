@@ -2,6 +2,7 @@ package com.comic.server.feature.comic.dto.otruyen;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
@@ -25,6 +26,8 @@ import lombok.Setter;
 })
 public class OtruyenComic implements Serializable {
 
+  public static final String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads/comics";
+
   @JsonProperty("_id")
   private String id;
 
@@ -43,8 +46,12 @@ public class OtruyenComic implements Serializable {
   @JsonProperty("status")
   private String status;
 
-  @JsonProperty("thumb_url")
   private String thumbUrl;
+
+  @JsonSetter("thumb_url")
+  public void setThumbUrl(String thumbUrl) {
+    this.thumbUrl = CDN_IMAGE_URL + "/" + thumbUrl;
+  }
 
   @JsonProperty("sub_docquyen")
   private boolean subDocQuyen;

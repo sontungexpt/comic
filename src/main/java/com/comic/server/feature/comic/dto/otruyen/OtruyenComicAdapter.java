@@ -9,7 +9,6 @@ import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import java.util.List;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,7 +16,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -25,11 +23,10 @@ public class OtruyenComicAdapter {
 
   private final OtruyenComicCategoryAdapter otruyenComicCategoryAdapter;
 
-  private String CDN_IMAGE_URL = "https://img.otruyenapi.com/uploads/comics";
+  private final String DESCRIPTION = "Truyện được lấy từ otruyenapi.com";
 
   @Getter
   @Setter
-  @Data
   public class ComicWithCategories {
     private Comic comic;
     private List<ComicCategory> categories;
@@ -43,10 +40,7 @@ public class OtruyenComicAdapter {
   public ComicWithCategories convertToComic(OtruyenComic comic, boolean includedId) {
     List<ComicCategory> categories =
         comic.getCategory().stream()
-            .map(
-                (category) -> {
-                  return otruyenComicCategoryAdapter.convertToComicCategory(category);
-                })
+            .map(otruyenComicCategoryAdapter::convertToComicCategory)
             .toList();
 
     ObjectId comic_id = new ObjectId();
@@ -76,17 +70,13 @@ public class OtruyenComicAdapter {
                 .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))
                 .alternativeNames(comic.getOriginName())
                 .summary(comic.getContent())
-                .thumbnailUrl(
-                    StringUtils.hasText(comic.getThumbUrl())
-                            && comic.getThumbUrl().startsWith("http")
-                        ? comic.getThumbUrl()
-                        : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
+                .thumbnailUrl(comic.getThumbUrl())
                 .thirdPartySource(
                     ThirdPartySource.builder()
                         .name(SourceName.OTRUYEN)
                         .id(comic.getId())
                         .slug(comic.getSlug())
-                        .description("Truyện được lấy từ otruyenapi.com")
+                        .description(DESCRIPTION)
                         .build())
                 .build(),
             categories);
@@ -113,16 +103,13 @@ public class OtruyenComicAdapter {
         .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))
         .alternativeNames(comic.getOriginName())
         .summary(comic.getContent())
-        .thumbnailUrl(
-            comic.getThumbUrl().startsWith("http")
-                ? comic.getThumbUrl()
-                : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
+        .thumbnailUrl(comic.getThumbUrl())
         .thirdPartySource(
             ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
                 .id(comic.getId())
                 .slug(comic.getSlug())
-                .description("Truyện được lấy từ otruyenapi.com")
+                .description(DESCRIPTION)
                 .build())
         .build();
   }
@@ -173,10 +160,7 @@ public class OtruyenComicAdapter {
         .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))
         .alternativeNames(comic.getOriginName())
         .summary(comic.getContent())
-        .thumbnailUrl(
-            comic.getThumbUrl().startsWith("http")
-                ? comic.getThumbUrl()
-                : CDN_IMAGE_URL + "/" + comic.getThumbUrl())
+        .thumbnailUrl(comic.getThumbUrl())
         .chapters(
             new PageImpl<>(
                 chapters.stream().skip(pageable.getOffset()).limit(pageable.getPageSize()).toList(),
@@ -187,7 +171,7 @@ public class OtruyenComicAdapter {
                 .name(SourceName.OTRUYEN)
                 .id(comic.getId())
                 .slug(comic.getSlug())
-                .description("Truyện được lấy từ otruyenapi.com")
+                .description(DESCRIPTION)
                 .build())
         .build();
   }

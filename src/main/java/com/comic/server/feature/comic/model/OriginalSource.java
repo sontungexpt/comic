@@ -4,10 +4,12 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class OriginalSource implements Source {
 
   private String name;

@@ -25,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -115,13 +116,12 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-    apiEndpointSecurityInspector.addPublicEndpoint("/v1/auth/**");
-    apiEndpointSecurityInspector.addPublicEndpoint("/actuator/**");
+    apiEndpointSecurityInspector.addPublicEndpoint("/v1/auth/**", "/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(
             customizer -> {
-              // customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+              customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
               customizer.ignoringRequestMatchers("/**", "/actuator/**");
             })
 

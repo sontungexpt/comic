@@ -1,5 +1,6 @@
 package com.comic.server.feature.comic.model;
 
+import com.comic.server.annotation.AutoSlugify;
 import com.comic.server.common.model.Sluggable;
 import com.comic.server.common.structure.BoundedPriorityQueue;
 import com.comic.server.feature.comic.model.chapter.Chapter;
@@ -24,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -99,6 +99,7 @@ public class Comic implements Sluggable, Serializable {
   private String thumbnailUrl;
 
   @Schema(hidden = true)
+  @AutoSlugify(fields = "name")
   private String slug;
 
   @Schema(description = "The status of the comic", defaultValue = "NEW")
@@ -127,6 +128,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Schema(description = "The last time the daily views were reset", hidden = true)
   @Default
+  @JsonIgnore
   private Instant lastDailyReset = Instant.now();
 
   @Schema(
@@ -137,6 +139,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Schema(description = "The last time the weekly views were reset", hidden = true)
   @Default
+  @JsonIgnore
   private Instant lastWeeklyReset = Instant.now();
 
   @Schema(
@@ -147,6 +150,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Schema(description = "The last time the monthly views were reset", hidden = true)
   @Default
+  @JsonIgnore
   private Instant lastMonthlyReset = Instant.now();
 
   @Schema(
@@ -157,6 +161,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Schema(description = "The last time the yearly views were reset", hidden = true)
   @Default
+  @JsonIgnore
   private Instant lastYearlyReset = Instant.now();
 
   @Schema(
@@ -206,8 +211,6 @@ public class Comic implements Sluggable, Serializable {
     return newChapters.stream().sorted((c1, c2) -> c2.getNum().compareTo(c1.getNum())).toList();
   }
 
-  @Setter(AccessLevel.NONE)
-  @Getter(AccessLevel.NONE)
   @Schema(hidden = true)
   private List<ShortInfoChapter> newChapters;
 
@@ -244,11 +247,6 @@ public class Comic implements Sluggable, Serializable {
   @JsonIgnore
   @LastModifiedDate
   private Instant updatedAt;
-
-  @Override
-  public String generateSlug() {
-    return name;
-  }
 
   @Override
   public int hashCode() {
