@@ -32,7 +32,8 @@ public class SluggableModelListener extends AbstractMongoEventListener<Sluggable
           boolean unique = autoSlugify.unique();
           boolean fromUniqueField = autoSlugify.fromUniqueField();
 
-          final Slugify slg = Slugify.builder().underscoreSeparator(underscoreSep).build();
+          final Slugify slg =
+              Slugify.builder().transliterator(true).underscoreSeparator(underscoreSep).build();
 
           List<String> values =
               Arrays.stream(autoSlugify.fields())
@@ -64,21 +65,25 @@ public class SluggableModelListener extends AbstractMongoEventListener<Sluggable
               int value_len = concatFieldsValue.length();
 
               int nanoid_size = NanoIdUtils.DEFAULT_SIZE;
+
               if (value_len > 100) {
-                nanoid_size = 6;
+                nanoid_size = 5;
               } else if (value_len > 80) {
-                nanoid_size = 8;
+                nanoid_size = 7;
+              } else if (value_len > 70) {
+                nanoid_size = 9;
               } else if (value_len > 60) {
-                nanoid_size = 10;
+                nanoid_size = 11;
               } else if (value_len > 40) {
-                nanoid_size = 12;
+                nanoid_size = 13;
               } else if (value_len > 30) {
-                nanoid_size = 14;
+                nanoid_size = 15;
               } else if (value_len > 20) {
-                nanoid_size = 16;
+                nanoid_size = 17;
               } else if (value_len > 15) {
-                nanoid_size = 18;
+                nanoid_size = 19;
               }
+
               slug +=
                   NanoIdUtils.randomNanoId(
                       NanoIdUtils.DEFAULT_NUMBER_GENERATOR,

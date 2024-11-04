@@ -11,4 +11,6 @@ public interface FollowedComicService {
   void unfollowComic(String userId, String comicId);
 
   Page<ComicDTO> getFollowedComics(String userId, Pageable pageable);
+
+  boolean isUserFollowingComic(String userId, String comicId);
 }
