@@ -8,6 +8,7 @@ import com.comic.server.feature.user.repository.FollowedComicRepository;
 import com.comic.server.feature.user.service.FollowedComicService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -40,5 +41,11 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   @Override
   public Page<ComicDTO> getFollowedComics(String userId, Pageable pageable) {
     return customFollowedComicRepository.findByUserId(userId, pageable);
+  }
+
+  @Override
+  public boolean isUserFollowingComic(String userId, String comicId) {
+    return followedComicRepository.existsByUserIdAndComicId(
+        new ObjectId(userId), new ObjectId(comicId));
   }
 }

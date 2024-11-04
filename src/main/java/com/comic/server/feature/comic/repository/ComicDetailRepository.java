@@ -6,7 +6,7 @@ import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.user.model.User;
-import com.comic.server.feature.user.repository.FollowedComicRepository;
+import com.comic.server.feature.user.service.FollowedComicService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 public class ComicDetailRepository {
   private final MongoTemplate mongoTemplate;
 
-  private final FollowedComicRepository followedComicRepository;
+  private final FollowedComicService followedComicService;
 
   private Aggregation buildAggregation(Criteria criteria, Pageable pageable) {
     return Aggregation.newAggregation(
@@ -138,9 +138,7 @@ public class ComicDetailRepository {
     comic.pageChapters(pageable);
 
     if (user != null) {
-      comic.setFollowed(
-          followedComicRepository.existsByUserIdAndComicId(
-              new ObjectId(user.getId()), new ObjectId(comicId)));
+      comic.setFollowed(followedComicService.isUserFollowingComic(user.getId(), comicId));
     }
 
     return comic;

@@ -18,6 +18,7 @@ import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.ThirdPartyMetadataRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.user.model.User;
+import com.comic.server.feature.user.service.FollowedComicService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -62,31 +63,41 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   private final OtruyenComicAdapter otruyenComicAdapter;
   private final OtruyenComicCategoryAdapter otruyenComicCategoryAdapter;
   private final MongoTemplate mongoTemplate;
+  private final FollowedComicService followedComicService;
 
   private Optional<OtruyenComic> getOtruyenComicBySlug(String slug) {
-    try {
-      var client = HttpClient.newHttpClient();
+    var client = HttpClient.newHttpClient();
 
-      var request =
-          HttpRequest.newBuilder()
-              .uri(URI.create(BASE_URL + "/truyen-tranh/" + slug))
-              .header("Accept", "application/json")
-              .GET()
-              .build();
+    var request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(BASE_URL + "/truyen-tranh/" + slug))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
 
-      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      JsonNode map = objectMapper.readTree(response.body());
-      OtruyenComic comic =
-          objectMapper.convertValue((map.get("data")).get("item"), OtruyenComic.class);
+    log.info("Sending request to " + request.uri());
+    return client
+        .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        .thenApply(HttpResponse::body)
+        .thenApply(
+            body -> {
+              JsonNode map = null;
+              try {
+                map = objectMapper.readTree(body);
+              } catch (JsonProcessingException e) {
+                log.error("Error when getting comic from " + SourceName.OTRUYEN);
+                e.printStackTrace();
+              }
 
-      log.info("Get comic from " + SourceName.OTRUYEN + " successfully");
-      return Optional.of(comic);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return Optional.empty();
+              OtruyenComic comic = null;
+              if (map != null) {
+                comic =
+                    objectMapper.convertValue((map.get("data")).get("item"), OtruyenComic.class);
+              }
+
+              return Optional.ofNullable(comic);
+            })
+        .join();
   }
 
   @Override
@@ -102,12 +113,22 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
                           Comic.class,
                           Map.of("id", comicId, "thirdPartySource.name", SourceName.OTRUYEN)));
 
-      return otruyenComicAdapter.convertToComicDetailDTO(
-          getOtruyenComicBySlug(comic.getThirdPartySource().getSlug())
-              .orElseThrow(
-                  () -> new ResourceNotFoundException(OtruyenComic.class, "slug", comicId)),
-          comicId,
-          pageable);
+      String otruyenSlug = comic.getThirdPartySource().getSlug();
+
+      log.info("Getting comic detail from " + SourceName.OTRUYEN);
+      var comicDetail =
+          otruyenComicAdapter.convertToComicDetailDTO(
+              getOtruyenComicBySlug(otruyenSlug)
+                  .orElseThrow(
+                      () -> new ResourceNotFoundException(OtruyenComic.class, "slug", otruyenSlug)),
+              comicId,
+              pageable);
+
+      if (user != null) {
+        comicDetail.setFollowed(followedComicService.isUserFollowingComic(user.getId(), comicId));
+      }
+
+      return comicDetail;
     }
     return null;
   }
