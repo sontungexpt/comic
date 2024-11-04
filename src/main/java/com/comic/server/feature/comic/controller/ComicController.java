@@ -1,5 +1,7 @@
 package com.comic.server.feature.comic.controller;
 
+import com.comic.server.annotation.CurrentUser;
+import com.comic.server.annotation.PageableQueryParams;
 import com.comic.server.annotation.PublicEndpoint;
 import com.comic.server.config.OpenApiConfig;
 import com.comic.server.feature.comic.model.Comic;
@@ -7,16 +9,14 @@ import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
-import com.comic.server.feature.user.enums.RoleType;
+import com.comic.server.feature.user.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -43,13 +43,12 @@ public class ComicController {
   @GetMapping("")
   @PublicEndpoint
   @Operation(summary = "Get all comics", description = "Get all comics with pagination")
-  @PageableAsQueryParam
+  @PageableQueryParams
   public ResponseEntity<?> getComics(
       @Parameter(description = "The category ids to filter", required = false)
           @RequestParam(required = false)
           List<String> filterCategoryIds,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
-          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
   }
@@ -59,51 +58,32 @@ public class ComicController {
   @Operation(summary = "Create new comic", description = "Create new comic")
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> createNewComic(@RequestBody @Valid Comic comic) {
-    try {
-      return ResponseEntity.ok(comicService.createComic(comic));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
+    return ResponseEntity.ok(comicService.createComic(comic));
   }
 
   @GetMapping("/searching")
   @Operation(summary = "Search comics", description = "Search comics by keyword")
   @PublicEndpoint
-  @PageableAsQueryParam
+  @PageableQueryParams
   public ResponseEntity<?> searchComics(
       @RequestParam String q,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
-          @Parameter(hidden = true)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.searchComic(q, pageable));
   }
 
-  // public CompletableFuture<ResponseEntity<Page<ComicDTO>>> getComics(
-  //     @RequestParam(required = false) List<String> filterCategoryIds,
-  //     @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
-  //         Pageable pageable) {
-  //   return comicService
-  //       .getComicsWithCategories(pageable, filterCategoryIds)
-  //       .thenApply(ResponseEntity::ok)
-  //       .exceptionally(
-  //           ex -> {
-  //             log.error("Failed to fetch comics: ", ex);
-  //             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Page.empty());
-  //           });
-  // }
-
   @GetMapping("/{comicId}")
-  @PublicEndpoint
+  @PublicEndpoint(filterJwt = true)
   @Operation(summary = "Get comic detail", description = "Get comic detail by comicId")
-  @PageableAsQueryParam
+  @PageableQueryParams
+  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> getComicDetail(
       @PathVariable("comicId") String comicId,
+      @CurrentUser User user,
       @RequestParam(required = true) SourceName sourceName,
-      @PageableDefault(page = 0, size = 24, sort = "number", direction = Sort.Direction.ASC)
-          @Parameter(hidden = true)
+      @PageableDefault(page = 0, size = 50, sort = "num", direction = Sort.Direction.ASC)
           Pageable pageable) {
-    return ResponseEntity.ok(comicService.getComicDetail(comicId, sourceName, pageable));
+    return ResponseEntity.ok(comicService.getComicDetail(comicId, sourceName, pageable, user));
   }
 
   @GetMapping("/{comicId}/chapters")
@@ -124,7 +104,8 @@ public class ComicController {
   @PostMapping("/{comicId}/chapters")
   @Operation(summary = "Create chapter", description = "Create chapter of comic by comicId")
   @ResponseStatus(HttpStatus.CREATED)
-  @RolesAllowed(RoleType.Fields.POSTER)
+  // @RolesAllowed(RoleType.Fields.POSTER)
+  @PublicEndpoint(profiles = {"dev"})
   public AbstractChapter createChapter(
       @PathVariable("comicId") String comicId, @RequestBody @Valid AbstractChapter chapter) {
     chapter.setComicId(comicId);

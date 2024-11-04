@@ -15,6 +15,5 @@ public class Character extends Person {
 
   public Character(String name, String desc, String imageUrl) {
     super(name, desc, imageUrl);
-    // super(name, desc, imageUrl, PersonType.Charactor);
   }
 }

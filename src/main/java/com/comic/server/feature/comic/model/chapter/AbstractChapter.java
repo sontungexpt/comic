@@ -80,7 +80,10 @@ public abstract class AbstractChapter implements Chapter {
     return id;
   }
 
-  @Schema(description = "The unique identifier of the comic", example = "60f3b3b3b3b3b3b3b3b3b3")
+  @Schema(
+      description = "The unique identifier of the comic",
+      example = "60f3b3b3b3b3b3b3b3b3b3",
+      hidden = true)
   @NonNull
   private ObjectId comicId;
 
@@ -136,6 +139,7 @@ public abstract class AbstractChapter implements Chapter {
   @Schema(
       description = "The source of the chapter",
       example = "ROOT",
+      hidden = true,
       allowableValues = {"ROOT", "OTRUYEN", "MANGADEX"})
   @Default
   private ThirdPartySource thirdPartySource = ThirdPartySource.defaultSource();

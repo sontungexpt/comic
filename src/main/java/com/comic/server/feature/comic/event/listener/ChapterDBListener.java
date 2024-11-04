@@ -5,7 +5,6 @@ import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.repository.ChapterRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
-import com.comic.server.utils.ConsoleUtils;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +32,6 @@ public class ChapterDBListener extends AbstractMongoEventListener<AbstractChapte
                   CompletableFuture.runAsync(() -> chapterRepository.deleteById(chapter.getId()));
                   throw new ResourceNotFoundException(Comic.class, "id", chapter.getComicId());
                 });
-
-    ConsoleUtils.prettyPrint(chapter);
 
     log.info("Chapter {} added to comic {}", chapter.getId(), comic.getId());
     comic.addNewChapter(chapter);

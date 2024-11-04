@@ -11,7 +11,7 @@ import com.comic.server.feature.comic.repository.ComicDetailRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
 import com.comic.server.feature.comic.service.ComicService;
-import com.comic.server.utils.ConsoleUtils;
+import com.comic.server.feature.user.model.User;
 import com.comic.server.utils.SortUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,12 +54,19 @@ public class ComicServiceImpl implements ComicService {
   }
 
   @Override
-  @Cacheable(value = "comic", key = "'comicId:' + #comicId")
-  public ComicDetailDTO getComicDetail(String comicId, SourceName sourceName, Pageable pageable) {
+  @Cacheable(
+      value = "comic",
+      key =
+          "'comic_user:' + #comicId + #user?.id"
+              + "+ 'page:' + #pageable.pageNumber"
+              + "+ 'size:' + #pageable.pageSize"
+              + "+ 'sort:' + #pageable.sort")
+  public ComicDetailDTO getComicDetail(
+      String comicId, SourceName sourceName, Pageable pageable, User user) {
     if (sourceName == SourceName.ROOT) {
-      return comicDetailRepository.findComicDetail(comicId, pageable);
+      return comicDetailRepository.findComicDetail(comicId, pageable, user);
     } else {
-      return getNextService().getComicDetail(comicId, SourceName.OTRUYEN, pageable);
+      return getNextService().getComicDetail(comicId, sourceName, pageable, user);
     }
   }
 
@@ -81,8 +88,10 @@ public class ComicServiceImpl implements ComicService {
   @Cacheable(
       value = "comics",
       key =
-          "'page:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort"
-              + " + 'filter:' + #filterCategoryIds")
+          "'page:' + #pageable.pageNumber "
+              + "+ 'size:' + #pageable.pageSize "
+              + "+ 'sort:' + #pageable.sort "
+              + "+ 'filter:' + #filterCategoryIds?.toString()")
   @Override
   public Page<ComicDTO> getComicsWithCategories(Pageable pageable, List<String> filterCategoryIds) {
 
@@ -111,8 +120,6 @@ public class ComicServiceImpl implements ComicService {
           comics.getTotalElements() + nextComics.getTotalElements());
     }
 
-    ConsoleUtils.prettyPrint(pageable);
-
     return new PageImpl<>(
         comics.getContent(),
         pageable,
@@ -120,12 +127,6 @@ public class ComicServiceImpl implements ComicService {
   }
 
   @Override
-  @Cacheable(
-      value = "comics",
-      key =
-          "'page:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' +"
-              + " #pageable.sort"
-              + " + 'keyword:' + #keyword")
   public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
 
     Page<ComicDTO> comics = comicDetailRepository.findComicDetailByKeyword(keyword, pageable);
