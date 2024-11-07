@@ -11,71 +11,64 @@ import org.springframework.lang.NonNull;
 @Slf4j
 public class ResourceAlreadyInUseException extends BaseException {
 
-  private String resourceName;
+  private String resource;
   private Map<String, Object> conflictFields = new HashMap<>();
 
-  // private String fieldName;
-  // private Object fieldValue;
-
   public <T> ResourceAlreadyInUseException(
-      Class<T> resourceName, String conflictFieldName, Object conflictFieldValue) {
+      Class<T> resource, String conflictFieldName, Object conflictFieldValue) {
     this(
         String.format(
-            "%s already in use with %s : '%s'",
-            resourceName, conflictFieldName, conflictFieldValue),
-        resourceName,
+            "%s already in use with %s : '%s'", resource, conflictFieldName, conflictFieldValue),
+        resource,
         conflictFieldName,
         conflictFieldValue);
   }
 
   public <T> ResourceAlreadyInUseException(
       String message,
-      @NonNull Class<T> resourceName,
+      @NonNull Class<T> resource,
       @NonNull String conflictFieldName,
       Object conflictFieldValue) {
     super(HttpStatus.CONFLICT, message);
     try {
-      resourceName.getDeclaredField(conflictFieldName);
+      resource.getDeclaredField(conflictFieldName);
 
-      this.resourceName = resourceName.getSimpleName();
+      this.resource = resource.getSimpleName();
       this.conflictFields.put(conflictFieldName, conflictFieldValue);
     } catch (NoSuchFieldException e) {
-      log.error("Field {} not found in class {}", conflictFieldName, resourceName.getSimpleName());
+      log.error("Field {} not found in class {}", conflictFieldName, resource.getSimpleName());
       throw new RuntimeException(
           String.format(
-              "Field %s not found in class %s", conflictFieldName, resourceName.getSimpleName()));
+              "Field %s not found in class %s", conflictFieldName, resource.getSimpleName()));
     }
   }
 
-  public <T> ResourceAlreadyInUseException(
-      Class<T> resourceName, Map<String, Object> conflictFields) {
+  public <T> ResourceAlreadyInUseException(Class<T> resource, Map<String, Object> conflictFields) {
     this(
-        String.format("%s already in use with %s", resourceName, conflictFields.toString()),
-        resourceName,
+        String.format("%s already in use with %s", resource, conflictFields.toString()),
+        resource,
         conflictFields);
   }
 
   public <T> ResourceAlreadyInUseException(
-      String message, @NonNull Class<T> resourceName, Map<String, Object> conflictFields) {
+      String message, @NonNull Class<T> resource, Map<String, Object> conflictFields) {
     super(HttpStatus.CONFLICT, message);
     try {
 
       for (String conflictField : conflictFields.keySet()) {
-        resourceName.getDeclaredField(conflictField);
+        resource.getDeclaredField(conflictField);
       }
 
-      this.resourceName = resourceName.getSimpleName();
+      this.resource = resource.getSimpleName();
       this.conflictFields = conflictFields;
 
     } catch (NoSuchFieldException e) {
       log.error(
-          "Field {} not found in class {}",
-          conflictFields.toString(),
-          resourceName.getSimpleName());
+          "Field {} not found in class {}", conflictFields.toString(), resource.getSimpleName());
       throw new RuntimeException(
           String.format(
               "Field %s not found in class %s",
-              conflictFields.toString(), resourceName.getSimpleName()));
+              conflictFields.toString(), resource.getSimpleName()));
     }
   }
 

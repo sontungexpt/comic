@@ -29,7 +29,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonIgnoreProperties(
     value = {"deleted", "createdAt", "updatedAt", "createdBy", "updatedBy", "slug", "id"},
     allowGetters = true)
-public class ComicCategory implements Sluggable {
+public class ComicCategory implements Sluggable<String> {
 
   @Id
   @Schema(hidden = true)

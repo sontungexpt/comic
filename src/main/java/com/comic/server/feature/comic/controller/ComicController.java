@@ -10,10 +10,12 @@ import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
 import com.comic.server.feature.user.model.User;
+import com.comic.server.validation.annotation.ObjectId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +49,7 @@ public class ComicController {
   public ResponseEntity<?> getComics(
       @Parameter(description = "The category ids to filter", required = false)
           @RequestParam(required = false)
-          List<String> filterCategoryIds,
+          List<@ObjectId String> filterCategoryIds,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.getComicsWithCategories(pageable, filterCategoryIds));
@@ -66,7 +68,7 @@ public class ComicController {
   @PublicEndpoint
   @PageableQueryParams
   public ResponseEntity<?> searchComics(
-      @RequestParam String q,
+      @NotBlank @RequestParam String q,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok(comicService.searchComic(q, pageable));
@@ -78,7 +80,7 @@ public class ComicController {
   @PageableQueryParams
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   public ResponseEntity<?> getComicDetail(
-      @PathVariable("comicId") String comicId,
+      @PathVariable("comicId") @ObjectId String comicId,
       @CurrentUser User user,
       @RequestParam(required = true) SourceName sourceName,
       @PageableDefault(page = 0, size = 50, sort = "num", direction = Sort.Direction.ASC)
@@ -89,7 +91,7 @@ public class ComicController {
   @GetMapping("/{comicId}/chapters")
   @PublicEndpoint
   @Operation(summary = "Get chapters", description = "Get chapters by comicId")
-  public ResponseEntity<?> getChaptersByComicId(@PathVariable("comicId") String comicId) {
+  public ResponseEntity<?> getChaptersByComicId(@ObjectId @PathVariable("comicId") String comicId) {
     return ResponseEntity.ok(comicService.getChaptersByComicId(comicId));
   }
 
@@ -97,7 +99,8 @@ public class ComicController {
   @Operation(summary = "Get chapter by id", description = "Get chapter by id")
   @PublicEndpoint
   public AbstractChapter getChapterDetailById(
-      @PathVariable("comicId") String comicId, @PathVariable("chapterId") String chapterId) {
+      @ObjectId @PathVariable("comicId") String comicId,
+      @PathVariable("chapterId") String chapterId) {
     return chapterService.getChapterDetailById(comicId, chapterId);
   }
 
@@ -107,7 +110,8 @@ public class ComicController {
   // @RolesAllowed(RoleType.Fields.POSTER)
   @PublicEndpoint(profiles = {"dev"})
   public AbstractChapter createChapter(
-      @PathVariable("comicId") String comicId, @RequestBody @Valid AbstractChapter chapter) {
+      @ObjectId @PathVariable("comicId") String comicId,
+      @RequestBody @Valid AbstractChapter chapter) {
     chapter.setComicId(comicId);
     return chapterService.createChapter(chapter);
   }

@@ -20,8 +20,47 @@ public @interface AutoSlugify {
   boolean fromUniqueField() default false;
 
   /** The separator between words in the slug. */
-  boolean underscoreSeperation() default false;
+  Separator separator() default Separator.HYPHEN;
 
   /** The slug must be unique or not. */
   boolean unique() default true;
+
+  /** The strategy to update the slug. */
+  UpdateStrategy updateStrategy() default UpdateStrategy.ON_VALUE_CHANGE;
+
+  public enum UpdateStrategy {
+    ON_DOCUMENT_SAVE,
+    ON_VALUE_CHANGE,
+    NEVER_UPDATE,
+  }
+
+  public enum Separator {
+    UNDERSCORE("_"),
+    HYPHEN("-"),
+    ;
+
+    private String value;
+
+    Separator(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public static Separator fromValue(String value) {
+      for (Separator s : values()) {
+        if (s.value.equals(value)) {
+          return s;
+        }
+      }
+      throw new IllegalArgumentException("No separator with value " + value);
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
 }

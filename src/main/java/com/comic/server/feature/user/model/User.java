@@ -69,6 +69,9 @@ public class User implements UserDetails, Persistable<String> {
   @Schema(description = "The name of the account", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
+  @Schema(description = "The avatar path of the account")
+  private String avatar;
+
   @Default
   @Schema(description = "The status of the account")
   private UserStatus status = UserStatus.ACTIVE;
