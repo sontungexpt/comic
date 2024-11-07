@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
     value = {
       "id",
       "slug",
+      "lastNewChaptersCheckedAt",
       "statusUpdatedAt",
       "statusUpdatedAt",
       "dailyViews",
@@ -67,7 +69,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 })
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comic implements Sluggable, Serializable {
+public class Comic implements Sluggable<String>, Serializable {
 
   public enum Status {
     ONGOING,
@@ -80,6 +82,7 @@ public class Comic implements Sluggable, Serializable {
 
   @Id
   @Schema(hidden = true)
+  @Null
   private String id;
 
   @Schema(description = "The name of the comic", example = "One Piece")
@@ -195,7 +198,7 @@ public class Comic implements Sluggable, Serializable {
       description = "The category ids of the comic",
       examples = {"6718cb6a65f0056b56c6682a"})
   @NotEmpty
-  private List<ObjectId> categoryIds;
+  private List<@com.comic.server.validation.annotation.ObjectId ObjectId> categoryIds;
 
   @Schema(
       description = "The tags of the comic to help with recommendations",
@@ -226,6 +229,10 @@ public class Comic implements Sluggable, Serializable {
     }
   }
 
+  @Schema(description = "The last time new chapters were checked", hidden = true)
+  @Default
+  private Instant lastNewChaptersCheckedAt = Instant.now();
+
   @Schema(description = "The characters in the comic")
   private List<@Valid Character> characters;
 
@@ -241,7 +248,7 @@ public class Comic implements Sluggable, Serializable {
   @Schema(hidden = true)
   @JsonIgnore
   @LastModifiedBy
-  private String updatedBy;
+  private ObjectId updatedBy;
 
   @Schema(hidden = true)
   @JsonIgnore

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SyncNewChapterSchedule {
+public class CheckingNewChapterSchedule {
 
   private final ComicRepository comicRepository;
   private final OtruyenComicServiceImpl otruyenComicService;

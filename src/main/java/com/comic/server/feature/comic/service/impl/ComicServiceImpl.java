@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +39,14 @@ public class ComicServiceImpl implements ComicService {
   private final OtruyenComicServiceImpl otruyenComicService;
 
   @Override
+  @Transactional
   public Comic createComic(Comic comic) {
     return comicRepository.save(comic);
   }
 
   @Override
   @CacheEvict(value = "comics", allEntries = true)
+  @Transactional
   public List<Comic> createComics(Iterable<Comic> comics) {
     return comicRepository.saveAll(comics);
   }
@@ -109,7 +112,8 @@ public class ComicServiceImpl implements ComicService {
       Page<ComicDTO> nextComics =
           getNextService()
               .getComicsWithCategories(
-                  PageRequest.of(0, remainingSize, pageable.getSort()), filterCategoryIds);
+                  PageRequest.of(0, remainingSize > 0 ? remainingSize : 1, pageable.getSort()),
+                  filterCategoryIds);
 
       var returnComics = new HashSet<>(comics.getContent());
       returnComics.addAll(nextComics.getContent());

@@ -16,45 +16,45 @@ public class ResourceNotFoundException extends BaseException {
   private Map<String, Object> conflictFields = new HashMap<>();
 
   public <T> ResourceNotFoundException(
-      Class<T> resourceName, String conflictFieldName, Object conflictFieldValue) {
+      Class<T> resource, String conflictFieldName, Object conflictFieldValue) {
     this(
         String.format(
-            "%s not found with %s : '%s'", resourceName, conflictFieldName, conflictFieldValue),
-        resourceName,
+            "%s not found with %s : '%s'", resource, conflictFieldName, conflictFieldValue),
+        resource,
         conflictFieldName,
         conflictFieldValue);
   }
 
   public <T> ResourceNotFoundException(
       String message,
-      @NonNull Class<T> resourceName,
+      @NonNull Class<T> resource,
       @NonNull String conflictFieldName,
       Object conflictFieldValue) {
     super(HttpStatus.NOT_FOUND, message);
     try {
-      resourceName.getDeclaredField(conflictFieldName);
+      resource.getDeclaredField(conflictFieldName);
 
-      this.resourceName = resourceName.getSimpleName();
+      this.resourceName = resource.getSimpleName();
       this.conflictFields.put(conflictFieldName, conflictFieldValue);
     } catch (NoSuchFieldException e) {
-      log.error("Field {} not found in class {}", conflictFieldName, resourceName.getSimpleName());
+      log.error("Field {} not found in class {}", conflictFieldName, resource.getSimpleName());
       throw new RuntimeException(
           String.format(
-              "Field %s not found in class %s", conflictFieldName, resourceName.getSimpleName()));
+              "Field %s not found in class %s", conflictFieldName, resource.getSimpleName()));
     }
   }
 
-  public <T> ResourceNotFoundException(Class<T> resourceName, Map<String, Object> conflictFields) {
+  public <T> ResourceNotFoundException(Class<T> resource, Map<String, Object> conflictFields) {
     this(
-        String.format("%s not found with %s", resourceName, conflictFields.toString()),
-        resourceName,
+        String.format("%s not found with %s", resource, conflictFields.toString()),
+        resource,
         conflictFields);
   }
 
   public <T> ResourceNotFoundException(
-      String message, @NonNull Class<T> resourceName, Map<String, Object> conflictFields) {
+      String message, @NonNull Class<T> resource, Map<String, Object> conflictFields) {
     super(HttpStatus.NOT_FOUND, message);
-    this.resourceName = resourceName.getSimpleName();
+    this.resourceName = resource.getSimpleName();
     this.conflictFields = conflictFields;
   }
 
