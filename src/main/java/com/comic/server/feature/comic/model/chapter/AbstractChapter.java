@@ -9,8 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.mongodb.lang.NonNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -145,7 +143,7 @@ public abstract class AbstractChapter implements Chapter {
   private ThirdPartySource thirdPartySource = ThirdPartySource.defaultSource();
 
   @Override
-  @JsonSerialize(using = NullSerializer.class)
+  @JsonIgnore
   public ThirdPartySource getThirdPartySource() {
     return thirdPartySource;
   }

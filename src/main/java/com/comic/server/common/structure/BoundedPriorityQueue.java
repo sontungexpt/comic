@@ -12,6 +12,24 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
 
   private boolean unique = false;
 
+  private boolean updateIfExists = false;
+
+  public boolean isUnique() {
+    return unique;
+  }
+
+  public void setUnique(boolean unique) {
+    this.unique = unique;
+  }
+
+  public boolean isUpdateIfExists() {
+    return updateIfExists;
+  }
+
+  public void setUpdateIfExists(boolean updateIfExists) {
+    this.updateIfExists = updateIfExists;
+  }
+
   public BoundedPriorityQueue(int maxSize, Comparator<T> comparator) {
     this(maxSize, comparator, null);
   }
@@ -23,9 +41,19 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
 
   public BoundedPriorityQueue(
       int maxSize, Comparator<T> comparator, Iterable<? extends T> elements, boolean unique) {
+    this(maxSize, comparator, elements, unique, false);
+  }
+
+  public BoundedPriorityQueue(
+      int maxSize,
+      Comparator<T> comparator,
+      Iterable<? extends T> elements,
+      boolean unique,
+      boolean updateIfExists) {
     super(maxSize, comparator);
     this.maxSize = maxSize;
     this.unique = unique;
+    this.updateIfExists = updateIfExists;
     if (elements != null) {
       for (T element : elements) {
         add(element);
@@ -35,18 +63,22 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
 
   @Override
   public boolean add(T t) {
-    if (!checkExists(t)) {
+    if (isExists(t)) {
+      if (updateIfExists) {
+        removeIf(e -> comparator().compare(t, e) == 0);
+        return offer(t);
+      }
       return false;
     } else if (size() < maxSize) {
-      return super.add(t);
+      return offer(t);
     } else if (comparator().compare(t, peek()) > 0) {
       poll();
-      return super.add(t);
+      return offer(t);
     }
     return false;
   }
 
-  private boolean checkExists(T t) {
+  private boolean isExists(T t) {
     if (unique) {
       if (uniqueSet == null) {
         uniqueSet = new HashSet<>();

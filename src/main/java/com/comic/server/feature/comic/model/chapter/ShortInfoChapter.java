@@ -4,8 +4,7 @@ import com.comic.server.feature.comic.model.OriginalSource;
 import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.NullSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -49,7 +48,7 @@ public class ShortInfoChapter implements Chapter {
   private ThirdPartySource thirdPartySource;
 
   @Override
-  @JsonSerialize(using = NullSerializer.class)
+  @JsonIgnore
   public ThirdPartySource getThirdPartySource() {
     return thirdPartySource;
   }

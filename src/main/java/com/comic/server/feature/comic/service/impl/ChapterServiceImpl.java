@@ -9,10 +9,12 @@ import com.comic.server.feature.comic.repository.ChapterRepository;
 import com.comic.server.feature.comic.service.ChapterChainService;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.feature.user.model.User;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +38,11 @@ public class ChapterServiceImpl implements ChapterService {
 
   @Override
   @Transactional
-  public AbstractChapter createChapter(AbstractChapter chapter) {
+  public AbstractChapter createChapter(AbstractChapter chapter, User user) {
+    Comic comic = comicService.getComicById(chapter.getComicId());
+    if (!comic.couldBeEditBy(user.getId())) {
+      throw new AccessDeniedException("You don't have permission to create chapter for this comic");
+    }
 
     try {
       return chapterRepository.save(chapter);
