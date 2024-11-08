@@ -27,9 +27,11 @@ public class CheckingNewChapterSchedule {
   private final MongoTemplate mongoTemplate;
 
   @Async
-  @Scheduled(cron = "0 */30 13-17 * * *")
+  @Scheduled(cron = "0 */30 13-17 * * MON-FRI")
   @Scheduled(cron = "0 */30 0-7 * * *")
   public void syncNewChaptersFromOtruyen() {
+
+    log.info("Start sync new chapters from Otruyen");
 
     var query =
         new Query()
@@ -52,11 +54,10 @@ public class CheckingNewChapterSchedule {
         List<ShortInfoChapter> lastestChapters =
             size > 3 ? chapters.subList(size - 3, size) : chapters;
 
-        for (ShortInfoChapter chapter : lastestChapters) {
-          comic.addNewChapter(chapter);
+        if (comic.addNewChapters(lastestChapters)) {
+          log.info("Sync new chapters for comic: {}", comic.getName());
         }
 
-        log.info("Sync new chapters for comic: {}", comic.getName());
         Update update = new Update();
         update.set("newChapters", comic.getNewChapters());
         update.set("lastNewChaptersCheckedAt", Instant.now());
@@ -68,5 +69,7 @@ public class CheckingNewChapterSchedule {
     }
 
     bulkOps.execute();
+
+    log.info("End sync new chapters from Otruyen");
   }
 }

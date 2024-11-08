@@ -234,6 +234,16 @@ public class Comic implements Sluggable<String>, Serializable {
     return false;
   }
 
+  public boolean addNewChapters(Collection<? extends Chapter> chapters) {
+    boolean newChapterAdded = false;
+    for (Chapter chapter : chapters) {
+      if (addNewChapter(chapter)) {
+        newChapterAdded = true;
+      }
+    }
+    return newChapterAdded;
+  }
+
   @Schema(description = "The last time new chapters were checked", hidden = true)
   @Default
   private Instant lastNewChaptersCheckedAt = Instant.now();
