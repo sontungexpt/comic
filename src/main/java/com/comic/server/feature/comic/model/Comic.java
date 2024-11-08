@@ -6,6 +6,7 @@ import com.comic.server.common.structure.BoundedPriorityQueue;
 import com.comic.server.feature.comic.model.chapter.Chapter;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.support.NewChapterComparator;
+import com.comic.server.feature.user.model.User;
 import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,8 +21,11 @@ import jakarta.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -218,14 +222,15 @@ public class Comic implements Sluggable<String>, Serializable {
   @Schema(hidden = true)
   private Collection<ShortInfoChapter> newChapters;
 
-  public boolean addNewChapter(Chapter chapter) {
+  public boolean addNewChapter(Chapter chapter, boolean updateIfExists) {
     if (newChapters == null) {
       newChapters = List.of(new ShortInfoChapter(chapter));
       return true;
     }
 
     var newChapters =
-        new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters, true);
+        new BoundedPriorityQueue<>(
+            3, new NewChapterComparator(), this.newChapters, true, updateIfExists);
 
     if (newChapters.add(chapter)) {
       this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
@@ -234,14 +239,36 @@ public class Comic implements Sluggable<String>, Serializable {
     return false;
   }
 
-  public boolean addNewChapters(Collection<? extends Chapter> chapters) {
+  public boolean addNewChapter(Chapter chapter) {
+    return addNewChapter(chapter, false);
+  }
+
+  public boolean addNewChapters(Collection<? extends Chapter> chapters, boolean updateIfExists) {
     boolean newChapterAdded = false;
     for (Chapter chapter : chapters) {
-      if (addNewChapter(chapter)) {
+      if (addNewChapter(chapter, updateIfExists)) {
         newChapterAdded = true;
       }
     }
     return newChapterAdded;
+  }
+
+  public boolean addNewChapters(Collection<? extends Chapter> chapters) {
+    return addNewChapters(chapters, false);
+  }
+
+  public boolean removeNewChapter(String chapterId) {
+    if (newChapters == null) {
+      return false;
+    }
+    return newChapters.removeIf((c) -> c.getId().equals(chapterId));
+  }
+
+  public boolean removeNewChapter(Chapter chapter) {
+    if (newChapters == null) {
+      return false;
+    }
+    return newChapters.remove(new ShortInfoChapter(chapter));
   }
 
   @Schema(description = "The last time new chapters were checked", hidden = true)
@@ -252,23 +279,48 @@ public class Comic implements Sluggable<String>, Serializable {
   private List<@Valid Character> characters;
 
   @Schema(hidden = true)
-  @CreatedBy
-  private ObjectId createdBy;
-
-  @Schema(hidden = true)
   @JsonIgnore
   @CreatedDate
   private Instant createdAt;
 
   @Schema(hidden = true)
   @JsonIgnore
-  @LastModifiedBy
-  private ObjectId updatedBy;
+  @LastModifiedDate
+  private Instant updatedAt;
+
+  @Schema(hidden = true)
+  @CreatedBy
+  private ObjectId createdBy;
 
   @Schema(hidden = true)
   @JsonIgnore
-  @LastModifiedDate
-  private Instant updatedAt;
+  @LastModifiedBy
+  private ObjectId updatedBy;
+
+  @JsonIgnore private Set<ObjectId> editableUserIds;
+
+  public final Set<ObjectId> getEditableUserIds() {
+    if (editableUserIds == null) {
+      editableUserIds = new HashSet<>();
+    }
+    editableUserIds.add(createdBy);
+    return editableUserIds.stream().filter(Objects::nonNull).collect(Collectors.toSet());
+  }
+
+  public boolean couldBeEditBy(String userId) {
+    return getEditableUserIds().contains(new ObjectId(userId));
+  }
+
+  public boolean couldBeEditBy(User user) {
+    return couldBeEditBy(user.getId());
+  }
+
+  public void addEditableUserId(ObjectId userId) {
+    if (editableUserIds == null) {
+      editableUserIds = new HashSet<>();
+    }
+    editableUserIds.add(userId);
+  }
 
   @Override
   public int hashCode() {

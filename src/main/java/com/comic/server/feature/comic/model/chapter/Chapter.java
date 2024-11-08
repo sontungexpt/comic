@@ -67,4 +67,8 @@ public interface Chapter extends Serializable {
           "{\"name\":\"MangaDex\",\"description\":\"MangaDex\", \"link\":\"https://mangadex.org\"}",
       requiredMode = RequiredMode.NOT_REQUIRED)
   OriginalSource getOriginalSource();
+
+  int hashCode();
+
+  boolean equals(Object o);
 }

@@ -12,8 +12,6 @@ import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import java.io.Serializable;
 import java.util.List;
 import lombok.AccessLevel;
@@ -51,7 +49,8 @@ public class ComicDetailDTO implements Serializable {
 
   private ThirdPartySource thirdPartySource;
 
-  @JsonSerialize(using = NullSerializer.class)
+  // @JsonSerialize(using = NullSerializer.class)
+  @JsonIgnore
   public ThirdPartySource getThirdPartySource() {
     return thirdPartySource;
   }
