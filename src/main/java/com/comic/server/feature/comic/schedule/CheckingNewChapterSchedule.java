@@ -40,7 +40,9 @@ public class CheckingNewChapterSchedule {
             .limit(15);
 
     List<Comic> comics = mongoTemplate.find(query, Comic.class);
-    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.ORDERED, Comic.class);
+    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Comic.class);
+
+    Instant now = Instant.now();
 
     for (Comic comic : comics) {
       try {
@@ -54,21 +56,23 @@ public class CheckingNewChapterSchedule {
         List<ShortInfoChapter> lastestChapters =
             size > 3 ? chapters.subList(size - 3, size) : chapters;
 
+        Update update = new Update();
         if (comic.addNewChapters(lastestChapters)) {
           log.info("Sync new chapters for comic: {}", comic.getName());
+          update.set("newChapters", comic.getNewChapters());
         }
-
-        Update update = new Update();
-        update.set("newChapters", comic.getNewChapters());
-        update.set("lastNewChaptersCheckedAt", Instant.now());
+        update.set("lastNewChaptersCheckedAt", now);
         bulkOps.updateOne(Query.query(Criteria.where("id").is(comic.getId())), update);
-
       } catch (Exception e) {
-        log.error("Error when sync new chapters for comic: {}", comic.getName(), e);
+        log.error("Error when sync new chapters for comic {}", comic.getName(), e);
       }
     }
 
-    bulkOps.execute();
+    try {
+      bulkOps.execute();
+    } catch (Exception e) {
+      log.error("Error when sync new chapters for comics", e);
+    }
 
     log.info("End sync new chapters from Otruyen");
   }
