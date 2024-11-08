@@ -19,6 +19,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import lombok.AccessLevel;
@@ -215,18 +216,22 @@ public class Comic implements Sluggable<String>, Serializable {
   }
 
   @Schema(hidden = true)
-  private List<ShortInfoChapter> newChapters;
+  private Collection<ShortInfoChapter> newChapters;
 
-  public void addNewChapter(Chapter chapter) {
+  public boolean addNewChapter(Chapter chapter) {
     if (newChapters == null) {
       newChapters = List.of(new ShortInfoChapter(chapter));
-    } else {
-      var newChapters =
-          new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters, true);
-      if (newChapters.add(chapter)) {
-        this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
-      }
+      return true;
     }
+
+    var newChapters =
+        new BoundedPriorityQueue<>(3, new NewChapterComparator(), this.newChapters, true);
+
+    if (newChapters.add(chapter)) {
+      this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      return true;
+    }
+    return false;
   }
 
   @Schema(description = "The last time new chapters were checked", hidden = true)

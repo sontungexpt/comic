@@ -19,7 +19,8 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.lang.NonNull;
 
@@ -29,6 +30,11 @@ import org.springframework.lang.NonNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@CompoundIndexes({
+  @CompoundIndex(
+      name = "comic_chapter_parent",
+      def = "{'comicId': 1, 'chapterId': 1, 'parentId':1}"),
+})
 public class Comment implements Serializable {
 
   @Schema(hidden = true)
@@ -84,14 +90,6 @@ public class Comment implements Serializable {
   @CreatedBy
   @JsonIgnore
   private ObjectId authorId;
-
-  // This is a transient field, it will not be persisted in the database.
-  // It is used to store the author name of the comment and easily convert it to a CommentResponse
-  @Transient private String authorName;
-
-  // This is a transient field, it will not be persisted in the database.
-  // It is used to store the author avatar of the comment and easily convert it to a CommentResponse
-  @Transient private String authorAvatar;
 
   @Schema(description = "The content of the comment", example = "This is a comment")
   @NotBlank
