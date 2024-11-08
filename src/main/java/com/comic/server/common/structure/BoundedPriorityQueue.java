@@ -1,14 +1,14 @@
 package com.comic.server.common.structure;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
   private final int maxSize;
 
-  private Map<Integer, T> indexMap;
+  private Set<T> uniqueSet;
 
   private boolean unique = false;
 
@@ -35,25 +35,26 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
 
   @Override
   public boolean add(T t) {
-    if (unique && indexMap != null && indexMap.containsKey(t.hashCode())) {
+    if (!checkExists(t)) {
       return false;
     } else if (size() < maxSize) {
-      trackIndex(t);
       return super.add(t);
     } else if (comparator().compare(t, peek()) > 0) {
       poll();
-      trackIndex(t);
       return super.add(t);
     }
     return false;
   }
 
-  private void trackIndex(T t) {
-    if (indexMap == null) {
-      indexMap = new HashMap<>();
-    }
+  private boolean checkExists(T t) {
     if (unique) {
-      indexMap.put(t.hashCode(), t);
+      if (uniqueSet == null) {
+        uniqueSet = new HashSet<>();
+      }
+
+      // add successful if the element is not already in the set
+      return !uniqueSet.add(t);
     }
+    return false;
   }
 }

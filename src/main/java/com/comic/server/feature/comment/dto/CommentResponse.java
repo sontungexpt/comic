@@ -1,6 +1,7 @@
 package com.comic.server.feature.comment.dto;
 
 import com.comic.server.feature.comment.model.Comment;
+import com.comic.server.feature.user.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.util.List;
@@ -37,15 +38,11 @@ public class CommentResponse {
 
   private String parentId;
 
-  public static CommentResponse from(Comment comment) {
+  public static CommentResponse from(Comment comment, User user) {
     return CommentResponse.builder()
         .id(comment.getId())
         .content(comment.getContent())
-        .author(
-            new CommentAuthor(
-                comment.getAuthorId().toHexString(),
-                comment.getAuthorName(),
-                comment.getAuthorAvatar()))
+        .author(CommentAuthor.from(user))
         .comicId(comment.getComicId().toHexString())
         .chapterId(comment.getChapterId().toHexString())
         .updatedAt(comment.getUpdatedAt())

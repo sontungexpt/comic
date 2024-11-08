@@ -13,9 +13,9 @@
     <appender-ref ref="HOT_ERROR_EMAIL_APPENDER"></appender-ref>
   </root>
   <logger additivity="false" level="INFO" name="com.foodey.server.logging.LoggingHttpRequestService">
-    <!-- <springProfile name="dev|develop"> -->
-    <!--   <appender-ref ref="CONSOLE"></appender-ref> -->
-    <!-- </springProfile> -->
+    <springProfile name="dev|develop">
+      <appender-ref ref="CONSOLE"></appender-ref>
+    </springProfile>
     <appender-ref ref="ASYNC_HTTP_REQUEST_FILE"></appender-ref>
   </logger>
 </configuration>

@@ -1,41 +1,101 @@
-package com.comic.server.common.payload;
+// package com.comic.server.common.payload;
 
-import java.util.List;
-import org.springframework.data.domain.Page;
+// import java.util.Iterator;
+// import java.util.List;
+// import java.util.function.Function;
+// import org.springframework.data.domain.Page;
+// import org.springframework.data.domain.Pageable;
+// import org.springframework.data.domain.Sort;
 
-@lombok.Getter
-@lombok.Setter
-@lombok.Builder
-@lombok.AllArgsConstructor
-public class PageResponse<T> {
+// @lombok.Getter
+// @lombok.Setter
+// @lombok.Builder
+// @lombok.AllArgsConstructor
+// public class PageResponse<T> implements Page<T> {
 
-  private List<T> content;
-  private int totalPages;
-  private long totalItems;
+//   private List<T> content;
+//   private int totalPages;
+//   private long totalItems;
 
-  private int currentPage;
-  private int pageSize;
-  private int numberOfElements;
+//   private int currentPage;
+//   private int pageSize;
+//   private int numberOfElements;
 
-  private boolean lastPage;
-  private boolean firstPage;
-  private boolean empty;
-  private boolean sorted;
-  private String sortBy;
+//   private boolean isFirst;
+//   private boolean isLast;
+//   private boolean empty;
+//   private boolean sorted;
+//   private Sort sort;
 
-  public PageResponse(Page<T> page) {
-    this.content = page.getContent();
-    this.totalPages = page.getTotalPages();
-    this.totalItems = page.getTotalElements();
+//   @Override
+//   public int getNumber() {
+//     return currentPage;
+//   }
 
-    this.currentPage = page.getNumber();
-    this.pageSize = page.getSize();
-    this.numberOfElements = page.getNumberOfElements();
+//   @Override
+//   public int getSize() {
+//     return pageSize;
+//   }
 
-    this.lastPage = page.isLast();
-    this.firstPage = page.isFirst();
-    this.empty = page.isEmpty();
-    this.sorted = page.getSort().isSorted();
-    this.sortBy = page.getSort().toString();
-  }
-}
+//   @Override
+//   public boolean hasContent() {
+//     return !content.isEmpty();
+//   }
+
+//   @Override
+//   public Sort getSort() {
+//     return sort;
+//   }
+
+//   @Override
+//   public boolean isFirst() {
+//     return firstPage;
+//   }
+
+//   @Override
+//   public boolean isLast() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'isLast'");
+//   }
+
+//   @Override
+//   public boolean hasNext() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'hasNext'");
+//   }
+
+//   @Override
+//   public boolean hasPrevious() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'hasPrevious'");
+//   }
+
+//   @Override
+//   public Pageable nextPageable() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'nextPageable'");
+//   }
+
+//   @Override
+//   public Pageable previousPageable() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'previousPageable'");
+//   }
+
+//   @Override
+//   public Iterator<T> iterator() {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'iterator'");
+//   }
+
+//   @Override
+//   public long getTotalElements() {
+//     return totalItems;
+//   }
+
+//   @Override
+//   public <U> Page<U> map(Function<? super T, ? extends U> converter) {
+//     // TODO Auto-generated method stub
+//     throw new UnsupportedOperationException("Unimplemented method 'map'");
+//   }
+// }

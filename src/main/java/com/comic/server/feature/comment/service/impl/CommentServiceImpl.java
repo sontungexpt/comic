@@ -1,7 +1,5 @@
 package com.comic.server.feature.comment.service.impl;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
 import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comment.dto.CommentResponse;
 import com.comic.server.feature.comment.dto.NewCommentRequest;
@@ -42,8 +40,6 @@ public class CommentServiceImpl implements CommentService {
         Comment.builder()
             .comicId(new ObjectId(newCommentRequest.getComicId()))
             .chapterId(new ObjectId(newCommentRequest.getChapterId()))
-            .authorName(user.getName())
-            .authorAvatar(user.getAvatar())
             .content(newCommentRequest.getContent())
             .build();
 
@@ -51,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
       comment.replyTo(parent);
     }
 
-    return CommentResponse.from(insert(comment));
+    return CommentResponse.from(insert(comment), user);
   }
 
   public Comment insert(Comment comment) {
