@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
@@ -24,11 +23,11 @@ public class MongoConfig {
     return () -> {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       if (authentication == null || !authentication.isAuthenticated()) {
-        throw new AuthenticationException("User is not authenticated") {};
+        return Optional.empty();
       }
       Object principal = authentication.getPrincipal();
       if (!(principal instanceof User)) {
-        throw new AuthenticationException("User is not authenticated") {};
+        return Optional.empty();
       }
       return Optional.of(((User) principal).getId());
     };
@@ -40,11 +39,11 @@ public class MongoConfig {
     return () -> {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       if (authentication == null || !authentication.isAuthenticated()) {
-        throw new AuthenticationException("User is not authenticated") {};
+        return Optional.empty();
       }
       Object principal = authentication.getPrincipal();
       if (!(principal instanceof User)) {
-        throw new AuthenticationException("User is not authenticated") {};
+        return Optional.empty();
       }
       return Optional.of(new ObjectId(((User) principal).getId()));
     };
