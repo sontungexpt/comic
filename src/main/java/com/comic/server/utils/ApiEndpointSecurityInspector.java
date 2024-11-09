@@ -100,6 +100,13 @@ public class ApiEndpointSecurityInspector {
         }
       };
 
+  private Set<PathWithCondition> getPublicEndpoints(HttpMethod httpMethod) {
+    if (publicEndpoints.get(httpMethod) == null) {
+      publicEndpoints.put(httpMethod, new HashSet<PathWithCondition>());
+    }
+    return publicEndpoints.get(httpMethod);
+  }
+
   /**
    * Adds a public endpoint that is accessible via any HTTP method.
    *
@@ -176,11 +183,7 @@ public class ApiEndpointSecurityInspector {
    * @param filterJwt Whether to filter JWT for the endpoint.
    */
   public void addPublicEndpoint(HttpMethod httpMethod, boolean filterJwt, String path) {
-
-    if (publicEndpoints.get(httpMethod) == null) {
-      publicEndpoints.put(httpMethod, new HashSet<PathWithCondition>());
-    }
-    publicEndpoints.get(httpMethod).add(new PathWithCondition(path, filterJwt));
+    getPublicEndpoints(httpMethod).add(new PathWithCondition(path, filterJwt));
     log.info("Added public endpoint: " + path + " for " + httpMethod);
   }
 
@@ -222,8 +225,7 @@ public class ApiEndpointSecurityInspector {
               requestInfo.getMethodsCondition().getMethods().stream()
                   .forEach(
                       httpMethod ->
-                          publicEndpoints
-                              .get(httpMethod.asHttpMethod())
+                          getPublicEndpoints(httpMethod.asHttpMethod())
                               .addAll(apiPathsWithCondition));
             }
           }
