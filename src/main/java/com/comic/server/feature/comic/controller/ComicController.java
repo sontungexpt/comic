@@ -9,11 +9,13 @@ import com.comic.server.feature.comic.model.chapter.AbstractChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.feature.user.enums.RoleType;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.validation.annotation.ObjectId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -57,15 +59,17 @@ public class ComicController {
 
   @PostMapping("")
   @PublicEndpoint(profiles = {"dev"})
-  @Operation(summary = "Create new comic", description = "Create new comic")
-  @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
+  @Operation(
+      summary = "Create new comic",
+      description = "Create new comic",
+      security = @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME))
   public ResponseEntity<?> createNewComic(@RequestBody @Valid Comic comic) {
     return ResponseEntity.ok(comicService.createComic(comic));
   }
 
   @GetMapping("/searching")
   @Operation(summary = "Search comics", description = "Search comics by keyword")
-  @PublicEndpoint
+  @PublicEndpoint(filterJwt = true)
   @PageableQueryParams
   public ResponseEntity<?> searchComics(
       @NotBlank @RequestParam String q,
@@ -107,12 +111,13 @@ public class ComicController {
   @PostMapping("/{comicId}/chapters")
   @Operation(summary = "Create chapter", description = "Create chapter of comic by comicId")
   @ResponseStatus(HttpStatus.CREATED)
-  // @RolesAllowed(RoleType.Fields.POSTER)
+  @RolesAllowed(RoleType.Fields.POSTER)
   @PublicEndpoint(profiles = {"dev"})
   public AbstractChapter createChapter(
       @ObjectId @PathVariable("comicId") String comicId,
+      @CurrentUser User user,
       @RequestBody @Valid AbstractChapter chapter) {
     chapter.setComicId(comicId);
-    return chapterService.createChapter(chapter);
+    return chapterService.createChapter(chapter, user);
   }
 }

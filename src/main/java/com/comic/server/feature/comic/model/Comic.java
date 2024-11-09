@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +41,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.Assert;
 
 @Data
 @Document(collection = "comics")
@@ -278,6 +278,9 @@ public class Comic implements Sluggable<String>, Serializable {
   @Schema(description = "The characters in the comic")
   private List<@Valid Character> characters;
 
+  @Schema(description = "The translators of the comic")
+  private List<@Valid Translator> translators;
+
   @Schema(hidden = true)
   @JsonIgnore
   @CreatedDate
@@ -290,36 +293,56 @@ public class Comic implements Sluggable<String>, Serializable {
 
   @Schema(hidden = true)
   @CreatedBy
-  private ObjectId createdBy;
+  private ObjectId ownerId;
 
   @Schema(hidden = true)
   @JsonIgnore
   @LastModifiedBy
-  private ObjectId updatedBy;
+  private ObjectId lastModifiedBy;
 
-  @JsonIgnore private Set<ObjectId> editableUserIds;
-
-  public final Set<ObjectId> getEditableUserIds() {
-    if (editableUserIds == null) {
-      editableUserIds = new HashSet<>();
-    }
-    editableUserIds.add(createdBy);
-    return editableUserIds.stream().filter(Objects::nonNull).collect(Collectors.toSet());
+  @JsonIgnore
+  public boolean isOwner(String userId) {
+    return ownerId != null && ownerId.equals(new ObjectId(userId));
   }
 
+  @JsonIgnore
+  @Schema(hidden = true, description = "The users who can update the comic")
+  private Set<ObjectId> editorIds;
+
+  @JsonIgnore
+  public final Set<ObjectId> getEditorIds() {
+    if (editorIds == null) editorIds = new HashSet<>();
+    editorIds.add(ownerId);
+    return new HashSet<>(editorIds);
+  }
+
+  @JsonIgnore
   public boolean couldBeEditBy(String userId) {
-    return getEditableUserIds().contains(new ObjectId(userId));
+    return editorIds != null
+        && editorIds.stream().anyMatch((editorId) -> editorId.toHexString().equals(userId));
   }
 
+  @JsonIgnore
   public boolean couldBeEditBy(User user) {
+    Assert.notNull(user, "User must not be null");
     return couldBeEditBy(user.getId());
   }
 
-  public void addEditableUserId(ObjectId userId) {
-    if (editableUserIds == null) {
-      editableUserIds = new HashSet<>();
-    }
-    editableUserIds.add(userId);
+  public boolean addEditor(ObjectId userId) {
+    if (editorIds == null) editorIds = new HashSet<>();
+    return editorIds.add(userId);
+  }
+
+  public boolean addEditor(String id) {
+    return addEditor(new ObjectId(id));
+  }
+
+  public boolean removeEditor(String id) {
+    return editorIds != null && editorIds.removeIf((userId) -> userId.toHexString().equals(id));
+  }
+
+  public boolean removeEditor(ObjectId userId) {
+    return editorIds != null && editorIds.remove(userId);
   }
 
   @Override
