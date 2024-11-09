@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -244,13 +245,18 @@ public class Comic implements Sluggable<String>, Serializable {
   }
 
   public boolean addNewChapters(Collection<? extends Chapter> chapters, boolean updateIfExists) {
-    boolean newChapterAdded = false;
-    for (Chapter chapter : chapters) {
-      if (addNewChapter(chapter, updateIfExists)) {
-        newChapterAdded = true;
-      }
+    if (newChapters == null) {
+      newChapters = new ArrayList<>(chapters.stream().map((c) -> new ShortInfoChapter(c)).toList());
+      return true;
     }
-    return newChapterAdded;
+    var newChapters =
+        new BoundedPriorityQueue<>(
+            3, new NewChapterComparator(), this.newChapters, true, updateIfExists);
+    if (newChapters.addAll(chapters)) {
+      this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      return true;
+    }
+    return false;
   }
 
   public boolean addNewChapters(Collection<? extends Chapter> chapters) {

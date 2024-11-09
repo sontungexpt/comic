@@ -1,9 +1,12 @@
 package com.comic.server.common.structure;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
+import org.checkerframework.common.value.qual.IntRange;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
@@ -14,6 +17,7 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
   private Set<T> getUniqueSet() {
     if (uniqueSet == null) {
       uniqueSet = new HashSet<>();
+      if (size() > 0) this.stream().forEach(uniqueSet::add);
     }
     return uniqueSet;
   }
@@ -38,24 +42,29 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
     this.updateIfExists = updateIfExists;
   }
 
-  public BoundedPriorityQueue(int maxSize, Comparator<T> comparator) {
+  public BoundedPriorityQueue(@IntRange(from = 1) int maxSize, @NonNull Comparator<T> comparator) {
     this(maxSize, comparator, null);
   }
 
   public BoundedPriorityQueue(
-      int maxSize, Comparator<T> comparator, Iterable<? extends T> elements) {
+      @IntRange(from = 1) int maxSize,
+      @NonNull Comparator<T> comparator,
+      @NonNull Collection<? extends T> elements) {
     this(maxSize, comparator, elements, false);
   }
 
   public BoundedPriorityQueue(
-      int maxSize, Comparator<T> comparator, Iterable<? extends T> elements, boolean unique) {
+      @IntRange(from = 1) int maxSize,
+      @NonNull Comparator<T> comparator,
+      @NonNull Collection<? extends T> elements,
+      boolean unique) {
     this(maxSize, comparator, elements, unique, false);
   }
 
   public BoundedPriorityQueue(
       int maxSize,
       Comparator<T> comparator,
-      Iterable<? extends T> elements,
+      Collection<? extends T> elements,
       boolean unique,
       boolean updateIfExists) {
     super(maxSize, comparator);
@@ -72,12 +81,8 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
   @Override
   public boolean add(T t) {
     Assert.notNull(t, "Element must not be null");
-
     if (isExists(t)) {
-      if (updateIfExists && remove(t)) {
-        return offer(t);
-      }
-      return false;
+      return updateIfExists && removeIf(e -> comparator().compare(e, t) == 0) && offer(t);
     } else if (size() < maxSize) {
       return offer(t);
     } else if (comparator().compare(t, peek()) > 0) {
