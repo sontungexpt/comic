@@ -21,8 +21,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -167,6 +169,14 @@ public abstract class AbstractChapter implements Chapter {
   @LastModifiedDate
   private Instant updatedAt;
 
+  @Schema(hidden = true)
+  @CreatedBy
+  private ObjectId createdBy;
+
+  @Schema(hidden = true)
+  @LastModifiedBy
+  private ObjectId updatedBy;
+
   public AbstractChapter(AbstractChapter chapter) {
     this.id = chapter.id;
     this.comicId = chapter.comicId;
@@ -179,6 +189,8 @@ public abstract class AbstractChapter implements Chapter {
     this.thirdPartySource = chapter.thirdPartySource;
     this.createdAt = chapter.createdAt;
     this.updatedAt = chapter.updatedAt;
+    this.createdBy = chapter.createdBy;
+    this.updatedBy = chapter.updatedBy;
   }
 
   public AbstractChapter() {}

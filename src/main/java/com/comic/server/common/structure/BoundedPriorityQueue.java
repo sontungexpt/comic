@@ -4,11 +4,19 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
+import org.springframework.util.Assert;
 
 public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
   private final int maxSize;
 
   private Set<T> uniqueSet;
+
+  private Set<T> getUniqueSet() {
+    if (uniqueSet == null) {
+      uniqueSet = new HashSet<>();
+    }
+    return uniqueSet;
+  }
 
   private boolean unique = false;
 
@@ -63,9 +71,10 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
 
   @Override
   public boolean add(T t) {
+    Assert.notNull(t, "Element must not be null");
+
     if (isExists(t)) {
-      if (updateIfExists) {
-        removeIf(e -> comparator().compare(t, e) == 0);
+      if (updateIfExists && remove(t)) {
         return offer(t);
       }
       return false;
@@ -79,14 +88,6 @@ public class BoundedPriorityQueue<T> extends PriorityQueue<T> {
   }
 
   private boolean isExists(T t) {
-    if (unique) {
-      if (uniqueSet == null) {
-        uniqueSet = new HashSet<>();
-      }
-
-      // add successful if the element is not already in the set
-      return !uniqueSet.add(t);
-    }
-    return false;
+    return unique && !getUniqueSet().add(t);
   }
 }
