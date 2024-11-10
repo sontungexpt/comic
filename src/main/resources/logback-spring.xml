@@ -12,7 +12,9 @@
     <appender-ref ref="ASYNC_WARN_FILE"></appender-ref>
     <appender-ref ref="ASYNC_DEBUG_FILE"></appender-ref>
     <appender-ref ref="ASYNC_ERROR_FILE"></appender-ref>
-    <appender-ref ref="HOT_ERROR_EMAIL_APPENDER"></appender-ref>
+    <springProfile name="prod|production">
+      <appender-ref ref="HOT_ERROR_EMAIL_APPENDER"></appender-ref>
+    </springProfile>
   </root>
   <logger additivity="false" level="INFO" name="com.foodey.server.logging.LoggingHttpRequestService">
     <springProfile name="dev|develop">

@@ -116,7 +116,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-    apiEndpointSecurityInspector.addPublicEndpoint("/v1/auth/**", "/actuator/**");
+    apiEndpointSecurityInspector.addPublicEndpoint("/api/v1/auth/**", "/api/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(

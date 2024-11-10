@@ -5,6 +5,7 @@ import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.service.impl.OtruyenComicServiceImpl;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,8 @@ public class CheckingNewChapterSchedule {
   private final MongoTemplate mongoTemplate;
 
   @Async
-  @Scheduled(cron = "0 */30 13-17 * * MON-FRI")
-  @Scheduled(cron = "0 */30 0-7 * * *")
+  @Scheduled(cron = "0 */20 13-17 * * MON-FRI")
+  @Scheduled(cron = "0 */15 0-7 * * *")
   public void syncNewChaptersFromOtruyen() {
 
     log.info("Start sync new chapters from Otruyen");
@@ -37,7 +38,7 @@ public class CheckingNewChapterSchedule {
         new Query()
             .addCriteria(Criteria.where("thirdPartySource.name").is(SourceName.OTRUYEN))
             .with(Sort.by(Sort.Direction.ASC, "lastNewChaptersCheckedAt"))
-            .limit(15);
+            .limit(4);
 
     List<Comic> comics = mongoTemplate.find(query, Comic.class);
     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Comic.class);
@@ -47,20 +48,30 @@ public class CheckingNewChapterSchedule {
     for (Comic comic : comics) {
       try {
         List<ShortInfoChapter> chapters = otruyenComicService.getChaptersByComic(comic);
-        if (chapters == null || chapters.isEmpty()) {
-          continue;
-        }
-
-        // get three lastest chapter at the end of list
-        int size = chapters.size();
-        List<ShortInfoChapter> lastestChapters =
-            size > 3 ? chapters.subList(size - 3, size) : chapters;
 
         Update update = new Update();
-        if (comic.addNewChapters(lastestChapters)) {
-          log.info("Sync new chapters for comic: {}", comic.getName());
-          update.set("newChapters", comic.getNewChapters());
+        int size;
+        if (chapters != null && (size = chapters.size()) > 0) {
+          final int MAX_NEW_CHAPTERS = 3;
+
+          List<ShortInfoChapter> lastestChapters =
+              size > MAX_NEW_CHAPTERS ? chapters.subList(size - MAX_NEW_CHAPTERS, size) : chapters;
+
+          Collection<String> oldChapters =
+              comic.getNewChaptersInfo().stream().map(ShortInfoChapter::getId).toList();
+          if (comic.addNewChapters(lastestChapters)) {
+
+            Collection<String> newChapters =
+                comic.getNewChaptersInfo().stream().map(ShortInfoChapter::getId).toList();
+            log.info(
+                "Sync new chapters for comic: {}, old chapters: {}, new chapters: {}",
+                comic.getName(),
+                oldChapters,
+                newChapters);
+            update.set("newChapters", comic.getNewChapters());
+          }
         }
+
         update.set("lastNewChaptersCheckedAt", now);
         bulkOps.updateOne(Query.query(Criteria.where("id").is(comic.getId())), update);
       } catch (Exception e) {
@@ -71,7 +82,8 @@ public class CheckingNewChapterSchedule {
     try {
       bulkOps.execute();
     } catch (Exception e) {
-      log.error("Error when sync new chapters for comics", e);
+      e.printStackTrace();
+      log.error("Error when sync new chapters for comics", e.getMessage());
     }
 
     log.info("End sync new chapters from Otruyen");
