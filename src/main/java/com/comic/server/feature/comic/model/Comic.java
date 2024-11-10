@@ -224,8 +224,8 @@ public class Comic implements Sluggable<String>, Serializable {
   private Collection<ShortInfoChapter> newChapters;
 
   public boolean addNewChapter(Chapter chapter, boolean updateIfExists) {
-    if (newChapters == null) {
-      newChapters = List.of(new ShortInfoChapter(chapter));
+    if (this.newChapters == null) {
+      this.newChapters = List.of(new ShortInfoChapter(chapter));
       return true;
     }
 
@@ -245,8 +245,11 @@ public class Comic implements Sluggable<String>, Serializable {
   }
 
   public boolean addNewChapters(Collection<? extends Chapter> chapters, boolean updateIfExists) {
-    if (newChapters == null) {
-      newChapters = new ArrayList<>(chapters.stream().map((c) -> new ShortInfoChapter(c)).toList());
+    if (chapters == null || chapters.isEmpty()) {
+      return false;
+    } else if (this.newChapters == null) {
+      this.newChapters =
+          new ArrayList<>(chapters.stream().map((c) -> new ShortInfoChapter(c)).toList());
       return true;
     }
     var newChapters =
