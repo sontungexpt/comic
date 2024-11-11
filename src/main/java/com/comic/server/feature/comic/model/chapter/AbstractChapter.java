@@ -209,9 +209,9 @@ public abstract class AbstractChapter implements Chapter {
     }
 
     AbstractChapter that = (AbstractChapter) obj;
-    if (id != null && that.id == null) {
+    if (id != null && that.id != null) {
       return id.equals(that.id);
-    } else if (thirdPartySource != null && that.thirdPartySource == null) {
+    } else if (thirdPartySource != null && that.thirdPartySource != null) {
       return thirdPartySource.equals(that.thirdPartySource);
     }
     return false;

@@ -92,16 +92,13 @@ public class ShortInfoChapter implements Chapter {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    } else if (!(obj instanceof ShortInfoChapter)) {
-      return false;
-    }
+    if (obj == this) return true;
+    else if (!(obj instanceof ShortInfoChapter)) return false;
 
     ShortInfoChapter that = (ShortInfoChapter) obj;
-    if (id != null && that.id == null) {
+    if (id != null && that.id != null) {
       return id.equals(that.id);
-    } else if (thirdPartySource != null && that.thirdPartySource == null) {
+    } else if (thirdPartySource != null && that.thirdPartySource != null) {
       return thirdPartySource.equals(that.thirdPartySource);
     }
     return false;
