@@ -3,6 +3,7 @@ package com.comic.server.feature.comic.model;
 import com.comic.server.annotation.AutoSlugify;
 import com.comic.server.common.model.Sluggable;
 import com.comic.server.common.structure.BoundedPriorityQueue;
+import com.comic.server.common.structure.BoundedPriorityQueue.Strategy;
 import com.comic.server.feature.comic.model.chapter.Chapter;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.support.NewChapterComparator;
@@ -42,6 +43,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 @Data
@@ -223,18 +226,23 @@ public class Comic implements Sluggable<String>, Serializable {
   @Schema(hidden = true)
   private Collection<ShortInfoChapter> newChapters;
 
-  public boolean addNewChapter(Chapter chapter, boolean updateIfExists) {
+  private BoundedPriorityQueue<Chapter> buildChapterPriorityQueue() {
+    return new BoundedPriorityQueue<>(
+        3, new NewChapterComparator(), this.newChapters, Strategy.UPDATE_IF_EXISTS);
+  }
+
+  private List<ShortInfoChapter> buildShortInfoChapters(Collection<? extends Chapter> chapters) {
+    return chapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+  }
+
+  public boolean addNewChapter(@NonNull Chapter chapter, boolean updateIfExists) {
     if (this.newChapters == null) {
       this.newChapters = List.of(new ShortInfoChapter(chapter));
       return true;
     }
-
-    var newChapters =
-        new BoundedPriorityQueue<>(
-            3, new NewChapterComparator(), this.newChapters, true, updateIfExists);
-
+    var newChapters = buildChapterPriorityQueue();
     if (newChapters.add(chapter)) {
-      this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      this.newChapters = buildShortInfoChapters(newChapters);
       return true;
     }
     return false;
@@ -244,25 +252,22 @@ public class Comic implements Sluggable<String>, Serializable {
     return addNewChapter(chapter, false);
   }
 
-  public boolean addNewChapters(Collection<? extends Chapter> chapters, boolean updateIfExists) {
-    if (chapters == null || chapters.isEmpty()) {
-      return false;
-    } else if (this.newChapters == null) {
-      this.newChapters =
-          new ArrayList<>(chapters.stream().map((c) -> new ShortInfoChapter(c)).toList());
+  public boolean addNewChapters(
+      @Nullable Collection<? extends Chapter> chapters, boolean updateIfExists) {
+    if (chapters == null || chapters.isEmpty()) return false;
+    else if (this.newChapters == null) {
+      this.newChapters = new ArrayList<>(buildShortInfoChapters(chapters));
       return true;
     }
-    var newChapters =
-        new BoundedPriorityQueue<>(
-            3, new NewChapterComparator(), this.newChapters, true, updateIfExists);
+    var newChapters = buildChapterPriorityQueue();
     if (newChapters.addAll(chapters)) {
-      this.newChapters = newChapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+      this.newChapters = buildShortInfoChapters(newChapters);
       return true;
     }
     return false;
   }
 
-  public boolean addNewChapters(Collection<? extends Chapter> chapters) {
+  public boolean addNewChapters(@Nullable Collection<? extends Chapter> chapters) {
     return addNewChapters(chapters, false);
   }
 
