@@ -217,9 +217,7 @@ public class Comic implements Sluggable<String>, Serializable {
   @JsonGetter("newChapters")
   @Schema(hidden = true)
   public List<ShortInfoChapter> getNewChaptersInfo() {
-    if (newChapters == null) {
-      return List.of();
-    }
+    if (newChapters == null) return List.of();
     return newChapters.stream().sorted((c1, c2) -> c2.getNum().compareTo(c1.getNum())).toList();
   }
 
