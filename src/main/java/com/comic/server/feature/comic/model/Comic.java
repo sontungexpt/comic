@@ -226,13 +226,16 @@ public class Comic implements Sluggable<String>, Serializable {
   @Schema(hidden = true)
   private Collection<ShortInfoChapter> newChapters;
 
-  private BoundedPriorityQueue<Chapter> buildChapterPriorityQueue() {
+  private BoundedPriorityQueue<Chapter> buildChapterPriorityQueue(boolean updateIfExists) {
     return new BoundedPriorityQueue<>(
-        3, new NewChapterComparator(), this.newChapters, Strategy.UPDATE_IF_EXISTS);
+        3,
+        new NewChapterComparator(),
+        this.newChapters,
+        updateIfExists ? Strategy.UPDATE_IF_EXISTS : Strategy.UNIQUE);
   }
 
   private List<ShortInfoChapter> buildShortInfoChapters(Collection<? extends Chapter> chapters) {
-    return chapters.stream().map((c) -> new ShortInfoChapter(c)).toList();
+    return chapters.stream().map(ShortInfoChapter::new).toList();
   }
 
   public boolean addNewChapter(@NonNull Chapter chapter, boolean updateIfExists) {
@@ -240,7 +243,7 @@ public class Comic implements Sluggable<String>, Serializable {
       this.newChapters = List.of(new ShortInfoChapter(chapter));
       return true;
     }
-    var newChapters = buildChapterPriorityQueue();
+    var newChapters = buildChapterPriorityQueue(updateIfExists);
     if (newChapters.add(chapter)) {
       this.newChapters = buildShortInfoChapters(newChapters);
       return true;
@@ -259,7 +262,7 @@ public class Comic implements Sluggable<String>, Serializable {
       this.newChapters = new ArrayList<>(buildShortInfoChapters(chapters));
       return true;
     }
-    var newChapters = buildChapterPriorityQueue();
+    var newChapters = buildChapterPriorityQueue(updateIfExists);
     if (newChapters.addAll(chapters)) {
       this.newChapters = buildShortInfoChapters(newChapters);
       return true;
@@ -272,16 +275,12 @@ public class Comic implements Sluggable<String>, Serializable {
   }
 
   public boolean removeNewChapter(String chapterId) {
-    if (newChapters == null) {
-      return false;
-    }
+    if (newChapters == null) return false;
     return newChapters.removeIf((c) -> c.getId().equals(chapterId));
   }
 
   public boolean removeNewChapter(Chapter chapter) {
-    if (newChapters == null) {
-      return false;
-    }
+    if (newChapters == null) return false;
     return newChapters.remove(new ShortInfoChapter(chapter));
   }
 
@@ -289,10 +288,16 @@ public class Comic implements Sluggable<String>, Serializable {
   @Default
   private Instant lastNewChaptersCheckedAt = Instant.now();
 
-  @Schema(description = "The characters in the comic")
+  @Schema(
+      description = "The characters in the comic",
+      type = "array",
+      exampleClasses = {Character.class})
   private List<@Valid Character> characters;
 
-  @Schema(description = "The translators of the comic")
+  @Schema(
+      description = "The translators of the comic",
+      type = "array",
+      exampleClasses = {Translator.class})
   private List<@Valid Translator> translators;
 
   @Schema(hidden = true)
@@ -316,7 +321,7 @@ public class Comic implements Sluggable<String>, Serializable {
 
   @JsonIgnore
   public boolean isOwner(String userId) {
-    return ownerId != null && ownerId.equals(new ObjectId(userId));
+    return ownerId != null && ownerId.toHexString().equals(userId);
   }
 
   @JsonIgnore
@@ -366,14 +371,13 @@ public class Comic implements Sluggable<String>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    final Comic other = (Comic) obj;
-    if (other != null && this.id != null) {
-      return other.id.equals(this.id);
-    } else if (thirdPartySource != null && other.thirdPartySource != null) {
-      return thirdPartySource.equals(other.thirdPartySource);
+    if (this == obj) return true;
+    else if (!(obj instanceof Comic)) return false;
+    final Comic that = (Comic) obj;
+    if (that != null && this.id != null) {
+      return that.id.equals(this.id);
+    } else if (thirdPartySource != null && that.thirdPartySource != null) {
+      return thirdPartySource.equals(that.thirdPartySource);
     }
     return false;
   }
