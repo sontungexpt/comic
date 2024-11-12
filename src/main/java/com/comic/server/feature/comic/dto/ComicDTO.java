@@ -8,6 +8,7 @@ import com.comic.server.feature.comic.model.Comic.Status;
 import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.OriginalSource;
 import com.comic.server.feature.comic.model.ThirdPartySource;
+import com.comic.server.feature.comic.model.Translator;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -59,6 +60,8 @@ public class ComicDTO implements Serializable {
   private List<Author> authors;
 
   private List<Artist> artists;
+
+  private List<Translator> translators;
 
   private List<ComicCategory> categories;
 

@@ -56,6 +56,7 @@ public class OtruyenComicAdapter {
                 .categoryIds(
                     categories.stream().map(category -> new ObjectId(category.getId())).toList())
                 .artists(List.of())
+                .translators(List.of())
                 .tags(List.of())
                 .characters(List.of())
                 .newChapters(
@@ -88,8 +89,9 @@ public class OtruyenComicAdapter {
 
     return ComicDTO.builder()
         .name(comic.getName())
-        .authors(comic.getAuthor().stream().map(name -> new Author(name)).toList())
+        .authors(comic.getAuthor().stream().map(Author::new).toList())
         .artists(List.of())
+        .translators(List.of())
         .categories(
             comic.getCategory().stream()
                 .map(category -> otruyenComicCategoryAdapter.convertToComicCategory(category))
@@ -156,6 +158,7 @@ public class OtruyenComicAdapter {
                 .toList())
         .tags(List.of())
         .characters(List.of())
+        .translators(List.of())
         .newChapters(newChapters)
         .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))
         .alternativeNames(comic.getOriginName())
