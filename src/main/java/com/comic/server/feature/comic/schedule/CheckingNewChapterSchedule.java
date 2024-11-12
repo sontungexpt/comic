@@ -28,8 +28,8 @@ public class CheckingNewChapterSchedule {
   private final MongoTemplate mongoTemplate;
 
   @Async
-  @Scheduled(cron = "0 */20 13-17 * * MON-FRI")
-  @Scheduled(cron = "0 */15 0-7 * * *")
+  @Scheduled(cron = "0 */15 13-17 * * MON-FRI")
+  @Scheduled(cron = "0 */10 0-7 * * *")
   public void syncNewChaptersFromOtruyen() {
 
     log.info("Start sync new chapters from Otruyen");
