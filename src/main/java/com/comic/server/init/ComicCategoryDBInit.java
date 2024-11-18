@@ -5,34 +5,36 @@ import com.comic.server.feature.comic.service.ComicCategoryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public record ComicCategoryDBInit(
-    ObjectMapper objectMapper, ComicCategoryService comicCategoryService)
-    implements CommandLineRunner {
+@RequiredArgsConstructor
+public class ComicCategoryDBInit implements CommandLineRunner {
+
+  private final ComicCategoryService comicCategoryService;
+  private final String CATEGORY_JSON_PATH = "src/main/resources/static/raws/category.json";
 
   @Override
   public void run(String... args) throws Exception {
-    if (comicCategoryService.countCategories() > 0) {
-      return;
-    }
+    if (comicCategoryService.countCategories() > 0) return;
 
     try {
-
-      String json = Files.readString(Paths.get("src/main/resources/static/raws/category.json"));
-      comicCategoryService.createComicCategories(convert(json));
-    } catch (Exception e) {
-      throw new RuntimeException("Error when create comic categories", e);
+      String json = Files.readString(Paths.get(CATEGORY_JSON_PATH));
+      comicCategoryService.createComicCategories(readJson(json));
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw e;
     }
   }
 
-  public List<ComicCategory> convert(String jsonString) throws JsonProcessingException {
+  public List<ComicCategory> readJson(String jsonString) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     List<ComicCategory> categories = new ArrayList<>();
 
