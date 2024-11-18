@@ -46,10 +46,10 @@ public class CheckingNewChapterSchedule {
     Instant now = Instant.now();
 
     for (Comic comic : comics) {
+      Update update = new Update();
       try {
         List<ShortInfoChapter> chapters = otruyenComicService.getChaptersByComic(comic);
 
-        Update update = new Update();
         int size;
         if (chapters != null && (size = chapters.size()) > 0) {
           final int MAX_NEW_CHAPTERS = 3;
@@ -71,12 +71,11 @@ public class CheckingNewChapterSchedule {
             update.set("newChapters", comic.getNewChapters());
           }
         }
-
-        update.set("lastNewChaptersCheckedAt", now);
-        bulkOps.updateOne(Query.query(Criteria.where("id").is(comic.getId())), update);
       } catch (Exception e) {
         log.error("Error when sync new chapters for comic {}", comic.getName(), e);
       }
+      update.set("lastNewChaptersCheckedAt", now);
+      bulkOps.updateOne(Query.query(Criteria.where("id").is(comic.getId())), update);
     }
 
     try {

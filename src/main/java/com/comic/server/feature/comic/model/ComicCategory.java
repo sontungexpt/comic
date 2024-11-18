@@ -40,6 +40,9 @@ public class ComicCategory implements Sluggable<String> {
   @Schema(description = "Name of the category (This is unique field)", example = "Comics")
   private String name;
 
+  @Schema(description = "Image URL of the category", example = "https://example.com/image.jpg")
+  private String imageUrl;
+
   @Schema(description = "Description of the category", example = "This is a category for comics")
   private String description;
 
