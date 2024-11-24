@@ -1,7 +1,7 @@
 package com.comic.server.feature.auth.dto;
 
-import com.comic.server.validation.annotation.Password;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +10,10 @@ import lombok.Setter;
 public class LoginRequest {
 
   @Schema(description = "Username", example = "admin")
+  @NotBlank
   private String username;
 
   @Schema(description = "Password", example = "Admin123")
-  @Password
+  @NotBlank
   private String password;
 }
