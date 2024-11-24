@@ -74,7 +74,9 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsApiConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:*", "*.ngrok-free.app"));
+    configuration.setAllowedOrigins(
+        List.of(
+            "http://localhost:*", "*.ngrok-free.app", "https://comic-production.up.railway.app"));
     // configuration.addAllowedOriginPattern("*");
     // configuration.addAllowedHeader("*");
     // configuration.addAllowedMethod("*");
