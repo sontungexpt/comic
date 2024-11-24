@@ -205,9 +205,10 @@ public class Comic implements Sluggable<String>, Serializable {
 
   @Schema(
       description = "The category ids of the comic",
+      types = {"string"},
       examples = {"6718cb6a65f0056b56c6682a"})
   @NotEmpty
-  private List<@com.comic.server.validation.annotation.ObjectId ObjectId> categoryIds;
+  private List<ObjectId> categoryIds;
 
   @Schema(
       description = "The tags of the comic to help with recommendations",

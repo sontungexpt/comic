@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Getter
 @Setter
@@ -41,7 +43,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @JsonIgnoreProperties(
     value = {"id", "pubId", "authorities"},
     allowGetters = true)
-public class User implements UserDetails, Persistable<String> {
+public class User implements UserDetails, OAuth2User, Persistable<String> {
   @JsonIgnore @Id private String id;
 
   // Why we need this?
@@ -182,5 +184,10 @@ public class User implements UserDetails, Persistable<String> {
   @JsonIgnore
   public boolean isNew() {
     return createdAt == null || id == null;
+  }
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    return Map.of("id", id, "pubId", pubId, "username", username, "name", name, "roles", roles);
   }
 }

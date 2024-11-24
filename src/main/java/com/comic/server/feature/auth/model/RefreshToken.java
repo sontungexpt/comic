@@ -28,6 +28,10 @@ public class RefreshToken implements Persistable<String> {
   @Id
   private String id;
 
+  @Schema(description = "Client IP address of the user associated with the refresh token")
+  // NOTE:unimplemented
+  private String clientIpAddress;
+
   @JsonIgnore
   @Schema(description = "User public ID of the user associated with the refresh token")
   private String userPubId;

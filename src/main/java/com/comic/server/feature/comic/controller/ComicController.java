@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,17 +71,17 @@ public class ComicController {
   @PublicEndpoint(filterJwt = true)
   @PageableQueryParams
   public ResponseEntity<?> searchComics(
-      @NotBlank @RequestParam String q,
+      @RequestParam String q,
       @PageableDefault(page = 0, size = 24, sort = "dailyViews", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok(comicService.searchComic(q, pageable));
+    return ResponseEntity.ok(comicService.searchComic(q.trim(), pageable));
   }
 
   @GetMapping("/{comicId}")
-  @PublicEndpoint(filterJwt = true)
   @Operation(summary = "Get comic detail", description = "Get comic detail by comicId")
   @PageableQueryParams
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
+  @PublicEndpoint(filterJwt = true)
   public ResponseEntity<?> getComicDetail(
       @PathVariable("comicId") @ObjectId String comicId,
       @CurrentUser User user,

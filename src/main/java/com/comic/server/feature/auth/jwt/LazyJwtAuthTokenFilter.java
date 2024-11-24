@@ -52,18 +52,15 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    boolean isOptionalJwtSecurityPath =
-        apiEndpointSecurityInspector.isOptionalJwtSecurityPath(request);
+    boolean isOptional = apiEndpointSecurityInspector.isOptionalJwtSecurityPath(request);
 
     try {
       SecurityContext context = SecurityContextHolder.getContext();
 
       Authentication authentication = context.getAuthentication();
 
-      if (authentication == null
-          || (authentication.getName() == "anonymousUser" && isOptionalJwtSecurityPath)) {
-
-        String jwtToken = HttpHeaderUtils.extractBearerToken(request);
+      if (authentication == null || (authentication.getName() == "anonymousUser" && isOptional)) {
+        String jwtToken = HttpHeaderUtils.extractBearerTokenOrThrow(request);
 
         String userPubId = jwtService.extractSubject(jwtToken);
 
@@ -90,7 +87,7 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
 
     } catch (MissingServletRequestPartException e) {
-      if (isOptionalJwtSecurityPath) {
+      if (isOptional) {
         filterChain.doFilter(request, response);
       } else {
         resolver.resolveException(request, response, null, e);

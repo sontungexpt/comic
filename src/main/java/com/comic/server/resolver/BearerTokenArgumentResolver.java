@@ -7,7 +7,6 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 public class BearerTokenArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -27,13 +26,9 @@ public class BearerTokenArgumentResolver implements HandlerMethodArgumentResolve
         (HttpServletRequest) webRequest.getNativeRequest(HttpServletRequest.class);
     BearerToken annotation = parameter.getParameterAnnotation(BearerToken.class);
 
-    try {
-      return HttpHeaderUtils.extractBearerToken(request);
-    } catch (MissingServletRequestPartException e) {
-      if (annotation.throwException()) {
-        throw e;
-      }
-      return null;
+    if (annotation.throwException()) {
+      return HttpHeaderUtils.extractBearerTokenOrThrow(request);
     }
+    return HttpHeaderUtils.extractBearerToken(request).orElse(null);
   }
 }

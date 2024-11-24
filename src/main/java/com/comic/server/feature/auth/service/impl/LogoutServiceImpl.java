@@ -1,7 +1,6 @@
 package com.comic.server.feature.auth.service.impl;
 
 import com.comic.server.exceptions.JwtTokenException;
-import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.auth.enums.TokenType;
 import com.comic.server.feature.auth.model.RefreshToken;
 import com.comic.server.feature.auth.repository.RefreshTokenRepository;
@@ -28,8 +27,7 @@ public record LogoutServiceImpl(
   public void logout(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
     try {
-      final String refreshToken = HttpHeaderUtils.extractBearerToken(request);
-
+      String refreshToken = HttpHeaderUtils.extractBearerTokenOrThrow(request);
       RefreshToken savedRefreshToken =
           refreshTokenRepository
               .findByToken(refreshToken)
@@ -47,8 +45,6 @@ public record LogoutServiceImpl(
 
       response.setStatus(HttpStatus.NO_CONTENT.value());
 
-    } catch (ResourceNotFoundException notFoundException) {
-      resolver.resolveException(request, response, null, notFoundException);
     } catch (MissingServletRequestPartException httpHeaderMissingException) {
       resolver.resolveException(request, response, null, httpHeaderMissingException);
     } catch (Exception e) {

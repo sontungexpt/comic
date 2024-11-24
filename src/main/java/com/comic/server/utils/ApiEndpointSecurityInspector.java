@@ -7,6 +7,8 @@ import com.comic.server.annotation.PublicEndpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,9 +22,12 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -35,7 +40,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class ApiEndpointSecurityInspector {
 
   @Getter
-  public static class PathWithCondition {
+  private class PathWithCondition {
     private String path;
     private boolean filterJwt;
 
@@ -94,6 +99,9 @@ public class ApiEndpointSecurityInspector {
                   add(new PathWithCondition("/v3/api-docs**/**"));
                   add(new PathWithCondition("/swagger-ui**/**"));
                   add(new PathWithCondition("/.well-known**/**"));
+                  add(new PathWithCondition("/test/**"));
+                  add(new PathWithCondition("/api/v1/test/**"));
+                  add(new PathWithCondition("/favicon.ico"));
                 }
               });
           put(POST, new HashSet<PathWithCondition>());
@@ -200,23 +208,26 @@ public class ApiEndpointSecurityInspector {
     handlerMethods.forEach(
         (requestInfo, handlerMethod) -> {
           // check if the method is annotated with PublicEndpoint or the parent class is annotated
-          //
-
-          var annotation = handlerMethod.getMethodAnnotation(PublicEndpoint.class);
-
-          if (annotation == null) {
-            annotation = handlerMethod.getBeanType().getAnnotation(PublicEndpoint.class);
-          }
+          var annotation = getAnnotation(handlerMethod, PublicEndpoint.class);
 
           if (annotation != null) {
             // if (handlerMethod.hasMethodAnnotation(PublicEndpoint.class)
             //     || handlerMethod.getBeanType().isAnnotationPresent(PublicEndpoint.class)) {
-
-            List<String> profilesList = Arrays.asList(annotation.profiles());
-            boolean filterJwt = annotation.filterJwt();
+            List<String> profilesList = new ArrayList<>();
+            for (String profile : annotation.profiles()) {
+              profilesList.add(profile);
+            }
+            Profile profileAnnotation = getAnnotation(handlerMethod, Profile.class);
+            // ConsoleUtils.prettyPrint("profileAnnotation: " + profileAnnotation);
+            if (profileAnnotation != null) {
+              for (String profile : profileAnnotation.value()) {
+                profilesList.add(profile);
+              }
+            }
 
             if (profilesList.isEmpty() || profilesList.contains(PROFILE)) {
               final Set<String> apiPaths = requestInfo.getPatternValues();
+              boolean filterJwt = annotation.filterJwt();
               final Set<PathWithCondition> apiPathsWithCondition =
                   apiPaths.stream()
                       .map(path -> new PathWithCondition(path, filterJwt))
@@ -320,5 +331,15 @@ public class ApiEndpointSecurityInspector {
     return publicEndpoints.getOrDefault(httpMethod, Collections.emptySet()).stream()
         .map(PathWithCondition::toString)
         .toArray(String[]::new);
+  }
+
+  @Nullable
+  private <A extends Annotation> A getAnnotation(
+      HandlerMethod annotatedMethod, Class<A> annotationClass) {
+    if (annotatedMethod == null) return null;
+    A annotation = annotatedMethod.getMethodAnnotation(annotationClass);
+    if (annotation != null) return annotation;
+    annotation = annotatedMethod.getBeanType().getAnnotation(annotationClass);
+    return annotation;
   }
 }
