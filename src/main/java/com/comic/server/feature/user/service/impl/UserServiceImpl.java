@@ -1,5 +1,7 @@
 package com.comic.server.feature.user.service.impl;
 
+import com.comic.server.feature.user.dto.UpdateUserProfileRequest;
+import com.comic.server.feature.user.dto.UserProfile;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.repository.UserRepository;
 import com.comic.server.feature.user.service.UserService;
@@ -17,6 +19,7 @@ public record UserServiceImpl(UserRepository userRepository, PasswordEncoder pas
 
   @Override
   public User createUser(String username, String password, String name) {
+
     User user =
         User.builder()
             .username(username)
@@ -24,5 +27,18 @@ public record UserServiceImpl(UserRepository userRepository, PasswordEncoder pas
             .name(name)
             .build();
     return userRepository.save(user);
+  }
+
+  @Override
+  public UserProfile getUserProfile(User user) {
+    return UserProfile.from(user);
+  }
+
+  @Override
+  public UserProfile updateUserProfile(User user, UpdateUserProfileRequest request) {
+    return null;
+
+    // JsonNode jsonNode = RawCon.convertValue(userProfile, JsonNode.class);
+
   }
 }
