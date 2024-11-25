@@ -14,12 +14,13 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = PasswordValidator.class)
 @Documented
 public @interface Password {
-  String message() default "Password must have 1 upcase char and at least 8 character";
+  String message() default
+      "Password must have 1 upcase, 1 lower case char and at least 8 character";
 
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
 
   // ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$
-  String regexp() default "^(?=.*[a-z])(?=.*[A-Z])[A-Za-z\\d@$!%*?&]{8,}$";
+  String regexp() default "^(?=.*[a-z])(?=.*[A-Z])[A-Za-z0-9@$!%*?&]{8,}$";
 }
