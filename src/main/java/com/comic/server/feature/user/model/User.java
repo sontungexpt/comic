@@ -84,7 +84,7 @@ public class User implements UserDetails, Persistable<String> {
   @Schema(description = "The roles of the account")
   @Default
   @JsonPatchIgnore
-  private Set<RoleType> roles = Set.of(RoleType.READER);
+  private Set<RoleType> roles = Set.of(RoleType.READER, RoleType.POSTER);
 
   @CreatedDate
   @Schema(description = "The created time of the account")
@@ -98,7 +98,8 @@ public class User implements UserDetails, Persistable<String> {
   @JsonPatchIgnore
   private Instant updatedAt;
 
-  @JsonIgnore @Transient private Collection<? extends GrantedAuthority> authorities;
+  @JsonPatchIgnore @JsonIgnore @Transient
+  private Collection<? extends GrantedAuthority> authorities;
 
   public boolean hasRole(RoleType roleType) {
     return roles.stream().anyMatch(r -> r.equals(roleType));

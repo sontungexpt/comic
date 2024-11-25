@@ -6,10 +6,9 @@ import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.repository.UserRepository;
 import com.comic.server.feature.user.service.UserService;
 import com.comic.server.utils.JsonMergePatchUtils;
-import com.comic.server.utils.RawJsonConvertor;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public record UserServiceImpl(
@@ -24,6 +23,7 @@ public record UserServiceImpl(
   }
 
   @Override
+  @Transactional
   public User createUser(String username, String password, String name) {
 
     User user =
@@ -41,8 +41,11 @@ public record UserServiceImpl(
   }
 
   @Override
+  @Transactional
   public UserProfile updateUserProfile(User user, UpdateUserProfileRequest request) {
-    JsonNode jsonNode = RawJsonConvertor.convertValue(request, JsonNode.class);
-    return UserProfile.from(jsonMergePatchUtils.patch(user, jsonNode));
+    if (request.getName() != null) {
+      user.setName(request.getName());
+    }
+    return UserProfile.from(userRepository.save(user));
   }
 }
