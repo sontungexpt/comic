@@ -5,11 +5,17 @@ import com.comic.server.feature.user.dto.UserProfile;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.repository.UserRepository;
 import com.comic.server.feature.user.service.UserService;
+import com.comic.server.utils.JsonMergePatchUtils;
+import com.comic.server.utils.RawJsonConvertor;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public record UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder)
+public record UserServiceImpl(
+    JsonMergePatchUtils jsonMergePatchUtils,
+    UserRepository userRepository,
+    PasswordEncoder passwordEncoder)
     implements UserService {
 
   @Override
@@ -36,9 +42,7 @@ public record UserServiceImpl(UserRepository userRepository, PasswordEncoder pas
 
   @Override
   public UserProfile updateUserProfile(User user, UpdateUserProfileRequest request) {
-    return null;
-
-    // JsonNode jsonNode = RawCon.convertValue(userProfile, JsonNode.class);
-
+    JsonNode jsonNode = RawJsonConvertor.convertValue(request, JsonNode.class);
+    return UserProfile.from(jsonMergePatchUtils.patch(user, jsonNode));
   }
 }

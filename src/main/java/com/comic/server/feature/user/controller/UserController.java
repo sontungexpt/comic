@@ -18,16 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 // @RolesAllowed(RoleType.Fields.CUSTOMER)
 public record UserController(UserService userService, UserRepository userRepository) {
 
-  // @PostMapping
-  // public ResponseEntity<UserProfile> createUser(@RequestBody CreateUserRequest request) {
-  //   if (userRepository.existsByUsername(request.getUsername())) {
-  //     return ResponseEntity.badRequest().build();
-  //   }
-  //   User user = userService.createUser(request.getUsername(), request.getPassword(),
-  // request.getName());
-  //   return ResponseEntity.ok(userService.getUserProfile(user));
-  // }
-
   @GetMapping("")
   public ResponseEntity<UserProfile> getUserProfile(@CurrentUser User user) {
     return ResponseEntity.ok(userService.getUserProfile(user));
