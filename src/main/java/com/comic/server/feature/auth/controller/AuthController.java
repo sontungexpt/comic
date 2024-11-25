@@ -23,7 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public record AuthController(AuthService authService) {
 
-  @Operation(summary = "Registers a new user to the system")
+  @Operation(
+      summary = "Registers a new user to the system",
+      description =
+          """
+Endpoint `"/api/v1/auth/register"` is used to register a new user to the system.
+
+The user is registered to the system with the provided details.
+""")
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void registerUser(@RequestBody @Valid RegistrationRequest signUpRequest) {

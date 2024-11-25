@@ -1,6 +1,7 @@
 package com.comic.server.feature.user.model;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.comic.server.annotation.JsonPatchIgnore;
 import com.comic.server.feature.user.enums.RoleType;
 import com.comic.server.feature.user.enums.UserStatus;
 import com.comic.server.validation.annotation.OptimizedName;
@@ -42,7 +43,7 @@ import org.springframework.security.core.userdetails.UserDetails;
     value = {"id", "pubId", "authorities"},
     allowGetters = true)
 public class User implements UserDetails, Persistable<String> {
-  @JsonIgnore @Id private String id;
+  @JsonPatchIgnore @JsonIgnore @Id private String id;
 
   // Why we need this?
   // The public id is a unique identifier for the account.
@@ -54,15 +55,18 @@ public class User implements UserDetails, Persistable<String> {
   @Default
   @Indexed(unique = true)
   @Schema(description = "The public id of the account")
+  @JsonPatchIgnore
   private String pubId = NanoIdUtils.randomNanoId();
 
   @Indexed(unique = true)
   @Schema(description = "The phone number of the account", requiredMode = RequiredMode.REQUIRED)
+  @JsonPatchIgnore
   private String username;
 
   @JsonIgnore
   @Password
   @Schema(description = "The password of the account", requiredMode = RequiredMode.REQUIRED)
+  @JsonPatchIgnore
   private String password;
 
   @OptimizedName
@@ -74,23 +78,28 @@ public class User implements UserDetails, Persistable<String> {
 
   @Default
   @Schema(description = "The status of the account")
+  @JsonPatchIgnore
   private UserStatus status = UserStatus.ACTIVE;
 
   @Schema(description = "The roles of the account")
   @Default
-  private Set<RoleType> roles = Set.of(RoleType.READER);
+  @JsonPatchIgnore
+  private Set<RoleType> roles = Set.of(RoleType.READER, RoleType.POSTER);
 
   @CreatedDate
   @Schema(description = "The created time of the account")
   @JsonIgnore
+  @JsonPatchIgnore
   private Instant createdAt;
 
   @LastModifiedDate
   @Schema(description = "The updated time of the account")
   @JsonIgnore
+  @JsonPatchIgnore
   private Instant updatedAt;
 
-  @JsonIgnore @Transient private Collection<? extends GrantedAuthority> authorities;
+  @JsonPatchIgnore @JsonIgnore @Transient
+  private Collection<? extends GrantedAuthority> authorities;
 
   public boolean hasRole(RoleType roleType) {
     return roles.stream().anyMatch(r -> r.equals(roleType));
