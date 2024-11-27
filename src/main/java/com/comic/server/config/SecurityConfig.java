@@ -25,7 +25,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -119,11 +118,12 @@ public class SecurityConfig {
     apiEndpointSecurityInspector.addPublicEndpoint("/api/v1/auth/**", "/api/actuator/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
-        .csrf(
-            customizer -> {
-              customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-              customizer.ignoringRequestMatchers("/**", "/actuator/**");
-            })
+        .csrf(csrf -> csrf.disable())
+        // .csrf(
+        //     customizer -> {
+        //       customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        //       customizer.ignoringRequestMatchers("/**", "/actuator/**");
+        //     })
 
         // exception handling
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

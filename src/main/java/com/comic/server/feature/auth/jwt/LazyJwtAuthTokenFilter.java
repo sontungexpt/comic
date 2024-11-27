@@ -4,6 +4,7 @@ import com.comic.server.exceptions.JwtTokenException;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.repository.UserRepository;
 import com.comic.server.utils.ApiEndpointSecurityInspector;
+import com.comic.server.utils.ConsoleUtils;
 import com.comic.server.utils.HttpHeaderUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -62,6 +63,7 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
 
       if (authentication == null
           || (authentication.getName() == "anonymousUser" && isOptionalJwtSecurityPath)) {
+        ConsoleUtils.prettyPrint("test");
 
         String jwtToken = HttpHeaderUtils.extractBearerToken(request);
 

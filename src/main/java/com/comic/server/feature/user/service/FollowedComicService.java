@@ -12,5 +12,7 @@ public interface FollowedComicService {
 
   Page<ComicDTO> getFollowedComics(String userId, Pageable pageable);
 
+  Page<ComicDTO> searchFollowedComics(String keyword, String userId, Pageable pageable);
+
   boolean isUserFollowingComic(String userId, String comicId);
 }

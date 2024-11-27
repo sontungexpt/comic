@@ -48,4 +48,9 @@ public class FollowedComicServiceImpl implements FollowedComicService {
     return followedComicRepository.existsByUserIdAndComicId(
         new ObjectId(userId), new ObjectId(comicId));
   }
+
+  @Override
+  public Page<ComicDTO> searchFollowedComics(String keyword, String userId, Pageable pageable) {
+    return customFollowedComicRepository.searchFollowedComic(keyword, userId, pageable);
+  }
 }
