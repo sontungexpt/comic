@@ -11,6 +11,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   private final CustomFollowedComicRepository customFollowedComicRepository;
 
   @Override
-  @CacheEvict(value = "comic", allEntries = true)
+  @CacheEvict(value = "comics", allEntries = true)
   public void followComic(String userId, String comicId) {
     try {
       followedComicRepository.insert(new FollowedComic(userId, comicId));
@@ -34,7 +35,7 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   }
 
   @Override
-  @CacheEvict(value = "comic", allEntries = true)
+  @CacheEvict(value = "comics", allEntries = true)
   public void unfollowComic(String userId, String comicId) {
     int count =
         followedComicRepository.deleteByUserIdAndComicId(
@@ -46,6 +47,13 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   }
 
   @Override
+  @Cacheable(
+      value = "followed_comics",
+      key =
+          "'user:' + #userId"
+              + "+ 'page:' + #pageable.pageNumber"
+              + "+ 'size:' + #pageable.pageSize"
+              + "+ 'sort:' + #pageable.sort")
   public Page<ComicDTO> getFollowedComics(String userId, Pageable pageable) {
     return customFollowedComicRepository.findByUserId(userId, pageable);
   }

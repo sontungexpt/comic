@@ -53,7 +53,12 @@ public class CacheConfig {
   public CacheManager caffeineCacheManager() {
     CaffeineCacheManager caffeineCacheManager =
         new CaffeineCacheManager(
-            "comics", "comic", "comic_chapters", "comic_chapter", "comic_categories");
+            "comics",
+            "comic",
+            "comic_chapters",
+            "comic_chapter",
+            "comic_categories",
+            "followed_comics");
     caffeineCacheManager.setCaffeineSpec(
         CaffeineSpec.parse("maximumSize=8000,expireAfterAccess=30000s"));
 
