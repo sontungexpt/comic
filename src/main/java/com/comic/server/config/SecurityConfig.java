@@ -11,9 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,30 +45,33 @@ public class SecurityConfig {
   private final LogoutSuccessHandler logoutSuccessHandler;
   private final LogoutHandler logoutHandler;
 
+  // @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+  // private String ISSUER_URL;
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
+  // @Bean
+  private DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
   }
 
-  @Bean
-  public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers)
-      throws Exception {
-    return new ProviderManager(providers);
-  }
-
   // @Bean
-  // public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+  // public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers)
   //     throws Exception {
-  //   return authConfig.getAuthenticationManager();
+  //   return new ProviderManager(providers);
   // }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+      throws Exception {
+    return authConfig.getAuthenticationManager();
+  }
 
   @Bean
   public CorsConfigurationSource corsApiConfigurationSource() {
@@ -118,7 +120,8 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-    apiEndpointSecurityInspector.addPublicEndpoint("/api/v1/auth/**", "/api/actuator/**");
+    apiEndpointSecurityInspector.addPublicEndpoint(
+        "/api/v1/auth/**", "/api/actuator/**", "/login/oauth2/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
         .csrf(
@@ -146,6 +149,20 @@ public class SecurityConfig {
                       });
               auth.anyRequest().authenticated();
             })
+        .formLogin(formLogin -> formLogin.disable())
+
+        // oauth2 login
+        // .oauth2Login(
+        //     oauth2 -> {
+        //       oauth2
+        //           // .clientRegistrationRepository(clientRegistrationRepository())
+        //           .successHandler(new OAuth2LoginSuccessHandlerImpl())
+        //           .defaultSuccessUrl("/api/v1/auth/oauth2/success")
+        //           // .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+        //           .authorizationEndpoint(
+        //               authorization -> authorization.baseUri("/api/v1/auth/oauth2/login"));
+        //     })
+        // .oauth2ResourceServer(server -> server.jwt(Customizer.withDefaults()))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(lazyJwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(

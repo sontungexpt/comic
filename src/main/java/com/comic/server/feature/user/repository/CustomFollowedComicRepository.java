@@ -38,4 +38,31 @@ public class CustomFollowedComicRepository {
 
     return new PageImpl<>(comics, pageable, comics.size());
   }
+
+  public Page<ComicDTO> searchFollowedComic(String keyword, String userId, Pageable pageable) {
+
+    Criteria findindKeywordCriteria = new Criteria();
+    findindKeywordCriteria.orOperator(
+        Criteria.where("name").regex(keyword, "i"),
+        Criteria.where("alternativeNames").regex(keyword, "i"));
+
+    Aggregation aggregation =
+        Aggregation.newAggregation(
+            Aggregation.match(Criteria.where("userId").is(new ObjectId(userId))),
+            Aggregation.lookup("comics", "comicId", "_id", "comic"),
+            Aggregation.unwind("comic"),
+            Aggregation.replaceRoot("comic"),
+            Aggregation.match(findindKeywordCriteria),
+            Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
+            Aggregation.sort(pageable.getSort()),
+            Aggregation.skip(pageable.getOffset()),
+            Aggregation.limit(pageable.getPageSize() + 1));
+
+    var comics =
+        mongoTemplate
+            .aggregate(aggregation, FollowedComic.class, ComicDTO.class)
+            .getMappedResults();
+
+    return new PageImpl<>(comics, pageable, comics.size());
+  }
 }

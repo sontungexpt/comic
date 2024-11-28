@@ -4,6 +4,7 @@ import com.comic.server.exceptions.JwtTokenException;
 import com.comic.server.feature.auth.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -63,13 +64,21 @@ public class JwtUtils {
       Date expiration,
       String secretKey,
       MacAlgorithm alg) {
-    return Jwts.builder()
-        .claims(extraClaims)
-        .subject(subject)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(expiration)
-        .signWith(getSignInKey(secretKey), alg)
-        .compact();
+    return buildToken(
+        Jwts.builder()
+            .claims(extraClaims)
+            .subject(subject)
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(expiration),
+        secretKey);
+  }
+
+  public static String buildToken(JwtBuilder jwtBuilder, String secretKey) {
+    return jwtBuilder.signWith(getSignInKey(secretKey)).compact();
+  }
+
+  public static String buildToken(JwtBuilder jwtBuilder, String secretKey, MacAlgorithm alg) {
+    return jwtBuilder.signWith(getSignInKey(secretKey), alg).compact();
   }
 
   public static Claims extractAllClaims(String token, String secretKey) {

@@ -1,6 +1,7 @@
 package com.comic.server.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -14,25 +15,24 @@ public final class HttpHeaderUtils {
    * Get the value of the Authorization Bearer token from the HttpServletRequest.
    *
    * @param request The HttpServletRequest object.
-   * @return The value of the Authorization Bearer token.
-   * @throws MissingServletRequestPartException If the Authorization Bearer token is missing.
+   * @return Optional containing the Authorization Bearer token, or empty if not present.
    */
-  public static String extractBearerToken(HttpServletRequest request)
-      throws MissingServletRequestPartException {
+  public static Optional<String> extractBearerToken(HttpServletRequest request) {
     log.debug("Extracting bearer token from request");
-    return extractHeader(request, AUTHORIZATION_HEADER, AUTHORIZATION_BEARER_PREFIX);
+    return extractHeaderWithPrefix(request, AUTHORIZATION_HEADER, AUTHORIZATION_BEARER_PREFIX);
   }
 
   /**
-   * Get the value of the Authorization Bearer token from the HttpServletRequest or return null if
-   * the token is missing.
+   * Get the value of the Authorization Bearer token and throw an exception if not present.
    *
    * @param request The HttpServletRequest object.
-   * @return The value of the Authorization Bearer token or null if the token is missing.
+   * @return The Authorization Bearer token.
+   * @throws MissingServletRequestPartException if the token is missing or invalid.
    */
-  public static String extractBearerTokenOrNull(HttpServletRequest request) {
-    log.debug("Extracting bearer token from request");
-    return extractHeaderOrNull(request, AUTHORIZATION_HEADER, AUTHORIZATION_BEARER_PREFIX);
+  public static String extractBearerTokenOrThrow(HttpServletRequest request)
+      throws MissingServletRequestPartException {
+    return extractBearerToken(request)
+        .orElseThrow(() -> new MissingServletRequestPartException(AUTHORIZATION_HEADER));
   }
 
   /**
@@ -40,14 +40,29 @@ public final class HttpHeaderUtils {
    *
    * @param request The HttpServletRequest object.
    * @param headerName The name of the header to retrieve.
-   * @return The value of the specified header.
-   * @throws MissingServletRequestPartException If the header is missing.
+   * @return Optional containing the header value, or empty if not present.
    */
-  public static String extractHeader(HttpServletRequest request, String headerName)
-      throws MissingServletRequestPartException {
+  public static Optional<String> extractHeader(HttpServletRequest request, String headerName) {
     String headerValue = request.getHeader(headerName);
-    validateHeaderPresence(headerValue, headerName);
-    return headerValue;
+    if (StringUtils.hasText(headerValue)) {
+      return Optional.of(headerValue);
+    }
+    log.warn("Header {} is missing", headerName);
+    return Optional.empty();
+  }
+
+  /**
+   * Get the value of a specific header and throw an exception if not present.
+   *
+   * @param request The HttpServletRequest object.
+   * @param headerName The name of the header to retrieve.
+   * @return The header value.
+   * @throws MissingServletRequestPartException if the header is missing.
+   */
+  public static String extractHeaderOrThrow(HttpServletRequest request, String headerName)
+      throws MissingServletRequestPartException {
+    return extractHeader(request, headerName)
+        .orElseThrow(() -> new MissingServletRequestPartException("Header " + headerName));
   }
 
   /**
@@ -56,61 +71,36 @@ public final class HttpHeaderUtils {
    * @param request The HttpServletRequest object.
    * @param headerName The name of the header to retrieve.
    * @param prefix The prefix of the header value.
-   * @return The value of the header with the specified prefix.
+   * @return Optional containing the header value with the prefix removed, or empty if not valid.
    */
-  public static String extractHeader(HttpServletRequest request, String headerName, String prefix)
-      throws MissingServletRequestPartException {
-    String headerValue = extractHeader(request, headerName);
-    validateHeaderPrefix(headerValue, headerName, prefix);
-    return headerValue.substring(prefix.length());
+  public static Optional<String> extractHeaderWithPrefix(
+      HttpServletRequest request, String headerName, String prefix) {
+    return extractHeader(request, headerName)
+        .filter(
+            headerValue -> {
+              if (headerValue.startsWith(prefix)) return true;
+              log.warn("Header {} does not start with {}", headerName, prefix);
+              return false;
+            })
+        .map(headerValue -> headerValue.substring(prefix.length()));
   }
 
   /**
-   * Get the value of a header starting after a specific prefix or return null if the header is
-   * missing.
+   * Get the value of a header starting after a specific prefix and throw an exception if invalid.
    *
    * @param request The HttpServletRequest object.
    * @param headerName The name of the header to retrieve.
    * @param prefix The prefix of the header value.
-   * @return The value of the header with the specified prefix or null if the header is missing.
+   * @return The header value with the prefix removed.
+   * @throws MissingServletRequestPartException if the header is missing or invalid.
    */
-  public static String extractHeaderOrNull(
-      HttpServletRequest request, String headerName, String prefix) {
-    String headerValue = request.getHeader(headerName);
-    if (!StringUtils.hasText(headerValue)) return null;
-    return headerValue.startsWith(prefix) ? headerValue.substring(prefix.length()) : null;
-  }
-
-  /**
-   * Validate the presence of a header in the HttpServletRequest.
-   *
-   * @param headerValue The value of the header.
-   * @param headerName The name of the header.
-   * @throws MissingServletRequestPartException If the header is missing.
-   */
-  private static void validateHeaderPresence(String headerValue, String headerName)
+  public static String extractHeaderWithPrefixOrThrow(
+      HttpServletRequest request, String headerName, String prefix)
       throws MissingServletRequestPartException {
-    if (!StringUtils.hasText(headerValue)) {
-      log.warn("Header {} is missing", headerName);
-      throw new MissingServletRequestPartException("Header " + headerName);
-    }
-  }
-
-  /**
-   * Validate the prefix of a header in the HttpServletRequest.
-   *
-   * @param headerValue The value of the header.
-   * @param headerName The name of the header.
-   * @param prefix The prefix of the header value.
-   * @throws MissingServletRequestPartException If the header does not start with the specified
-   *     prefix.
-   */
-  private static void validateHeaderPrefix(String headerValue, String headerName, String prefix)
-      throws MissingServletRequestPartException {
-    if (!headerValue.startsWith(prefix)) {
-      log.warn("Header {} does not start with {}", headerName, prefix);
-      throw new MissingServletRequestPartException(
-          "Header " + headerName + " with prefix " + prefix);
-    }
+    return extractHeaderWithPrefix(request, headerName, prefix)
+        .orElseThrow(
+            () ->
+                new MissingServletRequestPartException(
+                    "Header " + headerName + " with prefix " + prefix + " is missing or invalid"));
   }
 }

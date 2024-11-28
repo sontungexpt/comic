@@ -6,14 +6,13 @@ import com.comic.server.annotation.PublicEndpoint;
 import com.comic.server.config.OpenApiConfig;
 import com.comic.server.feature.comment.dto.NewCommentRequest;
 import com.comic.server.feature.comment.service.CommentService;
-import com.comic.server.feature.user.enums.RoleType;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.validation.annotation.ObjectId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +70,9 @@ public class CommentController {
           "Post a new comment to a comic or chapter. Only users with the `POSTER` role are"
               + " authorized to add comments.",
       security = @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME))
-  @RolesAllowed(RoleType.Fields.POSTER)
+  @Profile("dev")
+  @PublicEndpoint
+  // @RolesAllowed(RoleType.Fields.POSTER)
   public ResponseEntity<?> addComment(
       @RequestBody @Valid NewCommentRequest newCommentRequest, @CurrentUser User user) {
     return ResponseEntity.ok(commentService.addComment(newCommentRequest, user));

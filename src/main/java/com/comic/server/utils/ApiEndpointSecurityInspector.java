@@ -7,6 +7,8 @@ import com.comic.server.annotation.PublicEndpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,9 +22,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -35,16 +41,16 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class ApiEndpointSecurityInspector {
 
   @Getter
-  public static class PathWithCondition {
+  private class APIPath {
     private String path;
     private boolean filterJwt;
 
-    public PathWithCondition(String path, boolean filterJwt) {
+    public APIPath(String path, boolean filterJwt) {
       this.path = path;
       this.filterJwt = filterJwt;
     }
 
-    public PathWithCondition(String path) {
+    public APIPath(String path) {
       this(path, false);
     }
 
@@ -57,8 +63,8 @@ public class ApiEndpointSecurityInspector {
     public boolean equals(Object obj) {
       if (obj == null) return false;
       else if (obj == this) return true;
-      else if (!(obj instanceof PathWithCondition)) return false;
-      PathWithCondition other = (PathWithCondition) obj;
+      else if (!(obj instanceof APIPath)) return false;
+      APIPath other = (APIPath) obj;
       return this.path.equals(other.path);
     }
 
@@ -73,6 +79,7 @@ public class ApiEndpointSecurityInspector {
 
   private RequestMappingHandlerMapping requestHandlerMapping;
   private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+  private final Map<String, Boolean> staticEndpoints = new HashMap<>();
 
   // /** A set of public endpoints that are accessible via any HTTP method. */
   // private Set<PathWithCondition> publicAllMethodsEndpoints = new HashSet<>();
@@ -84,25 +91,28 @@ public class ApiEndpointSecurityInspector {
     this.requestHandlerMapping = requestHandlerMapping;
   }
 
-  private final Map<HttpMethod, Set<PathWithCondition>> publicEndpoints =
+  private final Map<HttpMethod, Set<APIPath>> publicEndpoints =
       new HashMap<>() {
         {
           put(
               GET,
-              new HashSet<PathWithCondition>() {
+              new HashSet<APIPath>() {
                 {
-                  add(new PathWithCondition("/v3/api-docs**/**"));
-                  add(new PathWithCondition("/swagger-ui**/**"));
-                  add(new PathWithCondition("/.well-known**/**"));
+                  add(new APIPath("/v3/api-docs**/**"));
+                  add(new APIPath("/swagger-ui**/**"));
+                  add(new APIPath("/.well-known**/**"));
+                  add(new APIPath("/test/**"));
+                  add(new APIPath("/api/v1/test/**"));
+                  add(new APIPath("/favicon.ico"));
                 }
               });
-          put(POST, new HashSet<PathWithCondition>());
+          put(POST, new HashSet<APIPath>());
         }
       };
 
-  private Set<PathWithCondition> getPublicEndpoints(HttpMethod httpMethod) {
+  private Set<APIPath> getPublicEndpoints(HttpMethod httpMethod) {
     if (publicEndpoints.get(httpMethod) == null) {
-      publicEndpoints.put(httpMethod, new HashSet<PathWithCondition>());
+      publicEndpoints.put(httpMethod, new HashSet<APIPath>());
     }
     return publicEndpoints.get(httpMethod);
   }
@@ -183,8 +193,44 @@ public class ApiEndpointSecurityInspector {
    * @param filterJwt Whether to filter JWT for the endpoint.
    */
   public void addPublicEndpoint(HttpMethod httpMethod, boolean filterJwt, String path) {
-    getPublicEndpoints(httpMethod).add(new PathWithCondition(path, filterJwt));
+    getPublicEndpoints(httpMethod).add(new APIPath(path, filterJwt));
+    addStaticEndpoint(path, httpMethod);
     log.info("Added public endpoint: " + path + " for " + httpMethod);
+  }
+
+  private void watchStaticEndpoints(Map<RequestMappingInfo, HandlerMethod> handlerMethods) {
+
+    publicEndpoints.forEach(
+        (httpMethod, apiPaths) -> {
+          apiPaths.forEach(apiPath -> addStaticEndpoint(apiPath.path, httpMethod));
+        });
+
+    handlerMethods.forEach(
+        (requestInfo, handlerMethod) -> {
+          requestInfo
+              .getMethodsCondition()
+              .getMethods()
+              .forEach(
+                  httpMethod -> {
+                    requestInfo
+                        .getPatternValues()
+                        .forEach(path -> addStaticEndpoint(path, httpMethod.asHttpMethod()));
+                  });
+        });
+  }
+
+  public void watchEachPublicEndpoints(RequestMappingInfo requestInfo, boolean filterJwt) {
+    requestInfo
+        .getMethodsCondition()
+        .getMethods()
+        .forEach(
+            httpMethod -> {
+              getPublicEndpoints(httpMethod.asHttpMethod())
+                  .addAll(
+                      requestInfo.getPatternValues().stream()
+                          .map(path -> new APIPath(path, filterJwt))
+                          .collect(Collectors.toSet()));
+            });
   }
 
   /**
@@ -196,37 +242,19 @@ public class ApiEndpointSecurityInspector {
   @PostConstruct
   public void init() {
     final var handlerMethods = requestHandlerMapping.getHandlerMethods();
+    watchStaticEndpoints(handlerMethods);
 
     handlerMethods.forEach(
         (requestInfo, handlerMethod) -> {
-          // check if the method is annotated with PublicEndpoint or the parent class is annotated
-          //
 
-          var annotation = handlerMethod.getMethodAnnotation(PublicEndpoint.class);
-
-          if (annotation == null) {
-            annotation = handlerMethod.getBeanType().getAnnotation(PublicEndpoint.class);
-          }
+          // check if the method is annotated with PublicEndpoint or the parent class is
+          // annotated
+          var annotation = getAnnotation(handlerMethod, PublicEndpoint.class);
 
           if (annotation != null) {
-            // if (handlerMethod.hasMethodAnnotation(PublicEndpoint.class)
-            //     || handlerMethod.getBeanType().isAnnotationPresent(PublicEndpoint.class)) {
-
-            List<String> profilesList = Arrays.asList(annotation.profiles());
-            boolean filterJwt = annotation.filterJwt();
-
+            List<String> profilesList = getProfiles(annotation, handlerMethod);
             if (profilesList.isEmpty() || profilesList.contains(PROFILE)) {
-              final Set<String> apiPaths = requestInfo.getPatternValues();
-              final Set<PathWithCondition> apiPathsWithCondition =
-                  apiPaths.stream()
-                      .map(path -> new PathWithCondition(path, filterJwt))
-                      .collect(Collectors.toSet());
-
-              requestInfo.getMethodsCondition().getMethods().stream()
-                  .forEach(
-                      httpMethod ->
-                          getPublicEndpoints(httpMethod.asHttpMethod())
-                              .addAll(apiPathsWithCondition));
+              watchEachPublicEndpoints(requestInfo, annotation.filterJwt());
             }
           }
         });
@@ -254,9 +282,7 @@ public class ApiEndpointSecurityInspector {
     return publicEndpoints
         .getOrDefault(HttpMethod.valueOf(request.getMethod()), Collections.emptySet())
         .stream()
-        .anyMatch(
-            apiPathWithCondition ->
-                antPathMatcher.match(apiPathWithCondition.path, request.getRequestURI()));
+        .anyMatch(apiPath -> matchPath(apiPath.path, request));
   }
 
   /**
@@ -267,7 +293,7 @@ public class ApiEndpointSecurityInspector {
    */
   public boolean isUnsecureRequest(@NonNull final HttpServletRequest request) {
     return getUnsecuredApiPaths(HttpMethod.valueOf(request.getMethod())).stream()
-        .anyMatch(apiPath -> antPathMatcher.match(apiPath, request.getRequestURI()));
+        .anyMatch(apiPath -> matchPath(apiPath, request));
   }
 
   /**
@@ -280,7 +306,7 @@ public class ApiEndpointSecurityInspector {
    */
   public boolean isUnsecureJwtRequest(@NonNull final HttpServletRequest request) {
     return getUnsecuredJwtApiPaths(HttpMethod.valueOf(request.getMethod())).stream()
-        .anyMatch(apiPath -> antPathMatcher.match(apiPath, request.getRequestURI()));
+        .anyMatch(apiPath -> matchPath(apiPath, request));
   }
 
   /**
@@ -293,8 +319,8 @@ public class ApiEndpointSecurityInspector {
    */
   private Set<String> getUnsecuredJwtApiPaths(@NonNull final HttpMethod httpMethod) {
     return publicEndpoints.getOrDefault(httpMethod, Collections.emptySet()).stream()
-        .filter(apiPathsWithCondition -> !apiPathsWithCondition.filterJwt)
-        .map(PathWithCondition::toString)
+        .filter(apiPath -> !apiPath.filterJwt)
+        .map(APIPath::toString)
         .collect(Collectors.toSet());
   }
 
@@ -306,7 +332,7 @@ public class ApiEndpointSecurityInspector {
    */
   private Set<String> getUnsecuredApiPaths(@NonNull final HttpMethod httpMethod) {
     return publicEndpoints.getOrDefault(httpMethod, Collections.emptySet()).stream()
-        .map(PathWithCondition::toString)
+        .map(APIPath::toString)
         .collect(Collectors.toSet());
   }
 
@@ -318,7 +344,59 @@ public class ApiEndpointSecurityInspector {
    */
   public String[] getPublicSecurityPaths(HttpMethod httpMethod) {
     return publicEndpoints.getOrDefault(httpMethod, Collections.emptySet()).stream()
-        .map(PathWithCondition::toString)
+        .map(APIPath::toString)
         .toArray(String[]::new);
+  }
+
+  @Nullable
+  private <A extends Annotation> A getAnnotation(
+      HandlerMethod annotatedMethod, Class<A> annotationClass) {
+    if (annotatedMethod == null) return null;
+    A annotation = annotatedMethod.getMethodAnnotation(annotationClass);
+    if (annotation != null) return annotation;
+    annotation = annotatedMethod.getBeanType().getAnnotation(annotationClass);
+    return annotation;
+  }
+
+  private boolean matchPath(String path, String requestPath, String methodName) {
+    if (path == null || requestPath == null) return false;
+    return antPathMatcher.match(path, requestPath)
+        && !staticEndpointExists(requestPath, methodName);
+  }
+
+  private boolean matchPath(String path, HttpServletRequest request) {
+    return matchPath(path, request.getRequestURI(), request.getMethod());
+  }
+
+  private void addStaticEndpoint(String path, HttpMethod method) {
+    addStaticEndpoint(path, method.name());
+  }
+
+  private void addStaticEndpoint(String path, String methodName) {
+    if (antPathMatcher.isPattern(path)) return;
+    staticEndpoints.put(prefixByMethodName(path, methodName), true);
+  }
+
+  private boolean staticEndpointExists(String path, String methodName) {
+    return staticEndpoints.containsKey(prefixByMethodName(path, methodName));
+  }
+
+  private String prefixByMethodName(String path, String methodName) {
+    return methodName + "_" + path;
+  }
+
+  private List<String> getProfiles(
+      @org.springframework.lang.NonNull PublicEndpoint annotation, HandlerMethod handlerMethod) {
+    List<String> profilesList = new ArrayList<>();
+    for (String profile : annotation.profiles()) {
+      profilesList.add(profile);
+    }
+    Profile profileAnnotation = getAnnotation(handlerMethod, Profile.class);
+    if (profileAnnotation != null) {
+      for (String profile : profileAnnotation.value()) {
+        profilesList.add(profile);
+      }
+    }
+    return profilesList;
   }
 }

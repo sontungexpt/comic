@@ -469,7 +469,6 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
 
   @Override
   public Page<ComicDTO> searchComic(String keyword, Pageable pageable) {
-
     var client = HttpClient.newHttpClient();
     var request =
         HttpRequest.newBuilder()

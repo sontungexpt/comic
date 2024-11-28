@@ -1,4 +1,5 @@
 debug: false
+
 comic:
 
 caching:
@@ -11,6 +12,32 @@ jwt:
   refresh-token-expiration: 2592000000 # 30 days
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI}
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+      resource:
+    userInfoUri:
+      https://api.github.com/user
+
+      # google:
+      #   client-id: ${GOOGLE_CLIENT_ID}
+      #   client-secret: ${GOOGLE_CLIENT_SECRET}
+      #   scope:
+      #     - email
+      #     - profile
+      # facebook:
+      #   client-id: ${FACEBOOK_CLIENT_ID}
+      #   client-secret: ${FACEBOOK_CLIENT_SECRET}
+      #   scope:
+      #     - email
+      #     - public_profile
   # jackson:
   #   mapper:
   #     accept-case-insensitive-enums: false

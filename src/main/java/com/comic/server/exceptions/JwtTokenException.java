@@ -25,10 +25,12 @@ public class JwtTokenException extends BaseException {
   }
 
   public JwtTokenException(String token, String message) {
-    super(
-        HttpStatus.UNAUTHORIZED,
-        String.format("%s: [%s] token: [%s] ", message, TokenType.BEARER, token));
+    this(TokenType.BEARER, token, message);
+  }
+
+  public JwtTokenException(String message) {
+    super(HttpStatus.UNAUTHORIZED, message);
     this.tokenType = TokenType.BEARER;
-    this.token = token;
+    this.token = "";
   }
 }
