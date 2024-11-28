@@ -8,8 +8,8 @@ caching:
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
-  access-token-expiration: 36000000 # 5 mins
-  refresh-token-expiration: 2592000000 # 30 days
+  access-token-expiration-ms: 300000 # 5 mins
+  refresh-token-expiration-ms: 2592000000 # 30 days
 
 spring:
   security:
