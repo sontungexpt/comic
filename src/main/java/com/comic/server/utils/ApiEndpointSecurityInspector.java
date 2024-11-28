@@ -18,12 +18,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -358,10 +358,24 @@ public class ApiEndpointSecurityInspector {
     return annotation;
   }
 
+  private boolean isPathVariablePattern(@NonNull String path) {
+    boolean uriVar = false;
+    for (int i = 0; i < path.length(); i++) {
+      char c = path.charAt(i);
+      if (c == '{') {
+        uriVar = true;
+      } else if (c == '}' && uriVar) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean matchPath(String path, String requestPath, String methodName) {
     if (path == null || requestPath == null) return false;
-    return antPathMatcher.match(path, requestPath)
-        && !staticEndpointExists(requestPath, methodName);
+    boolean matched = antPathMatcher.match(path, requestPath);
+    if (!isPathVariablePattern(path)) return matched;
+    return matched && !staticEndpointExists(requestPath, methodName);
   }
 
   private boolean matchPath(String path, HttpServletRequest request) {
@@ -386,7 +400,7 @@ public class ApiEndpointSecurityInspector {
   }
 
   private List<String> getProfiles(
-      @org.springframework.lang.NonNull PublicEndpoint annotation, HandlerMethod handlerMethod) {
+      @NonNull PublicEndpoint annotation, HandlerMethod handlerMethod) {
     List<String> profilesList = new ArrayList<>();
     for (String profile : annotation.profiles()) {
       profilesList.add(profile);
