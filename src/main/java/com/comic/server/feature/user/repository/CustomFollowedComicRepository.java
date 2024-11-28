@@ -1,6 +1,8 @@
 package com.comic.server.feature.user.repository;
 
+import com.comic.server.common.model.FacetResult;
 import com.comic.server.feature.comic.dto.ComicDTO;
+import com.comic.server.feature.comic.dto.FacetComicDTOResult;
 import com.comic.server.feature.user.model.FollowedComic;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -23,20 +25,24 @@ public class CustomFollowedComicRepository {
     Aggregation aggregation =
         Aggregation.newAggregation(
             Aggregation.match(Criteria.where("userId").is(new ObjectId(userId))),
-            Aggregation.lookup("comics", "comicId", "_id", "comic"),
-            Aggregation.unwind("comic"),
-            Aggregation.replaceRoot("comic"),
-            Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
-            Aggregation.sort(pageable.getSort()),
-            Aggregation.skip(pageable.getOffset()),
-            Aggregation.limit(pageable.getPageSize() + 1));
+            Aggregation.facet(Aggregation.count().as("totalComics"))
+                .as(FacetResult.getCountFacetName())
+                .and(
+                    Aggregation.lookup("comics", "comicId", "_id", "comic"),
+                    Aggregation.unwind("comic"),
+                    Aggregation.replaceRoot("comic"),
+                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
+                    Aggregation.sort(pageable.getSort()),
+                    Aggregation.skip(pageable.getOffset()),
+                    Aggregation.limit(pageable.getPageSize() + 1))
+                .as(FacetResult.getDataFacetName()));
 
-    var comics =
+    var result =
         mongoTemplate
-            .aggregate(aggregation, FollowedComic.class, ComicDTO.class)
-            .getMappedResults();
+            .aggregate(aggregation, FollowedComic.class, FacetComicDTOResult.class)
+            .getUniqueMappedResult();
 
-    return new PageImpl<>(comics, pageable, comics.size());
+    return new PageImpl<>(result.getDatas(), pageable, result.getCount("totalComics"));
   }
 
   public Page<ComicDTO> searchFollowedComic(String keyword, String userId, Pageable pageable) {
@@ -49,20 +55,24 @@ public class CustomFollowedComicRepository {
     Aggregation aggregation =
         Aggregation.newAggregation(
             Aggregation.match(Criteria.where("userId").is(new ObjectId(userId))),
-            Aggregation.lookup("comics", "comicId", "_id", "comic"),
-            Aggregation.unwind("comic"),
-            Aggregation.replaceRoot("comic"),
-            Aggregation.match(findindKeywordCriteria),
-            Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
-            Aggregation.sort(pageable.getSort()),
-            Aggregation.skip(pageable.getOffset()),
-            Aggregation.limit(pageable.getPageSize() + 1));
+            Aggregation.facet(Aggregation.count().as("totalComics"))
+                .as(FacetResult.getCountFacetName())
+                .and(
+                    Aggregation.lookup("comics", "comicId", "_id", "comic"),
+                    Aggregation.unwind("comic"),
+                    Aggregation.replaceRoot("comic"),
+                    Aggregation.match(findindKeywordCriteria),
+                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
+                    Aggregation.sort(pageable.getSort()),
+                    Aggregation.skip(pageable.getOffset()),
+                    Aggregation.limit(pageable.getPageSize() + 1))
+                .as(FacetResult.getDataFacetName()));
 
-    var comics =
+    var result =
         mongoTemplate
-            .aggregate(aggregation, FollowedComic.class, ComicDTO.class)
-            .getMappedResults();
+            .aggregate(aggregation, FollowedComic.class, FacetComicDTOResult.class)
+            .getUniqueMappedResult();
 
-    return new PageImpl<>(comics, pageable, comics.size());
+    return new PageImpl<>(result.getDatas(), pageable, result.getCount("totalComics"));
   }
 }

@@ -4,11 +4,11 @@ import com.comic.server.common.model.FacetResult;
 import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.ComicDetailDTO;
+import com.comic.server.feature.comic.dto.FacetComicDTOResult;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.service.FollowedComicService;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -164,12 +164,5 @@ public class ComicDetailRepository {
     }
 
     return mongoTemplate.count(query, Comic.class);
-  }
-
-  private class FacetComicDTOResult extends FacetResult<ComicDTO> {
-
-    public FacetComicDTOResult(List<ComicDTO> dataFacet, List<Map<String, Object>> countFacet) {
-      super(dataFacet, countFacet);
-    }
   }
 }
