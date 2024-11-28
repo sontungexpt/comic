@@ -192,4 +192,9 @@ public class User implements UserDetails, Persistable<String> {
   public boolean isNew() {
     return createdAt == null || id == null;
   }
+
+  // @Override
+  // public Map<String, Object> getAttributes() {
+  //   return Map.of("id", id, "pubId", pubId, "username", username, "name", name, "roles", roles);
+  // }
 }

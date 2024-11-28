@@ -11,9 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -45,35 +45,39 @@ public class SecurityConfig {
   private final LogoutSuccessHandler logoutSuccessHandler;
   private final LogoutHandler logoutHandler;
 
+  // @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+  // private String ISSUER_URL;
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
+  // @Bean
+  private DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService);
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
   }
 
-  @Bean
-  public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers)
-      throws Exception {
-    return new ProviderManager(providers);
-  }
-
   // @Bean
-  // public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+  // public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers)
   //     throws Exception {
-  //   return authConfig.getAuthenticationManager();
+  //   return new ProviderManager(providers);
   // }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+      throws Exception {
+    return authConfig.getAuthenticationManager();
+  }
 
   @Bean
   public CorsConfigurationSource corsApiConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:*", "*.ngrok-free.app"));
+    configuration.setAllowedOrigins(
+        List.of("https://github.com*", "http://localhost:*", "*.ngrok-free.app"));
     // configuration.addAllowedOriginPattern("*");
     // configuration.addAllowedHeader("*");
     // configuration.addAllowedMethod("*");
@@ -115,15 +119,15 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
-    apiEndpointSecurityInspector.addPublicEndpoint("/api/v1/auth/**", "/api/actuator/**");
+    apiEndpointSecurityInspector.addPublicEndpoint(
+        "/api/v1/auth/**", "/api/actuator/**", "/login/oauth2/**");
 
     http.cors(cors -> cors.configurationSource(corsApiConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
-        // .csrf(
-        //     customizer -> {
-        //       customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-        //       customizer.ignoringRequestMatchers("/**", "/actuator/**");
-        //     })
+        .csrf(
+            customizer -> {
+              customizer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+              customizer.ignoringRequestMatchers("/**", "/actuator/**");
+            })
 
         // exception handling
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
@@ -144,6 +148,20 @@ public class SecurityConfig {
                       });
               auth.anyRequest().authenticated();
             })
+        .formLogin(formLogin -> formLogin.disable())
+
+        // oauth2 login
+        // .oauth2Login(
+        //     oauth2 -> {
+        //       oauth2
+        //           // .clientRegistrationRepository(clientRegistrationRepository())
+        //           .successHandler(new OAuth2LoginSuccessHandlerImpl())
+        //           .defaultSuccessUrl("/api/v1/auth/oauth2/success")
+        //           // .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+        //           .authorizationEndpoint(
+        //               authorization -> authorization.baseUri("/api/v1/auth/oauth2/login"));
+        //     })
+        // .oauth2ResourceServer(server -> server.jwt(Customizer.withDefaults()))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(lazyJwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(

@@ -28,4 +28,32 @@ public class ConsoleUtils {
             + ": "
             + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object));
   }
+
+  @SneakyThrows
+  public static void prettyPrint(Object... objects) {
+    if (objects == null) {
+      System.out.println("No object to log: null");
+      return;
+    }
+
+    for (Object object : objects) {
+      prettyPrint(object);
+    }
+  }
+
+  public static void print(Object object) {
+    prettyPrint(object);
+  }
+
+  public static void print(Object... objects) {
+    prettyPrint(objects);
+  }
+
+  public static void log(Object object) {
+    prettyPrint(object);
+  }
+
+  public static void log(Object... objects) {
+    prettyPrint(objects);
+  }
 }
