@@ -20,10 +20,10 @@ public class JwtService {
   @Value("${jwt.secret-key}")
   private String JWT_SECRET_KEY;
 
-  @Value("${jwt.access-token-expiration}")
+  @Value("${jwt.access-token-expiration-ms}")
   private long ACCESS_TOKEN_EXPIRATION;
 
-  @Value("${jwt.refresh-token-expiration}")
+  @Value("${jwt.refresh-token-expiration-ms}")
   private long REFRESH_TOKEN_EXPIRATION;
 
   private final RefreshTokenRepository refreshTokenRepository;
