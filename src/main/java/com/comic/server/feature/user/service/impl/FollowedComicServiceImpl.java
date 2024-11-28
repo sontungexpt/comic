@@ -1,6 +1,7 @@
 package com.comic.server.feature.user.service.impl;
 
 import com.comic.server.exceptions.ResourceAlreadyInUseException;
+import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.user.model.FollowedComic;
 import com.comic.server.feature.user.repository.CustomFollowedComicRepository;
@@ -35,7 +36,13 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   @Override
   @CacheEvict(value = "comic", allEntries = true)
   public void unfollowComic(String userId, String comicId) {
-    followedComicRepository.deleteByUserIdAndComicId(userId, comicId);
+    int count =
+        followedComicRepository.deleteByUserIdAndComicId(
+            new ObjectId(userId), new ObjectId(comicId));
+    if (count == 0) {
+      throw new ResourceNotFoundException(
+          FollowedComic.class, Map.of("userId", userId, "comicId", comicId));
+    }
   }
 
   @Override

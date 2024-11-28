@@ -8,13 +8,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FollowedComicRepository extends MongoRepository<FollowedComic, String> {
-  List<FollowedComic> findByUserId(String userId);
+  List<FollowedComic> findByUserId(ObjectId userId);
 
-  List<FollowedComic> findByComicId(String comicId);
+  List<FollowedComic> findByComicId(ObjectId comicId);
 
-  FollowedComic findByUserIdAndComicId(String userId, String comicId);
+  FollowedComic findByUserIdAndComicId(ObjectId userId, ObjectId comicId);
 
-  void deleteByUserIdAndComicId(String userId, String comicId);
+  int deleteByUserIdAndComicId(ObjectId userId, ObjectId comicId);
 
   boolean existsByUserIdAndComicId(ObjectId userId, ObjectId comicId);
 }
