@@ -34,7 +34,7 @@ public class CustomFollowedComicRepository {
                     Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
                     Aggregation.sort(pageable.getSort()),
                     Aggregation.skip(pageable.getOffset()),
-                    Aggregation.limit(pageable.getPageSize() + 1))
+                    Aggregation.limit(pageable.getPageSize()))
                 .as(FacetResult.getDataFacetName()));
 
     var result =
@@ -65,7 +65,7 @@ public class CustomFollowedComicRepository {
                     Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
                     Aggregation.sort(pageable.getSort()),
                     Aggregation.skip(pageable.getOffset()),
-                    Aggregation.limit(pageable.getPageSize() + 1))
+                    Aggregation.limit(pageable.getPageSize()))
                 .as(FacetResult.getDataFacetName()));
 
     var result =
