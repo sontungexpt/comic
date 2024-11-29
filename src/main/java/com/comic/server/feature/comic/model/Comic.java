@@ -240,11 +240,13 @@ public class Comic implements Sluggable<String>, Serializable {
   public boolean addNewChapter(@NonNull Chapter chapter, boolean updateIfExists) {
     if (this.newChapters == null) {
       this.newChapters = List.of(new ShortInfoChapter(chapter));
+      newChapterUpdatedAt = Instant.now();
       return true;
     }
     var newChapters = buildChapterPriorityQueue(updateIfExists);
     if (newChapters.add(chapter)) {
       this.newChapters = buildShortInfoChapters(newChapters);
+      newChapterUpdatedAt = Instant.now();
       return true;
     }
     return false;
@@ -259,11 +261,13 @@ public class Comic implements Sluggable<String>, Serializable {
     if (chapters == null || chapters.isEmpty()) return false;
     else if (this.newChapters == null) {
       this.newChapters = new ArrayList<>(buildShortInfoChapters(chapters));
+      newChapterUpdatedAt = Instant.now();
       return true;
     }
     var newChapters = buildChapterPriorityQueue(updateIfExists);
     if (newChapters.addAll(chapters)) {
       this.newChapters = buildShortInfoChapters(newChapters);
+      newChapterUpdatedAt = Instant.now();
       return true;
     }
     return false;
@@ -286,6 +290,10 @@ public class Comic implements Sluggable<String>, Serializable {
   @Schema(description = "The last time new chapters were checked", hidden = true)
   @Default
   private Instant lastNewChaptersCheckedAt = Instant.now();
+
+  @Default
+  @Schema(description = "The last time a new chapter was updated", hidden = true)
+  private Instant newChapterUpdatedAt = Instant.now();
 
   @Schema(
       description = "The characters in the comic",

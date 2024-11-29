@@ -8,6 +8,7 @@ import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
+import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -106,6 +107,7 @@ public class OtruyenComicAdapter {
         .alternativeNames(comic.getOriginName())
         .summary(comic.getContent())
         .thumbnailUrl(comic.getThumbUrl())
+        .newChapterUpdatedAt(Instant.now())
         .thirdPartySource(
             ThirdPartySource.builder()
                 .name(SourceName.OTRUYEN)
@@ -164,6 +166,7 @@ public class OtruyenComicAdapter {
         .alternativeNames(comic.getOriginName())
         .summary(comic.getContent())
         .thumbnailUrl(comic.getThumbUrl())
+        .newChapterUpdatedAt(Instant.now())
         .chapters(
             new PageImpl<>(
                 chapters.stream().skip(pageable.getOffset()).limit(pageable.getPageSize()).toList(),

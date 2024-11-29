@@ -14,6 +14,7 @@ import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -71,6 +72,8 @@ public class ComicDTO implements Serializable {
 
   private List<Character> characters;
 
+  private Instant newChapterUpdatedAt;
+
   public ComicDTO(Comic comic, List<ComicCategory> categories) {
     this.id = comic.getId();
     this.name = comic.getName();
@@ -87,6 +90,7 @@ public class ComicDTO implements Serializable {
     this.tags = comic.getTags();
     this.newChapters = comic.getNewChaptersInfo();
     this.characters = comic.getCharacters();
+    this.newChapterUpdatedAt = comic.getNewChapterUpdatedAt();
   }
 
   @Override

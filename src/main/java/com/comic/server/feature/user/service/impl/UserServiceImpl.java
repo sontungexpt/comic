@@ -1,11 +1,13 @@
 package com.comic.server.feature.user.service.impl;
 
+import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.user.dto.UpdateUserProfileRequest;
 import com.comic.server.feature.user.dto.UserProfile;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.repository.UserRepository;
 import com.comic.server.feature.user.service.UserService;
 import com.comic.server.utils.JsonMergePatchUtils;
+import org.bson.types.ObjectId;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public record UserServiceImpl(
     JsonMergePatchUtils jsonMergePatchUtils,
     UserRepository userRepository,
+    ComicRepository comicRepository,
     PasswordEncoder passwordEncoder)
     implements UserService {
 
@@ -37,7 +40,9 @@ public record UserServiceImpl(
 
   @Override
   public UserProfile getUserProfile(User user) {
-    return UserProfile.from(user);
+    var profile = UserProfile.from(user);
+    profile.setTotalCreatedComics(comicRepository.countByOwnerId(new ObjectId(user.getId())));
+    return profile;
   }
 
   @Override
