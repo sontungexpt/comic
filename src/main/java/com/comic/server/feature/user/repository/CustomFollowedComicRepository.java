@@ -3,12 +3,14 @@ package com.comic.server.feature.user.repository;
 import com.comic.server.common.model.FacetResult;
 import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.FacetComicDTOResult;
+import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.user.model.FollowedComic;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -28,13 +30,14 @@ public class CustomFollowedComicRepository {
             Aggregation.facet(Aggregation.count().as("totalComics"))
                 .as(FacetResult.getCountFacetName())
                 .and(
-                    Aggregation.lookup("comics", "comicId", "_id", "comic"),
-                    Aggregation.unwind("comic"),
-                    Aggregation.replaceRoot("comic"),
-                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
-                    Aggregation.sort(pageable.getSort()),
+                    Aggregation.sort(Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("_id"))),
                     Aggregation.skip(pageable.getOffset()),
-                    Aggregation.limit(pageable.getPageSize()))
+                    Aggregation.limit(pageable.getPageSize()),
+                    Aggregation.lookup(
+                        mongoTemplate.getCollectionName(Comic.class), "comicId", "_id", "comics"),
+                    Aggregation.project().and("comics").arrayElementAt(0).as("comic"),
+                    Aggregation.replaceRoot("comic"),
+                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"))
                 .as(FacetResult.getDataFacetName()));
 
     var result =
@@ -58,14 +61,15 @@ public class CustomFollowedComicRepository {
             Aggregation.facet(Aggregation.count().as("totalComics"))
                 .as(FacetResult.getCountFacetName())
                 .and(
-                    Aggregation.lookup("comics", "comicId", "_id", "comic"),
-                    Aggregation.unwind("comic"),
+                    Aggregation.sort(Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("_id"))),
+                    Aggregation.lookup(
+                        mongoTemplate.getCollectionName(Comic.class), "comicId", "_id", "comics"),
+                    Aggregation.project().and("comics").arrayElementAt(0).as("comic"),
                     Aggregation.replaceRoot("comic"),
                     Aggregation.match(findindKeywordCriteria),
-                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"),
-                    Aggregation.sort(pageable.getSort()),
                     Aggregation.skip(pageable.getOffset()),
-                    Aggregation.limit(pageable.getPageSize()))
+                    Aggregation.limit(pageable.getPageSize()),
+                    Aggregation.lookup("comic_categories", "categoryIds", "_id", "categories"))
                 .as(FacetResult.getDataFacetName()));
 
     var result =

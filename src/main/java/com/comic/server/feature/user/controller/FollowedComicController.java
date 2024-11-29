@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +57,7 @@ public class FollowedComicController {
   @PageableQueryParams
   @PreAuthorize("hasRole('READER')")
   public ResponseEntity<?> getFollowedComics(
-      @PageableDefault(size = 24, page = 0, sort = "dailyViews", direction = Sort.Direction.DESC)
-          @Parameter(hidden = true)
-          Pageable pageable) {
+      @PageableDefault(size = 24, page = 0) @Parameter(hidden = true) Pageable pageable) {
     return ResponseEntity.ok(
         followedComicService.getFollowedComics(PrincipalUtils.getUserId(), pageable));
   }
@@ -69,12 +66,11 @@ public class FollowedComicController {
   @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH_NAME)
   @GetMapping("/searching")
   @PageableQueryParams
+  @Parameter(name = "sort", hidden = true)
   public ResponseEntity<?> searchFollowedComics(
       @RequestParam String q,
       @CurrentUser User user,
-      @PageableDefault(size = 24, page = 0, sort = "dailyViews", direction = Sort.Direction.DESC)
-          @Parameter(hidden = true)
-          Pageable pageable) {
+      @PageableDefault(size = 24, page = 0) Pageable pageable) {
     return ResponseEntity.ok(followedComicService.searchFollowedComics(q, user.getId(), pageable));
   }
 }

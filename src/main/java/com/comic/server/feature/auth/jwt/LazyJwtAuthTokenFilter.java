@@ -43,13 +43,17 @@ public class LazyJwtAuthTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    return apiEndpointSecurityInspector.isUnsecureJwtRequest(request);
+    boolean skip = apiEndpointSecurityInspector.isUnsecureJwtRequest(request);
+    log.info(request.getRequestURI() + " is unsecure jwt: " + skip);
+    return skip;
   }
 
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
+
+    log.info("Processing jwt authentication for '{}'", request.getRequestURI());
 
     boolean isOptional = apiEndpointSecurityInspector.isOptionalJwtSecurityPath(request);
 
