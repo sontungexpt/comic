@@ -22,6 +22,9 @@ public class UserProfile {
   @Schema(description = "The avatar path of the account")
   private String avatar;
 
+  @Schema(description = "The number of comics created by user")
+  private int totalCreatedComics;
+
   @Schema(description = "The status of the account")
   private UserStatus status;
 

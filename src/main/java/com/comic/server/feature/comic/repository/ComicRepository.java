@@ -4,6 +4,7 @@ import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +20,6 @@ public interface ComicRepository extends MongoRepository<Comic, String> {
   List<Comic> findByThirdPartySourceName(SourceName sourceName);
 
   boolean existsByIdAndThirdPartySourceName(String id, SourceName sourceName);
+
+  int countByOwnerId(ObjectId ownerId);
 }

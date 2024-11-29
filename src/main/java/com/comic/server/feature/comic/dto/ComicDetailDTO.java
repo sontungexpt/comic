@@ -14,6 +14,7 @@ import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,8 @@ public class ComicDetailDTO implements Serializable {
   private Double rating;
 
   private ThirdPartySource thirdPartySource;
+
+  private Instant newChapterUpdatedAt;
 
   // @JsonSerialize(using = NullSerializer.class)
   @JsonIgnore
