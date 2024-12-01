@@ -7,11 +7,13 @@ import com.comic.server.feature.user.model.FollowedComic;
 import com.comic.server.feature.user.repository.CustomFollowedComicRepository;
 import com.comic.server.feature.user.repository.FollowedComicRepository;
 import com.comic.server.feature.user.service.FollowedComicService;
+import com.comic.server.utils.ConsoleUtils;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,11 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   private final CustomFollowedComicRepository customFollowedComicRepository;
 
   @Override
-  @CacheEvict(value = "comics", allEntries = true)
+  @Caching(
+      evict = {
+        @CacheEvict(value = "comics", allEntries = true),
+        @CacheEvict(value = "comic", allEntries = true)
+      })
   public void followComic(String userId, String comicId) {
     try {
       followedComicRepository.insert(new FollowedComic(userId, comicId));
@@ -35,7 +41,11 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   }
 
   @Override
-  @CacheEvict(value = "comics", allEntries = true)
+  @Caching(
+      evict = {
+        @CacheEvict(value = "comics", allEntries = true),
+        @CacheEvict(value = "comic", allEntries = true)
+      })
   public void unfollowComic(String userId, String comicId) {
     int count =
         followedComicRepository.deleteByUserIdAndComicId(
@@ -60,6 +70,7 @@ public class FollowedComicServiceImpl implements FollowedComicService {
 
   @Override
   public boolean isUserFollowingComic(String userId, String comicId) {
+    ConsoleUtils.prettyPrint(userId);
     return followedComicRepository.existsByUserIdAndComicId(
         new ObjectId(userId), new ObjectId(comicId));
   }

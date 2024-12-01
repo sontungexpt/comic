@@ -339,7 +339,7 @@ public class ApiEndpointSecurityInspector {
   /**
    * Retrieves the list of public API paths based on the provided HTTP method.
    *
-   * @param httpMethod The HTTP method for which public paths are to be retrieved.
+   * @param httpMethod The HTTP metrhod for which public paths are to be retrieved.
    * @return A list of public API paths for the specified HTTP method.
    */
   public String[] getPublicSecurityPaths(HttpMethod httpMethod) {
