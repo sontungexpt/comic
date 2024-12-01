@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -104,5 +105,5 @@ public class ComicDetailDTO implements Serializable {
 
   private List<Character> characters;
 
-  private boolean isFollowed;
+  @Default private boolean isFollowed = false;
 }

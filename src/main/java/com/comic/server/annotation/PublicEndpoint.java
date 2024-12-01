@@ -29,5 +29,15 @@ public @interface PublicEndpoint {
    */
   String[] profiles() default {};
 
+  /**
+   * If true, the endpoint will process the request by checking the JWT token. If the user is
+   * authenticated (i.e., a valid JWT token is provided), the request will proceed with the context
+   * of the authenticated user (to identify who the user is). If no valid JWT token is provided, the
+   * endpoint will still function as a public endpoint and process the request without any
+   * user-specific context. If false, the endpoint will process the request without checking the JWT
+   * token. This is useful for endpoints that do not require any user-specific context.
+   *
+   * <p>By default, this attribute is set to false .
+   */
   boolean filterJwt() default false;
 }
