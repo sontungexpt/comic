@@ -1,6 +1,5 @@
 package com.comic.server.feature.auth.service.impl;
 
-import com.comic.server.exceptions.JwtTokenException;
 import com.comic.server.exceptions.ResourceAlreadyInUseException;
 import com.comic.server.feature.auth.dto.JwtResponse;
 import com.comic.server.feature.auth.dto.LoginRequest;
@@ -10,6 +9,7 @@ import com.comic.server.feature.auth.jwt.JwtService;
 import com.comic.server.feature.auth.model.RefreshToken;
 import com.comic.server.feature.auth.repository.RefreshTokenRepository;
 import com.comic.server.feature.auth.service.AuthService;
+import com.comic.server.feature.auth.service.RefreshTokenService;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ public record AuthServiceImpl(
     RefreshTokenRepository refreshTokenRepository,
     JwtService jwtService,
     UserService userService,
+    RefreshTokenService refreshTokenService,
     AuthenticationManager authenticationManager)
     implements AuthService {
 
@@ -70,33 +71,9 @@ public record AuthServiceImpl(
   @Transactional
   public JwtResponse refreshToken(String refreshToken) {
     RefreshToken savedRefreshToken =
-        refreshTokenRepository
-            .findByToken(refreshToken)
-            .orElseThrow(
-                () -> {
-                  log.warn("Refresh token {} not found", refreshToken);
-                  return new JwtTokenException(refreshToken, "Refresh token not found");
-                });
-
-    if (savedRefreshToken.isRevoked()) {
-      handleRefreshtokenIntrusion(savedRefreshToken);
-      throw new JwtTokenException(refreshToken, "Refresh token revoked");
-    } else if (savedRefreshToken.isExpired()) {
-      savedRefreshToken.revoke(refreshTokenRepository);
-      throw new JwtTokenException(refreshToken, "Refresh token expired");
-    }
-
-    String userPubId = savedRefreshToken.getUserPubId();
-    String newAccessToken = jwtService.generateAccessToken(userPubId);
-
-    RefreshToken newRefreshToken = savedRefreshToken.refresh(refreshTokenRepository);
-
-    log.info(
-        "Refresh token {} refreshed successfully for user with public id {}",
-        refreshToken,
-        savedRefreshToken.getUserPubId());
-
-    return new JwtResponse(newAccessToken, newRefreshToken.getToken());
+        refreshTokenService.getAndValidateRefreshToken(
+            refreshToken, this::handleRefreshtokenIntrusion);
+    return refreshTokenService.refreshJwtTokens(savedRefreshToken);
   }
 
   public void handleRefreshtokenIntrusion(RefreshToken refreshToken) {
