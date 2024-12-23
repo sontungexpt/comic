@@ -36,8 +36,6 @@ public class ComicDTO implements Serializable {
 
   private List<String> alternativeNames;
 
-  private String summary;
-
   private String thumbnailUrl;
 
   private String slug;
@@ -78,7 +76,6 @@ public class ComicDTO implements Serializable {
     this.id = comic.getId();
     this.name = comic.getName();
     this.alternativeNames = comic.getAlternativeNames();
-    this.summary = comic.getSummary();
     this.thumbnailUrl = comic.getThumbnailUrl();
     this.slug = comic.getSlug();
     this.status = comic.getStatus();

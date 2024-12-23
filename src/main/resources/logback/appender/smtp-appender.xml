@@ -7,6 +7,7 @@
   <property name="BUFFER_SIZE" value="${BUFFER_SIZE:-20}"></property>
   <appender class="ch.qos.logback.classic.net.SMTPAppender" name="HOT_ERROR_EMAIL_APPENDER">
     <smtpHost>${spring.mail.host}</smtpHost>
+    <evaluator class="ch.qos.logback.classic.boolex.OnErrorEvaluator"></evaluator>
     <smtpPort>${spring.mail.port}</smtpPort>
     <username>${spring.mail.username}</username>
     <password>${spring.mail.password}</password>

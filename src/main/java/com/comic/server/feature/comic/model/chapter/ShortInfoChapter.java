@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -61,7 +60,7 @@ public class ShortInfoChapter implements Chapter {
     return SourceHelper.resolveOriginalSource(originalSource, thirdPartySource);
   }
 
-  @Transient private Instant createdAt;
+  @JsonIgnore private Instant createdAt;
 
   private Instant updatedAt;
 

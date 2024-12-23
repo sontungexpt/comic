@@ -76,6 +76,9 @@ public class User implements UserDetails, Persistable<String> {
   @Schema(description = "The avatar path of the account")
   private String avatar;
 
+  @Schema(description = "The introduction of the user")
+  private String introduction;
+
   @Default
   @Schema(description = "The status of the account")
   @JsonPatchIgnore

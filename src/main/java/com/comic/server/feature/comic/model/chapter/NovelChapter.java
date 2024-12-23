@@ -16,11 +16,11 @@ public class NovelChapter extends AbstractChapter {
 
   public NovelChapter() {
     super();
-    setType(ChapterType.COMIC);
+    setType(ChapterType.NOVEL);
   }
 
   public NovelChapter(AbstractChapter chapter) {
     super(chapter);
-    setType(ChapterType.COMIC);
+    setType(ChapterType.NOVEL);
   }
 }

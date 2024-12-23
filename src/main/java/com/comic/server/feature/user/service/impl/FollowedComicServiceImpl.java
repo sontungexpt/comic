@@ -28,7 +28,7 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   @Override
   @Caching(
       evict = {
-        @CacheEvict(value = "comics", allEntries = true),
+        @CacheEvict(value = "followed_comics", allEntries = true),
         @CacheEvict(value = "comic", allEntries = true)
       })
   public void followComic(String userId, String comicId) {
@@ -43,7 +43,7 @@ public class FollowedComicServiceImpl implements FollowedComicService {
   @Override
   @Caching(
       evict = {
-        @CacheEvict(value = "comics", allEntries = true),
+        @CacheEvict(value = "followed_comics", allEntries = true),
         @CacheEvict(value = "comic", allEntries = true)
       })
   public void unfollowComic(String userId, String comicId) {

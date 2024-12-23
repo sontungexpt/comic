@@ -39,9 +39,14 @@ public class CommentServiceImpl implements CommentService {
     Comment comment =
         Comment.builder()
             .comicId(new ObjectId(newCommentRequest.getComicId()))
-            .chapterId(new ObjectId(newCommentRequest.getChapterId()))
             .content(newCommentRequest.getContent())
             .build();
+
+    var chapterId = newCommentRequest.getChapterId();
+
+    if (chapterId != null) {
+      comment.setChapterId(new ObjectId(chapterId));
+    }
 
     if (parent != null) {
       comment.replyTo(parent);

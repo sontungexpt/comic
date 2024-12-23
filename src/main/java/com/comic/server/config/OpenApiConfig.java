@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -19,9 +18,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    servers = {
-      @Server(url = "https://comic-production.up.railway.app"),
-    },
+    // servers = {
+    //   @Server(url = "https://comic-production.up.railway.app"),
+    // },
+    // servers = {
+    //   @Server(url = "https://80c3-14-169-94-210.ngrok-free.app"),
+    // },
     info =
         @Info(
             title = "Comic API",

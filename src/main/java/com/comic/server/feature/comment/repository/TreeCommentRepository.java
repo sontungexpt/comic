@@ -256,12 +256,21 @@ public class TreeCommentRepository {
    * @return criteria
    */
   private Criteria buildFilterCommentCriteria(String comicId, String chapterId, String parentId) {
-    return Criteria.where("comicId")
-        .is(new ObjectId(comicId))
-        .and("parentId")
-        .is(chapterId == null ? null : new ObjectId(chapterId))
-        .and("parentId")
-        .is(parentId == null ? null : new ObjectId(parentId));
+    var criteria = Criteria.where("comicId").is(new ObjectId(comicId));
+
+    if (parentId == null) {
+      criteria.and("parentId").exists(false);
+    } else {
+      criteria.and("parentId").is(new ObjectId(parentId));
+    }
+
+    if (chapterId == null) {
+      criteria.and("chapterId").exists(false);
+    } else {
+      criteria.and("chapterId").is(new ObjectId(chapterId));
+    }
+
+    return criteria;
   }
 
   class CommentFacetResult extends FacetResult<CommentResponse> {

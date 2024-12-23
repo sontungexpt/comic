@@ -56,7 +56,7 @@ public class OtruyenComicChapterAdapter {
         .name(chapter.getChapterTitle())
         .num(Double.parseDouble(chapter.getChapterName()))
         .description("")
-        .sourceInfo(new RelativeSourceInfo(imageBaseUrl) {})
+        .resourceInfo(new RelativeSourceInfo(imageBaseUrl) {})
         .imagePages(imagePages)
         .build();
   }

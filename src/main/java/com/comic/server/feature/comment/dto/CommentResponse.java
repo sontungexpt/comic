@@ -2,7 +2,6 @@ package com.comic.server.feature.comment.dto;
 
 import com.comic.server.feature.comment.model.Comment;
 import com.comic.server.feature.user.model.User;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentResponse {
 
   private String id;
@@ -44,7 +42,7 @@ public class CommentResponse {
         .content(comment.getContent())
         .author(CommentAuthor.from(user))
         .comicId(comment.getComicId().toHexString())
-        .chapterId(comment.getChapterId().toHexString())
+        .chapterId(comment.getChapterId() == null ? null : comment.getChapterId().toHexString())
         .updatedAt(comment.getUpdatedAt())
         .totalReplies(comment.getTotalReplies())
         .replies(List.of())

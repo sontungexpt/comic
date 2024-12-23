@@ -105,7 +105,6 @@ public class OtruyenComicAdapter {
                 .toList())
         .status(OtruyenComicStatusAdapter.convertToStatus(comic.getStatus()))
         .alternativeNames(comic.getOriginName())
-        .summary(comic.getContent())
         .thumbnailUrl(comic.getThumbUrl())
         .newChapterUpdatedAt(Instant.now())
         .thirdPartySource(

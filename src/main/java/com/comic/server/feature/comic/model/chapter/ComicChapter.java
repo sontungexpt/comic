@@ -66,7 +66,7 @@ public class ComicChapter extends AbstractChapter {
               + " will be the full URL of the image, otherwise, it will be the relative path to the"
               + " base URL example: baseUrl + /images/chapter-1.jpg(relative path)")
   @NotNull
-  private ResourceInfo sourceInfo;
+  private ResourceInfo resourceInfo;
 
   @Data
   @AllArgsConstructor

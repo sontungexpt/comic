@@ -76,11 +76,11 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsApiConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(
-        List.of(
-            "http://localhost:*", "*.ngrok-free.app", "https://comic-production.up.railway.app"));
+    configuration.addAllowedOriginPattern("https://*.ngrok-free.app");
+    configuration.addAllowedOriginPattern("http://localhost:*");
+    configuration.addAllowedOriginPattern("https://comic-production.up.railway.app");
+
     // configuration.addAllowedOriginPattern("*");
-    // configuration.addAllowedHeader("*");
     // configuration.addAllowedMethod("*");
     configuration.setAllowCredentials(true);
     configuration.setMaxAge(3600L);
@@ -99,6 +99,7 @@ public class SecurityConfig {
             "X-Requested-With",
             "Access-Control-Allow-Origin",
             "Access-Control-Allow-Headers",
+            "ngrok-skip-browser-warning",
             "Origin")); // <-- headers allowed in CORS policy
     configuration.setExposedHeaders(
         List.of(

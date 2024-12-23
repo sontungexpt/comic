@@ -89,10 +89,10 @@ public class LoggingHttpRequestService {
           .append("[STATUS]: ")
           .append(response.getStatus())
           .append("\n")
-          .append("[BODY RESPONSE]: ")
           .append("[TIME]: ")
           .append(Instant.now())
-          .append("\n");
+          .append("\n")
+          .append("[BODY RESPONSE]: ");
 
       if (body != null) {
         data.append("\n\n")
@@ -105,7 +105,7 @@ public class LoggingHttpRequestService {
 
       log.info(data.toString());
     } catch (Exception e) {
-      log.error("Error while logging response", e);
+      e.printStackTrace();
     }
   }
 }
