@@ -70,7 +70,16 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+
+      # if you use redis on cloud, you can set password and make sure that
+      # uncomment the following lines
+      # password: ${REDIS_PASSWORD}
+      #
+      # and the following lines in the file /src/main/java/com/comic/server/config/RedisConfig.java
+      #  @Value("${spring.data.redis.password}")
+      #  private String PASSWORD;
+      # and
+      #  config.useSingleServer().setAddress(address).setPassword(PASSWORD);
 
   cache:
     type: caffeine

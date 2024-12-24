@@ -115,6 +115,8 @@ public abstract class AbstractChapter implements Chapter {
       example = "https://example.com/thumbnail.jpg")
   private String thumbnailUrl;
 
+  private boolean isRead = false;
+
   @NotNull
   @Min(0)
   @Schema(

@@ -3,6 +3,9 @@ package com.comic.server.feature.history.model;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +22,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @CompoundIndex(name = "user_comic", def = "{'userId': 1, 'comicId': 1}", unique = true)
+@AllArgsConstructor
+@Builder
 public class ReadHistory {
 
   @Id private String id;
@@ -30,6 +35,7 @@ public class ReadHistory {
   @NonNull private ReadChapter lastestReadChapter;
 
   @Setter(lombok.AccessLevel.NONE)
+  @Default
   private List<ReadChapter> readChapters = new ArrayList<>();
 
   public void addChapterReadHistory(ReadChapter chapterRead) {

@@ -37,8 +37,10 @@ public class ChapterServiceImpl implements ChapterService {
   public AbstractChapter getChapterDetailById(String comicId, String chapterId, User user) {
     Comic comic = comicService.getComicById(comicId);
     var chapterDetail = fetchChapterDetail(comic, chapterId);
+
     if (user != null) {
       readHistoryService.addReadHistory(user.getId(), comicId, chapterId);
+      chapterDetail.setRead(true);
     }
     return chapterDetail;
   }

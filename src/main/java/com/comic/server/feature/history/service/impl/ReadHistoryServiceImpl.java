@@ -24,13 +24,13 @@ public class ReadHistoryServiceImpl implements ReadHistoryService {
 
   @Override
   public ReadHistory addReadHistory(String userId, String comicId, String chapterId) {
+    ObjectId userIdObj = new ObjectId(userId);
+    ObjectId comicIdObj = new ObjectId(comicId);
+
     ReadHistory readHistory =
         readHistoryRepository
-            .findByUserIdAndComicId(new ObjectId(userId), new ObjectId(comicId))
-            .orElseGet(() -> new ReadHistory());
-
-    readHistory.setUserId(new ObjectId(userId));
-    readHistory.setComicId(new ObjectId(comicId));
+            .findByUserIdAndComicId(userIdObj, comicIdObj)
+            .orElseGet(() -> ReadHistory.builder().userId(userIdObj).comicId(comicIdObj).build());
 
     ReadChapter chapterRead = new ReadChapter(new ObjectId(chapterId), Instant.now());
     readHistory.addChapterReadHistory(chapterRead);

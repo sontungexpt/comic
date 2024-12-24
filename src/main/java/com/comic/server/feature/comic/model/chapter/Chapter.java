@@ -30,6 +30,10 @@ public interface Chapter extends Serializable {
 
   Double getNum();
 
+  default boolean isRead() {
+    return false;
+  }
+
   @JsonGetter("chapter")
   default String getChapter() {
     return "Chapter " + getNum();
