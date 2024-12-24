@@ -57,13 +57,13 @@ public class ComicServiceImpl implements ComicService {
   }
 
   @Override
-  @Cacheable(
-      value = "comic",
-      key =
-          "'comic_user:' + #comicId + #user?.id"
-              + "+ 'page:' + #pageable.pageNumber"
-              + "+ 'size:' + #pageable.pageSize"
-              + "+ 'sort:' + #pageable.sort")
+  // @Cacheable(
+  //     value = "comic",
+  //     key =
+  //         "'comic_user:' + #comicId + #user?.id"
+  //             + "+ 'page:' + #pageable.pageNumber"
+  //             + "+ 'size:' + #pageable.pageSize"
+  //             + "+ 'sort:' + #pageable.sort")
   public ComicDetailDTO getComicDetail(
       String comicId, SourceName sourceName, Pageable pageable, User user) {
     if (sourceName == SourceName.ROOT) {

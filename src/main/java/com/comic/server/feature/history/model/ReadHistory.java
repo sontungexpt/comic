@@ -10,12 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Document(collection = "read_histories")
 @NoArgsConstructor
@@ -32,7 +33,7 @@ public class ReadHistory {
 
   @NonNull private ObjectId comicId;
 
-  @NonNull private ReadChapter lastestReadChapter;
+  @Nullable private ReadChapter lastestReadChapter;
 
   @Setter(lombok.AccessLevel.NONE)
   @Default
