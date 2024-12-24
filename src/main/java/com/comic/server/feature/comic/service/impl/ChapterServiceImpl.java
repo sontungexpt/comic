@@ -4,11 +4,13 @@ import com.comic.server.exceptions.ResourceAlreadyInUseException;
 import com.comic.server.exceptions.ResourceNotFoundException;
 import com.comic.server.feature.comic.model.Comic;
 import com.comic.server.feature.comic.model.chapter.AbstractChapter;
+import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
 import com.comic.server.feature.comic.repository.ChapterRepository;
 import com.comic.server.feature.comic.service.ChapterChainService;
 import com.comic.server.feature.comic.service.ChapterService;
 import com.comic.server.feature.comic.service.ComicService;
+import com.comic.server.feature.history.service.ReadHistoryService;
 import com.comic.server.feature.user.model.User;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +27,26 @@ public class ChapterServiceImpl implements ChapterService {
   private final ChapterRepository chapterRepository;
   private final OtruyenChapterServiceImpl otruyenChapterService;
   private final ComicService comicService;
+  private final ReadHistoryService readHistoryService;
 
   @Override
   @Transactional
   @Cacheable(
       value = "comic_chapter",
       key = "'chapterId:' + #chapterId" + " + '-comicId:' + #comicId")
-  public AbstractChapter getChapterDetailById(String comicId, String chapterId) {
+  public AbstractChapter getChapterDetailById(String comicId, String chapterId, User user) {
     Comic comic = comicService.getComicById(comicId);
-    return fetchChapterDetail(comic, chapterId);
+    var chapterDetail = fetchChapterDetail(comic, chapterId);
+    if (user != null) {
+      readHistoryService.addReadHistory(user.getId(), comicId, chapterId);
+    }
+    return chapterDetail;
+  }
+
+  @Override
+  public AbstractChapter getFistChapterDetail(String comicId, User user) {
+    ShortInfoChapter chapter = comicService.getFirstChapterByComicId(comicId);
+    return getChapterDetailById(comicId, chapter.getId(), user);
   }
 
   @Override
@@ -71,5 +84,19 @@ public class ChapterServiceImpl implements ChapterService {
   @Override
   public boolean canHandle(SourceName sourceName) {
     return sourceName == SourceName.ROOT;
+  }
+
+  @Override
+  public AbstractChapter getLastestReadChapterDetail(String comicId, User user) {
+    if (user == null) {
+      return getFistChapterDetail(comicId, null);
+    }
+
+    return readHistoryService
+        .getLatestReadChapter(user.getId(), comicId)
+        .map(
+            chapterRead ->
+                getChapterDetailById(comicId, chapterRead.getChapterId().toHexString(), user))
+        .orElseGet(() -> getFistChapterDetail(comicId, user));
   }
 }

@@ -22,8 +22,11 @@ public class UserProfile {
   @Schema(description = "The avatar path of the account")
   private String avatar;
 
+  @Schema(description = "The email of the account")
+  private String email;
+
   @Schema(description = "The introduction of the account")
-  private String introduction;
+  private String bio;
 
   @Schema(description = "The number of comics created by user")
   private int totalCreatedComics;
@@ -42,7 +45,7 @@ public class UserProfile {
         .avatar(user.getAvatar())
         .status(user.getStatus())
         .roles(user.getRoles())
-        .introduction(user.getIntroduction())
+        .bio(user.getBio())
         .isEnabled(user.isEnabled())
         .build();
   }

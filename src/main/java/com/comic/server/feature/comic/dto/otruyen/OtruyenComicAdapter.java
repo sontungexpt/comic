@@ -8,8 +8,10 @@ import com.comic.server.feature.comic.model.ComicCategory;
 import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
 import com.comic.server.feature.comic.model.thirdparty.SourceName;
+import com.comic.server.feature.history.model.ReadChapter;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -118,7 +120,11 @@ public class OtruyenComicAdapter {
   }
 
   public ComicDetailDTO convertToComicDetailDTO(
-      OtruyenComic comic, String realComicId, Pageable pageable) {
+      OtruyenComic comic, String realComicId, List<ReadChapter> readChapters, Pageable pageable) {
+
+    var map =
+        readChapters.stream()
+            .collect(Collectors.toMap(r -> r.getChapterId().toHexString(), r -> r));
 
     var serverData = comic.getServerDatas();
     List<ShortInfoChapter> chapters =
@@ -126,9 +132,15 @@ public class OtruyenComicAdapter {
             ? List.of()
             : serverData.get(0).getChapters().stream()
                 .map(
-                    chapter ->
-                        OtruyenComicChapterAdapter.convertToShortInfoChapter(
-                            chapter, new ObjectId(realComicId)))
+                    chapter -> {
+                      var shortInfoChapter =
+                          OtruyenComicChapterAdapter.convertToShortInfoChapter(
+                              chapter, new ObjectId(realComicId));
+                      if (map.containsKey(shortInfoChapter.getId())) {
+                        shortInfoChapter.setRead(true);
+                      }
+                      return shortInfoChapter;
+                    })
                 .toList();
 
     long totalElements = chapters.size();

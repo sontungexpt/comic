@@ -73,11 +73,13 @@ public class User implements UserDetails, Persistable<String> {
   @Schema(description = "The name of the account", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
+  private String email;
+
   @Schema(description = "The avatar path of the account")
   private String avatar;
 
   @Schema(description = "The introduction of the user")
-  private String introduction;
+  private String bio;
 
   @Default
   @Schema(description = "The status of the account")

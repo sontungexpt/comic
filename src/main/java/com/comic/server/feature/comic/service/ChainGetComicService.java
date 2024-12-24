@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-/** ChainComicServiceApi */
 public interface ChainGetComicService {
 
   ChainGetComicService getNextService();
@@ -24,4 +23,6 @@ public interface ChainGetComicService {
   Page<ComicDTO> searchComic(String keyword, Pageable pageable);
 
   List<ShortInfoChapter> getChaptersByComicId(String comicId);
+
+  ShortInfoChapter getFirstChapterByComicId(String comicId);
 }

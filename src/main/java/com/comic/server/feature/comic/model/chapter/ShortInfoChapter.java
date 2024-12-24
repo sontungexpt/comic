@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -63,6 +64,8 @@ public class ShortInfoChapter implements Chapter {
   @JsonIgnore private Instant createdAt;
 
   private Instant updatedAt;
+
+  @Default private boolean isRead = false;
 
   @JsonGetter("updatedDate")
   public Instant getUpdatedAt() {

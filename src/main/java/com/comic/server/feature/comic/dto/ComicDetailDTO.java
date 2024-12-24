@@ -10,12 +10,14 @@ import com.comic.server.feature.comic.model.OriginalSource;
 import com.comic.server.feature.comic.model.ThirdPartySource;
 import com.comic.server.feature.comic.model.Translator;
 import com.comic.server.feature.comic.model.chapter.ShortInfoChapter;
+import com.comic.server.feature.history.model.ReadChapter;
 import com.comic.server.utils.SourceHelper;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -92,6 +94,24 @@ public class ComicDetailDTO implements Serializable {
       return null;
     }
     return chaptersFacets.get(0);
+  }
+
+  public void checkReadChapters(List<ReadChapter> readChapters) {
+    var chaptersFacet = getChaptersFacet();
+    var map =
+        readChapters.stream()
+            .collect(Collectors.toMap(r -> r.getChapterId().toHexString(), r -> r));
+
+    if (chaptersFacet != null) {
+      chaptersFacet
+          .getDatas()
+          .forEach(
+              chapter -> {
+                if (map.containsKey(chapter.getId())) {
+                  chapter.setRead(true);
+                }
+              });
+    }
   }
 
   public void pageChapters(Pageable pageable) {

@@ -59,6 +59,14 @@ public record UserServiceImpl(
     if (request.getName() != null) {
       user.setName(request.getName());
     }
+    if (request.getEmail() != null) {
+      user.setEmail(request.getEmail());
+    }
+
+    if (request.getBio() != null) {
+      user.setBio(request.getBio());
+    }
+
     return UserProfile.from(userRepository.save(user));
   }
 

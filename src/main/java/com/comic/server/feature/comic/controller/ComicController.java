@@ -100,11 +100,12 @@ public class ComicController {
 
   @GetMapping("/{comicId}/chapters/{chapterId}")
   @Operation(summary = "Get chapter by id", description = "Get chapter by id")
-  @PublicEndpoint
+  @PublicEndpoint(filterJwt = true)
   public AbstractChapter getChapterDetailById(
       @ObjectId @PathVariable("comicId") String comicId,
-      @PathVariable("chapterId") String chapterId) {
-    return chapterService.getChapterDetailById(comicId, chapterId);
+      @PathVariable("chapterId") String chapterId,
+      @CurrentUser User user) {
+    return chapterService.getChapterDetailById(comicId, chapterId, user);
   }
 
   @PostMapping("/{comicId}/chapters")
@@ -118,5 +119,21 @@ public class ComicController {
       @RequestBody @Valid AbstractChapter chapter) {
     chapter.setComicId(comicId);
     return chapterService.createChapter(chapter, user);
+  }
+
+  @GetMapping("/{comicId}/chapters/first")
+  @Operation(summary = "Get first chapter", description = "Get first chapter of comic by comicId")
+  @PublicEndpoint(filterJwt = true)
+  public AbstractChapter getFirstChapterDetail(
+      @ObjectId @PathVariable("comicId") String comicId, @CurrentUser User user) {
+    return chapterService.getFistChapterDetail(comicId, user);
+  }
+
+  @GetMapping("/{comicId}/chapters/lastest-read")
+  @Operation(summary = "Get last chapter", description = "Get last chapter of comic by comicId")
+  @PublicEndpoint(filterJwt = true)
+  public AbstractChapter getLastestReadChapterDetail(
+      @ObjectId @PathVariable("comicId") String comicId, @CurrentUser User user) {
+    return chapterService.getLastestReadChapterDetail(comicId, user);
   }
 }

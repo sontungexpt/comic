@@ -6,6 +6,7 @@ import com.comic.server.feature.comic.dto.ComicDTO;
 import com.comic.server.feature.comic.dto.ComicDetailDTO;
 import com.comic.server.feature.comic.dto.FacetComicDTOResult;
 import com.comic.server.feature.comic.model.Comic;
+import com.comic.server.feature.history.service.ReadHistoryService;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.service.FollowedComicService;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ComicDetailRepository {
   private final MongoTemplate mongoTemplate;
 
   private final FollowedComicService followedComicService;
+  private final ReadHistoryService readHistoryService;
 
   private Aggregation buildAggregation(Criteria criteria, Pageable pageable) {
     return Aggregation.newAggregation(
@@ -135,12 +137,13 @@ public class ComicDetailRepository {
       throw new ResourceNotFoundException(Comic.class, "id", comicId);
     }
 
-    comic.pageChapters(pageable);
-
     if (user != null) {
       comic.setFollowed(followedComicService.isUserFollowingComic(user.getId(), comicId));
+      var readChaps = readHistoryService.getReadChapters(user.getId(), comicId);
+      comic.checkReadChapters(readChaps);
     }
 
+    comic.pageChapters(pageable);
     return comic;
   }
 

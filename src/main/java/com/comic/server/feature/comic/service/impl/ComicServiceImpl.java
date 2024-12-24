@@ -74,7 +74,6 @@ public class ComicServiceImpl implements ComicService {
   }
 
   @Override
-  @Cacheable(value = "comic_chapters", key = "'comicId:' + #comicId")
   public List<ShortInfoChapter> getChaptersByComicId(String comicId) {
     if (comicRepository.existsByIdAndThirdPartySourceName(comicId, SourceName.ROOT)) {
       log.info("Fetching chapters from ROOT source");
@@ -165,5 +164,18 @@ public class ComicServiceImpl implements ComicService {
     return comicRepository
         .findById(comicId)
         .orElseThrow(() -> new ResourceNotFoundException(Comic.class, "id", comicId));
+  }
+
+  @Override
+  public ShortInfoChapter getFirstChapterByComicId(String comicId) {
+
+    if (comicRepository.existsByIdAndThirdPartySourceName(comicId, SourceName.ROOT)) {
+      return chapterRepository
+          .findFirstByComicIdOrderByNumAsc(new ObjectId(comicId))
+          .orElseThrow(
+              () -> new ResourceNotFoundException(ShortInfoChapter.class, "comicId", comicId));
+    }
+
+    return getNextService().getFirstChapterByComicId(comicId);
   }
 }

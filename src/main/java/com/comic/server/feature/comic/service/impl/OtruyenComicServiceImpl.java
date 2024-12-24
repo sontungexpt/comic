@@ -17,6 +17,7 @@ import com.comic.server.feature.comic.repository.ComicCategoryRepository;
 import com.comic.server.feature.comic.repository.ComicRepository;
 import com.comic.server.feature.comic.repository.ThirdPartyMetadataRepository;
 import com.comic.server.feature.comic.service.ChainGetComicService;
+import com.comic.server.feature.history.service.ReadHistoryService;
 import com.comic.server.feature.user.model.User;
 import com.comic.server.feature.user.service.FollowedComicService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,6 +65,7 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   private final OtruyenComicCategoryAdapter otruyenComicCategoryAdapter;
   private final MongoTemplate mongoTemplate;
   private final FollowedComicService followedComicService;
+  private final ReadHistoryService readHistoryService;
 
   private Optional<OtruyenComic> getOtruyenComicBySlug(String slug) {
     var client = HttpClient.newHttpClient();
@@ -116,12 +118,17 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
       String otruyenSlug = comic.getThirdPartySource().getSlug();
 
       log.info("Getting comic detail from " + SourceName.OTRUYEN);
+
+      var readChapters =
+          readHistoryService.getReadChapters(user == null ? null : user.getId(), comicId);
+
       var comicDetail =
           otruyenComicAdapter.convertToComicDetailDTO(
               getOtruyenComicBySlug(otruyenSlug)
                   .orElseThrow(
                       () -> new ResourceNotFoundException(OtruyenComic.class, "slug", otruyenSlug)),
               comicId,
+              readChapters,
               pageable);
 
       if (user != null) {
@@ -510,5 +517,14 @@ public class OtruyenComicServiceImpl implements ChainGetComicService {
   @Override
   public ChainGetComicService getNextService() {
     return null;
+  }
+
+  @Override
+  public ShortInfoChapter getFirstChapterByComicId(String comicId) {
+    return getChaptersByComicId(comicId).stream()
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new ResourceNotFoundException(ShortInfoChapter.class, Map.of("comicId", comicId)));
   }
 }
